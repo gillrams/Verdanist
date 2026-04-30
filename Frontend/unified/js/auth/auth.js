@@ -147,7 +147,10 @@ function setupAuthForm() {
                     alert('Please check your email to confirm your account before logging in.');
                 } else {
                     alert('Account created successfully! Welcome to Persada Farm.');
-                    await redirectBasedOnRole(supabase);
+                    // NEW USER: Always redirect to welcome-guest first (admin approval required)
+                    // Wait 2 seconds for Supabase trigger to create profile with 'guest' role
+                    await new Promise(r => setTimeout(r, 2000));
+                    window.location.href = window.location.origin + '/pages/welcome-guest.html';
                 }
             } else {
                 // Log In mode

@@ -13,22 +13,30 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-client.js"></script>
 <script>
-// Auto-redirect to dashboard if already logged in
-(async function() {
-    // Wait for supabase to be ready
-    const checkSession = async () => {
+// Auto-redirect to dashboard if already logged in - wait for Supabase to process auth
+window.addEventListener('load', function() {
+    // Give Supabase time to initialize and parse URL hash
+    setTimeout(function() {
         if (typeof supabase !== 'undefined' && supabase.auth) {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                // User is logged in, redirect to dashboard
-                window.location.replace('/pages/dashboard.html');
-            }
+            // Use onAuthStateChange to catch the auth event from URL hash
+            supabase.auth.onAuthStateChange((event, session) => {
+                console.log("Auth Event:", event);
+                if (session) {
+                    console.log("Session found! Redirecting to dashboard...");
+                    window.location.replace('/pages/dashboard.html');
+                }
+            });
+            
+            // Also check immediately in case session is already established
+            supabase.auth.getSession().then(({ data: { session } }) => {
+                if (session) {
+                    console.log("Existing session found! Redirecting...");
+                    window.location.replace('/pages/dashboard.html');
+                }
+            });
         }
-    };
-    // Run immediately and also after a short delay to ensure supabase is loaded
-    checkSession();
-    setTimeout(checkSession, 1000);
-})();
+    }, 500); // Wait 500ms for Supabase to initialize
+});
 </script>
 </head>
 <body class="bg-lm-background dark:bg-dm-background text-lm-on-surface dark:text-dm-on-surface font-body antialiased min-h-screen flex flex-col transition-colors duration-300">

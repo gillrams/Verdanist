@@ -200,7 +200,7 @@ async function signInWithGoogle() {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: 'https://verdanist.my.id/pages/dashboard.html',
+                redirectTo: 'https://www.verdanist.my.id/pages/dashboard.html',
                 skipBrowserRedirect: false
             }
         });

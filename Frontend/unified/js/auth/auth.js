@@ -287,6 +287,17 @@ async function handleAuthRedirect() {
             currentUser = session.user;
             console.log('[handleAuthRedirect] User signed in:', currentUser.email);
             
+            // Check if guest is on dashboard - redirect to welcome-guest
+            if (isDashboardPage) {
+                getUserRole(supabase).then(role => {
+                    if (role === 'guest') {
+                        console.log('[handleAuthRedirect] Guest on dashboard - redirecting to welcome-guest');
+                        window.location.href = window.location.origin + '/pages/welcome-guest.html';
+                    }
+                });
+                return;
+            }
+            
             // CRITICAL: Only redirect if on login page, NOT if already on dashboard/welcome
             if (!isLoginPage) {
                 console.log('[handleAuthRedirect] Already on protected page, no redirect needed');
@@ -342,6 +353,15 @@ async function handleAuthRedirect() {
                     window.location.href = window.location.origin + '/pages/welcome-guest.html';
                 }
             } else {
+                // Check if guest is wrongly on dashboard
+                if (isDashboardPage) {
+                    const role = await getUserRole(supabase);
+                    if (role === 'guest') {
+                        console.log('[handleAuthRedirect] Guest on dashboard - redirecting to welcome-guest');
+                        window.location.href = window.location.origin + '/pages/welcome-guest.html';
+                        return;
+                    }
+                }
                 console.log('[handleAuthRedirect] Session found but already on protected page, staying here');
             }
             return;

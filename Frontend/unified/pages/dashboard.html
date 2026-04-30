@@ -13,6 +13,67 @@
 <link rel="stylesheet" href="../assets/css/style.css"/>
 <!-- Theme initialization - runs immediately to prevent flash -->
 <script>(function(){const t=localStorage.getItem('verdanist-theme');if(t==='dark')document.documentElement.classList.add('dark');})();</script>
+<!-- CRITICAL: Dashboard Protection - MUST run before any content shows -->
+<style>
+  #auth-loading { position: fixed; inset: 0; background: #fff; z-index: 99999; display: flex; align-items: center; justify-content: center; }
+  .dark #auth-loading { background: #161311; }
+  #auth-loading .spinner { width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: #4be277; border-radius: 50%; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/auth/supabase-client.js"></script>
+<script>
+// IMMEDIATE protection - runs before body renders
+(function() {
+  // Create loading overlay immediately
+  const loading = document.createElement('div');
+  loading.id = 'auth-loading';
+  loading.innerHTML = '<div class="spinner"></div>';
+  
+  // Block rendering until auth check completes
+  document.write = function() {}; // Prevent premature writes
+  
+  // Wait for DOM to add overlay
+  if (document.body) {
+    document.body.appendChild(loading);
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
+      document.body.appendChild(loading);
+    });
+  }
+  
+  // Check auth after scripts load
+  window.addEventListener('load', async function() {
+    await new Promise(r => setTimeout(r, 500)); // Wait for supabase init
+    
+    if (typeof supabase !== 'undefined') {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.replace('/pages/login.html');
+        return;
+      }
+      
+      // Check role from profiles
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+      
+      if (!profile || (profile.role !== 'admin' && profile.role !== 'farmer')) {
+        console.log('ACCESS DENIED: role=' + (profile?.role || 'none'));
+        window.location.replace('/pages/welcome-guest.html');
+        return;
+      }
+      
+      // Access granted - remove loading
+      const loader = document.getElementById('auth-loading');
+      if (loader) loader.remove();
+      console.log('ACCESS GRANTED: role=' + profile.role);
+    }
+  });
+})();
+</script>
 </head>
 <body class="bg-gray-50 dark:bg-background text-gray-900 dark:text-on-surface font-body h-screen overflow-hidden antialiased selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
 <!-- Welcome Toast (Shows on login) -->
@@ -675,35 +736,7 @@ function hideWelcomeToast() {
 </div>
 
 <!-- Auth System Enabled -->
-<script src="../js/auth/supabase-client.js"></script>
 <script src="../js/auth/auth.js"></script>
-<!-- Dashboard Protection: Redirect guests to welcome-guest -->
-<script>
-// Protect dashboard - only admin/farmer can access
-if (typeof protectDashboard === 'function') {
-    protectDashboard();
-} else {
-    // Fallback: manual role check if protectDashboard not loaded
-    (async function() {
-        await new Promise(r => setTimeout(r, 1000));
-        if (typeof getUserRole === 'function' && typeof getSupabaseAuth === 'function') {
-            const supabase = getSupabaseAuth();
-            if (supabase) {
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session) {
-                    const role = await getUserRole(supabase);
-                    if (role !== 'admin' && role !== 'farmer') {
-                        console.log('Guest detected - redirecting to welcome-guest');
-                        window.location.replace('/pages/welcome-guest.html');
-                    }
-                } else {
-                    window.location.replace('/pages/login.html');
-                }
-            }
-        }
-    })();
-}
-</script>
 <!-- External JavaScript -->
 <script src="../js/utils/app.js"></script>
 <script src="../js/utils/theme-toggle.js"></script>

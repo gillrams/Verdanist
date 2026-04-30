@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Verdanist Farm - Smart Greenhouse Ecosystem</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="js/utils/tailwind-config.js"></script>
+<link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body class="bg-lm-background dark:bg-dm-background text-lm-on-surface dark:text-dm-on-surface font-body antialiased min-h-screen flex flex-col transition-colors duration-300">
+<!-- TopNavBar -->
+<nav id="main-nav" class="fixed top-0 w-full z-50 flex items-center px-6 md:px-8 h-20 bg-white/80 dark:bg-[#161311]/80 backdrop-blur-xl border-b border-gray-200 dark:border-white/10 transition-all duration-500">
+<!-- Logo -->
+<a href="#" class="flex items-center gap-2 group flex-1">
+<span class="material-symbols-outlined text-[#4be277] text-3xl transition-transform group-hover:scale-110 duration-300" style="font-variation-settings: 'FILL' 1;">spa</span>
+<span class="text-[#4be277] font-black tracking-tight text-xl font-headline">Verdanist</span>
+</a>
+
+<!-- Desktop Navigation -->
+<div class="hidden md:flex items-center justify-center gap-8 flex-1">
+<a href="#hero" class="nav-link text-sm font-medium text-gray-700 dark:text-stone-300 hover:text-[#4be277] transition-colors relative group">
+                    Home
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#4be277] transition-all group-hover:w-full"></span>
+</a>
+<a href="#zones" class="nav-link text-sm font-medium text-gray-700 dark:text-stone-300 hover:text-[#4be277] transition-colors relative group">
+                    Zones
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#4be277] transition-all group-hover:w-full"></span>
+</a>
+<a href="#features" class="nav-link text-sm font-medium text-gray-700 dark:text-stone-300 hover:text-[#4be277] transition-colors relative group">
+                    Features
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#4be277] transition-all group-hover:w-full"></span>
+</a>
+<a href="#about" class="nav-link text-sm font-medium text-gray-700 dark:text-stone-300 hover:text-[#4be277] transition-colors relative group">
+                    About
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#4be277] transition-all group-hover:w-full"></span>
+</a>
+</div>
+
+<!-- CTA Button -->
+<div class="flex items-center justify-end gap-4 flex-1">
+<!-- Theme Toggle Button -->
+<button data-theme-toggle class="w-10 h-10 flex items-center justify-center rounded-full bg-lm-surface dark:bg-dm-surface-container border border-lm-outline dark:border-dm-outline-variant text-lm-on-surface dark:text-dm-on-surface hover:bg-lm-surface-container-high dark:hover:bg-dm-surface-container-high transition-all duration-300" title="Toggle Theme">
+<span class="material-symbols-outlined">light_mode</span>
+</button>
+<a href="pages/login.html" class="hidden md:flex px-5 py-2.5 rounded-full bg-primary/10 border border-primary/30 text-primary text-sm font-semibold hover:bg-primary hover:text-white transition-all duration-300">
+                    Login
+                </a>
+<!-- Mobile Menu Button -->
+<button id="mobile-menu-btn" class="md:hidden text-lm-on-surface-variant dark:text-dm-on-surface-variant hover:text-primary transition-colors p-2">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</button>
+</div>
+</nav>
+
+<!-- Mobile Menu Overlay -->
+<div id="mobile-menu" class="fixed inset-0 z-40 bg-white/98 dark:bg-[#161311]/98 backdrop-blur-xl md:hidden opacity-0 pointer-events-none transition-opacity duration-300">
+<div class="flex flex-col items-center justify-center h-full gap-8">
+<a href="#hero" class="mobile-nav-link text-2xl font-medium text-gray-800 dark:text-stone-300 hover:text-[#4be277] transition-colors">Home</a>
+<a href="#zones" class="mobile-nav-link text-2xl font-medium text-gray-800 dark:text-stone-300 hover:text-[#4be277] transition-colors">Zones</a>
+<a href="#features" class="mobile-nav-link text-2xl font-medium text-gray-800 dark:text-stone-300 hover:text-[#4be277] transition-colors">Features</a>
+<a href="#about" class="mobile-nav-link text-2xl font-medium text-gray-800 dark:text-stone-300 hover:text-[#4be277] transition-colors">About</a>
+<a href="pages/login.html" class="mt-4 px-8 py-3 rounded-full bg-[#4be277] text-white font-semibold">Login</a>
+<button id="close-mobile-menu" class="absolute top-6 right-6 text-gray-500 dark:text-stone-400 hover:text-gray-800 dark:hover:text-white transition-colors p-2">
+<span class="material-symbols-outlined text-3xl">close</span>
+</button>
+</div>
+</div>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-20">
+<!-- Hero Section -->
+<section id="hero" class="relative min-h-[921px] flex items-center justify-center px-8 py-20 overflow-hidden">
+<!-- Background Image with Tonal Overlay - Brighter for Light Mode -->
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-gradient-to-b from-white/40 via-white/70 to-white/90 dark:from-surface-dim/80 dark:via-surface/90 dark:to-surface z-10"></div>
+<img alt="Greenhouse Background" class="w-full h-full object-cover opacity-60" data-alt="Lush interior of a modern misty greenhouse filled with rows of vibrant green pakcoy and leafy vegetables, soft diffused light filtering through the roof, atmospheric depth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcV_0RrQGvdJfhnc04jMq3FRGcP8M3GxAoCKPCg9-yviRdUm7pB7Y1YqVS4ozqghg0j66VnU__hckNQS6zBAl-z0s_y1V6KXbqrzjy4mXqh43GzsNPouclsmI6DFZ02zZaFuRse6Epe6XJDgYk-qHlRubdPI_G75nZ0eXORtIDaz1VwyGlMDsnIKzZuTsPcNQvxlHbifIMizb2MwXZHQk9Ji4z6Kj2i0_z6mOGTzwMGDjj1BBx-bwsxxex1ZFz1ZBS6logOWo9eegp"/>
+</div>
+<div class="relative z-10 max-w-5xl mx-auto text-center flex flex-col items-center gap-8 scroll-reveal">
+<div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 dark:bg-surface-container-high/80 backdrop-blur-md border border-gray-200 dark:border-outline-variant/30 text-green-700 dark:text-secondary-fixed text-sm font-medium tracking-wide">
+<span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(75,226,119,0.6)] animate-pulse"></span>
+                    System Online
+                </div>
+<h1 class="font-headline font-extrabold text-5xl md:text-7xl leading-tight tracking-tight text-gray-900 dark:text-white scroll-reveal stagger-1">
+                    Smart Greenhouse <br/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-container">Ecosystem</span> for <br/>
+                    Persada Farm
+                </h1>
+<p class="text-lg md:text-xl text-gray-600 dark:text-stone-400 max-w-2xl leading-relaxed font-body scroll-reveal stagger-2">
+                    Cultivating the future with precision agriculture. Seamlessly monitor and automate your indoor misting and outdoor polybag environments.
+                </p>
+<div class="flex flex-col sm:flex-row gap-4 mt-8 scroll-reveal stagger-3">
+<a href="pages/login.html" class="px-8 py-4 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold text-lg hover:shadow-[0_8px_32px_rgba(75,226,119,0.3)] transition-all active:scale-95 duration-200 flex items-center gap-3">
+                        Enter Dashboard
+                        <span class="material-symbols-outlined">arrow_forward</span>
+</a>
+<a href="pages/demo.html" class="px-8 py-4 rounded-full bg-gray-100 dark:bg-surface-container-high text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-surface-container-highest transition-all active:scale-95 duration-200 font-medium text-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">play_circle</span>
+                        Watch Demo
+                    </a>
+</div>
+</div>
+<!-- Floating Data Card (Hero Detail) -->
+<div class="absolute bottom-12 right-12 hidden lg:flex flex-col gap-4 bg-white/90 dark:bg-surface-container/90 backdrop-blur-xl p-6 rounded-xl border border-gray-200 dark:border-outline-variant/15 shadow-xl scroll-reveal stagger-4">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-tertiary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+</div>
+<div>
+<p class="text-xs text-gray-500 dark:text-on-surface-variant uppercase tracking-wider font-semibold">Current Humidity</p>
+<p class="text-2xl font-headline font-bold text-gray-900 dark:text-white">82<span class="text-tertiary text-lg">%</span></p>
+</div>
+</div>
+<div class="w-full h-1 bg-gray-200 dark:bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary w-[82%] rounded-full"></div>
+</div>
+</div>
+</section>
+<!-- Stats Section -->
+<section id="stats" class="py-16 px-8 !bg-gray-50 dark:!bg-[#161311] border-y border-[#4be277]/10">
+<div class="max-w-6xl mx-auto">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+<!-- Stat 1 -->
+<div class="text-center scroll-reveal">
+<div class="w-12 h-12 mx-auto mb-4 rounded-full bg-[#4be277]/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#4be277] text-2xl">grass</span>
+</div>
+<div class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-1 counter" data-target="12500">0</div>
+<div class="text-sm text-gray-600 dark:text-stone-400">Plants Monitored</div>
+</div>
+<!-- Stat 2 -->
+<div class="text-center scroll-reveal">
+<div class="w-12 h-12 mx-auto mb-4 rounded-full bg-[#4be277]/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#4be277] text-2xl">water_drop</span>
+</div>
+<div class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-1 counter" data-target="45">0</div>
+<div class="text-sm text-gray-600 dark:text-stone-400">% Water Saved</div>
+</div>
+<!-- Stat 3 -->
+<div class="text-center scroll-reveal">
+<div class="w-12 h-12 mx-auto mb-4 rounded-full bg-[#4be277]/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#4be277] text-2xl">trending_up</span>
+</div>
+<div class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-1 counter" data-target="32">0</div>
+<div class="text-sm text-gray-600 dark:text-stone-400">% Yield Increase</div>
+</div>
+<!-- Stat 4 -->
+<div class="text-center scroll-reveal">
+<div class="w-12 h-12 mx-auto mb-4 rounded-full bg-[#4be277]/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#4be277] text-2xl">sensors</span>
+</div>
+<div class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-1 counter" data-target="48">0</div>
+<div class="text-sm text-gray-600 dark:text-stone-400">Active Sensors</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Technology Section (Bento Grid) -->
+<section id="zones" class="py-24 px-8 max-w-7xl mx-auto">
+<div class="text-center mb-16 scroll-reveal">
+<h2 class="font-headline font-bold text-4xl text-gray-900 dark:text-white mb-4">Cultivation Zones</h2>
+<p class="text-gray-600 dark:text-stone-400 max-w-2xl mx-auto">Dual-environment mastery. Tailored sensing and actuation for completely different growth stages.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Indoor Misting Card -->
+<div class="bg-white dark:bg-surface-container-low rounded-[3rem] p-10 flex flex-col justify-between relative overflow-hidden group hover:bg-gray-50 dark:hover:bg-surface-container transition-colors duration-500 shadow-lg dark:shadow-none scroll-reveal-left stagger-1">
+<div class="absolute top-0 right-0 w-64 h-64 bg-tertiary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+<div class="relative z-10 mb-12">
+<div class="w-16 h-16 rounded-2xl bg-tertiary/10 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-tertiary text-3xl" style="font-variation-settings: 'FILL' 1;">foggy</span>
+</div>
+<h3 class="font-headline font-bold text-3xl text-gray-900 dark:text-white mb-4">Indoor Misting</h3>
+<p class="text-gray-600 dark:text-stone-400 leading-relaxed">
+                            High-density seedling propagation. Our ultra-fine misting system maintains precise VPD (Vapor Pressure Deficit) to ensure perfect root development without waterlogging.
+                        </p>
+</div>
+<div class="relative z-10 h-48 rounded-2xl overflow-hidden mt-auto">
+<img alt="Indoor Misting" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Close up of delicate green vegetable seedlings in a dark indoor nursery, illuminated by soft purple and white LED grow lights, fine mist lingering in the air." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiIslHpVeqWE_BYJuFzupZylucZdwofANvHLM9esDIk5TYJ1j3VJteQ7tirzwermHMvM8asO2HtHo5AEiW78R6ofKem82H8c8pL2Pcq2TN4ER8Dh9GzPp0oNS3cizzLeCCNWxLekDnRGQEiGotiMXOWx5Oji3lNX6J7Jzxvp4m19s6WjvF53OBLuHLJEpNf5y3kU_ibZj2f4BSJqMKERaCDda-L9gOGtQJq1qIKa3cv15HbXziG6XVNB5sUqnQa3IjnL2FaTjw4GLb"/>
+</div>
+</div>
+<!-- Outdoor Polybag Card -->
+<div class="bg-white dark:bg-surface-container-low rounded-[3rem] p-10 flex flex-col justify-between relative overflow-hidden group hover:bg-gray-50 dark:hover:bg-surface-container transition-colors duration-500 shadow-lg dark:shadow-none scroll-reveal-right stagger-2">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+<div class="relative z-10 mb-12">
+<div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">potted_plant</span>
+</div>
+<h3 class="font-headline font-bold text-3xl text-gray-900 dark:text-white mb-4">Outdoor Polybag</h3>
+<p class="text-gray-600 dark:text-stone-400 leading-relaxed">
+                            Robust maturation tracking. Soil moisture probes and automated drip lines adjust daily based on hyper-local weather forecasts and direct solar radiation levels.
+                        </p>
+</div>
+<div class="relative z-10 h-48 rounded-2xl overflow-hidden mt-auto">
+<img alt="Outdoor Polybags" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Rows of mature leafy green plants growing in black polybags under an outdoor shade net structure, natural sunlight casting soft shadows, neat and orderly farm layout." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0G5dRPEjtBXlNJg5YMQsoGrgmGsUjPnzdbkCzIoSJRWQoMofIJMIg3ibxI6nYsQv3bgnI3amfA4PClrizM1cya8DUHkMb6aoKicml8mpU_AEpLVb4GxzWtao6YufC8pZRVUM7-q8H-q3zbV2c3zUQnbYbstgBduV_XCm0gTu7bwdE6AQAwSKtkSNsAewFtIsef8D_lWlMyTD3scHzkmmHWehcHbwKsOeUTJkXf89gW-YdfV7D6F1yrsBwgB6S2CnDHnKaH5zlDt_q"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Features Section (Asymmetric) -->
+<section id="features" class="py-24 px-8 bg-gray-100 dark:bg-surface-container-lowest border-y border-gray-200 dark:border-outline-variant/10">
+<div class="max-w-7xl mx-auto">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+<div class="lg:col-span-5 flex flex-col gap-8 scroll-reveal-left">
+<h2 class="font-headline font-bold text-4xl lg:text-5xl text-gray-900 dark:text-white leading-tight">
+                            Intelligence at the Root.
+                        </h2>
+<p class="text-gray-600 dark:text-stone-400 text-lg">
+                            We bring data closer to the soil. Our proprietary edge-computing nodes process environmental variables locally, ensuring actions happen exactly when the plant needs them.
+                        </p>
+</div>
+<div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6 scroll-reveal-right">
+<!-- Feature 1 -->
+<div class="bg-white dark:bg-surface-container rounded-[2rem] p-8 hover:bg-gray-50 dark:hover:bg-surface-container-high transition-colors shadow-md dark:shadow-none scroll-reveal stagger-1">
+<div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-surface-variant flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary">smart_toy</span>
+</div>
+<h4 class="font-headline font-bold text-xl text-gray-900 dark:text-white mb-2">Full Automation</h4>
+<p class="text-gray-600 dark:text-stone-400 text-sm leading-relaxed">
+                                Set your ideal growth parameters once. The system autonomously manages pumps, fans, and valves to maintain the perfect balance.
+                            </p>
+</div>
+<!-- Feature 2 -->
+<div class="bg-white dark:bg-surface-container rounded-[2rem] p-8 hover:bg-gray-50 dark:hover:bg-surface-container-high transition-colors shadow-md dark:shadow-none sm:translate-y-8 scroll-reveal stagger-2">
+<div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-surface-variant flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-secondary">bolt</span>
+</div>
+<h4 class="font-headline font-bold text-xl text-gray-900 dark:text-white mb-2">Zero-Latency</h4>
+<p class="text-gray-600 dark:text-stone-400 text-sm leading-relaxed">
+                                Local network architecture means critical actuations (like emergency misting on hot days) occur instantly, even if the main internet connection drops.
+                            </p>
+</div>
+<!-- Feature 3 -->
+<div class="bg-white dark:bg-surface-container rounded-[2rem] p-8 hover:bg-gray-50 dark:hover:bg-surface-container-high transition-colors shadow-md dark:shadow-none sm:col-span-2 scroll-reveal stagger-3">
+<div class="flex items-start gap-6">
+<div class="w-12 h-12 shrink-0 rounded-full bg-gray-100 dark:bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">hub</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-xl text-gray-900 dark:text-white mb-2">Edge Computing</h4>
+<p class="text-gray-600 dark:text-stone-400 text-sm leading-relaxed max-w-lg">
+                                        Data isn't just collected; it's analyzed on-site. The nodes learn your specific micro-climate patterns to optimize water usage over time, reducing waste and increasing yield.
+                                    </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section id="about" class="py-32 px-8 text-center relative overflow-hidden">
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-gray-100/95 dark:bg-surface-dim/95 z-10 backdrop-blur-sm"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[100px] pointer-events-none"></div>
+</div>
+<div class="relative z-10 max-w-3xl mx-auto flex flex-col items-center gap-8">
+<span class="material-symbols-outlined text-primary text-5xl scroll-reveal" style="font-variation-settings: 'FILL' 1;">eco</span>
+<h2 class="font-headline font-extrabold text-5xl text-gray-900 dark:text-white scroll-reveal stagger-1">Ready to grow smarter?</h2>
+<p class="text-gray-600 dark:text-stone-400 text-lg scroll-reveal stagger-2">
+                    Join the next generation of precision agriculture. Take control of your farm's ecosystem today.
+                </p>
+<a href="pages/login.html" class="mt-4 px-10 py-5 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold text-xl hover:shadow-[0_12px_40px_rgba(75,226,119,0.4)] transition-all active:scale-95 duration-200 flex items-center gap-3 scroll-reveal stagger-3">
+                    Enter Dashboard
+                    <span class="material-symbols-outlined">dashboard</span>
+</a>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="flex flex-col items-center gap-6 w-full bg-white dark:bg-[#161311] py-12 border-t border-gray-200 dark:border-stone-800/15">
+<div class="flex gap-8 mb-4">
+<a class="font-['Manrope'] text-xs uppercase tracking-widest text-gray-500 dark:text-stone-500 hover:text-[#4be277] transition-colors" href="#">Sustainability</a>
+<a class="font-['Manrope'] text-xs uppercase tracking-widest text-gray-500 dark:text-stone-500 hover:text-[#4be277] transition-colors" href="#">API Docs</a>
+<a class="font-['Manrope'] text-xs uppercase tracking-widest text-gray-500 dark:text-stone-500 hover:text-[#4be277] transition-colors" href="#">Privacy</a>
+</div>
+<p class="font-['Manrope'] text-xs uppercase tracking-widest text-[#2E7D32] dark:text-[#96d5a3]">
+            © 2026 Verdanist Conservatory. Cultivated with intelligence.
+        </p>
+</footer>
+<!-- External JavaScript -->
+<script src="js/utils/app.js"></script>
+<script src="js/utils/theme-toggle.js"></script>
+
+<!-- Landing Page Enhancements -->
+<style>
+        /* Scroll Reveal Animations */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .scroll-reveal-left {
+            opacity: 0;
+            transform: translateX(-40px);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .scroll-reveal-left.revealed {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .scroll-reveal-right {
+            opacity: 0;
+            transform: translateX(40px);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .scroll-reveal-right.revealed {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        /* Stagger delays for children */
+        .stagger-1 { transition-delay: 0.1s; }
+        .stagger-2 { transition-delay: 0.2s; }
+        .stagger-3 { transition-delay: 0.3s; }
+        .stagger-4 { transition-delay: 0.4s; }
+        
+        /* Smooth scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Navbar scroll state */
+        #main-nav.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom-color: rgba(75, 226, 119, 0.3);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        .dark #main-nav.scrolled {
+            background: rgba(22, 19, 17, 0.95);
+            border-bottom-color: rgba(75, 226, 119, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Counter animation */
+        .counter {
+            font-variant-numeric: tabular-nums;
+        }
+        
+        /* Mobile menu active state */
+        #mobile-menu.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        /* Reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            .scroll-reveal,
+            .scroll-reveal-left,
+            .scroll-reveal-right {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+            html {
+                scroll-behavior: auto;
+            }
+        }
+    </style>
+
+<script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const closeMobileMenu = document.getElementById('close-mobile-menu');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+        function openMobileMenu() {
+            mobileMenu.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMobileMenuFn() {
+            mobileMenu.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', openMobileMenu);
+        if (closeMobileMenu) closeMobileMenu.addEventListener('click', closeMobileMenuFn);
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', closeMobileMenuFn);
+        });
+
+        // Navbar Scroll Effect
+        const mainNav = document.getElementById('main-nav');
+        let lastScrollY = window.scrollY;
+
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            
+            // Add/remove scrolled class
+            if (currentScrollY > 50) {
+                mainNav.classList.add('scrolled');
+            } else {
+                mainNav.classList.remove('scrolled');
+            }
+            
+            lastScrollY = currentScrollY;
+        }, { passive: true });
+
+        // Scroll Reveal Animation
+        const revealElements = document.querySelectorAll('.scroll-reveal, .scroll-reveal-left, .scroll-reveal-right');
+        
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // Counter Animation
+        const counters = document.querySelectorAll('.counter');
+        
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counter = entry.target;
+                    const target = parseInt(counter.getAttribute('data-target'));
+                    const duration = 2000; // 2 seconds
+                    const startTime = performance.now();
+                    
+                    function updateCounter(currentTime) {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        
+                        // Easing function (ease-out)
+                        const easeOut = 1 - Math.pow(1 - progress, 3);
+                        const current = Math.floor(easeOut * target);
+                        
+                        // Format number with commas
+                        counter.textContent = current.toLocaleString();
+                        
+                        if (progress < 1) {
+                            requestAnimationFrame(updateCounter);
+                        } else {
+                            counter.textContent = target.toLocaleString();
+                        }
+                    }
+                    
+                    requestAnimationFrame(updateCounter);
+                    counterObserver.unobserve(counter);
+                }
+            });
+        }, {
+            threshold: 0.5
+        });
+
+        counters.forEach(counter => counterObserver.observe(counter));
+
+        // Active Nav Link on Scroll
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('text-[#4be277]');
+                link.classList.add('text-gray-700', 'dark:text-stone-300');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.remove('text-gray-700', 'dark:text-stone-300');
+                    link.classList.add('text-[#4be277]');
+                }
+            });
+        }, { passive: true });
+    </script>
+</body></html>

@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin - User Management | Verdanist</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="../js/utils/tailwind-config.js"></script>
+<link rel="stylesheet" href="../assets/css/style.css"/>
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/auth/supabase-client.js"></script>
+<style>
+.user-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+.user-table th {
+    text-align: left;
+    padding: 16px;
+    font-weight: 600;
+    color: #a8a29e;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.user-table td {
+    padding: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: #e9e1dd;
+}
+.user-table tr:hover td {
+    background: rgba(74, 222, 128, 0.05);
+}
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.role-admin {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+.role-farmer {
+    background: rgba(74, 222, 128, 0.2);
+    color: #4ade80;
+}
+.role-guest {
+    background: rgba(168, 162, 158, 0.2);
+    color: #a8a29e;
+}
+.btn-approve {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #4ade80, #22c55e);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-approve:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+}
+.btn-approve:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+.btn-admin-promote {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-admin-promote:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+.btn-demote {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-demote:hover {
+    background: rgba(251, 191, 36, 0.3);
+    transform: translateY(-2px);
+}
+.btn-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px;
+    width: 36px;
+    height: 36px;
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-delete:hover {
+    background: rgba(239, 68, 68, 0.3);
+    transform: translateY(-2px);
+}
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-top-color: #4ade80;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+.btn-refresh {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+}
+.btn-refresh:hover {
+    background: rgba(74, 222, 128, 0.1);
+    border-color: rgba(74, 222, 128, 0.3);
+}
+.btn-refresh.spinning .material-symbols-outlined {
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+.admin-only-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1c1917;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+</style>
+</head>
+<body class="bg-gray-50 dark:bg-background text-gray-900 dark:text-on-surface font-body min-h-screen antialiased selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
+
+<!-- Admin Only Loading Overlay -->
+<div id="admin-check-overlay" class="admin-only-overlay">
+    <div class="loading-spinner" style="width: 50px; height: 50px; border-width: 4px;"></div>
+    <p class="text-on-surface-variant">Verifying admin access...</p>
+</div>
+
+<!-- TopNavBar (Mobile Only) -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 h-20 bg-white/80 dark:bg-surface-container-low/80 backdrop-blur-xl rounded-b-[2rem] shadow-[0_20px_50px_rgba(75,226,119,0.08)] lg:hidden">
+<div class="flex items-center gap-3">
+<div class="flex flex-col">
+<span class="font-headline font-extrabold tracking-tight text-primary text-xl">Persada Farm Bogor</span>
+<span class="font-label text-[10px] text-gray-500 dark:text-on-surface-variant uppercase tracking-widest">Powered by Verdanist</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-surface-container rounded-full border border-gray-200 dark:border-outline-variant/15">
+<div class="w-2 h-2 rounded-full bg-primary pulse-dot"></div>
+<span class="font-label text-xs text-primary font-medium">Live</span>
+</div>
+<button data-theme-toggle class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-surface-container text-gray-700 dark:text-on-surface hover:bg-gray-200 dark:hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">light_mode</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-surface-container text-gray-700 dark:text-on-surface hover:bg-gray-200 dark:hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">sensors</span>
+</button>
+<button onclick="handleLogout()" class="w-10 h-10 flex items-center justify-center rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors" title="Logout">
+<span class="material-symbols-outlined">logout</span>
+</button>
+</div>
+</header>
+
+<div class="flex h-screen overflow-hidden">
+<!-- SideNavBar (Web Only) -->
+<aside class="hidden lg:flex flex-col py-8 bg-white dark:bg-[#1e1b19] h-screen w-72 rounded-r-[3rem] z-40 relative flex-shrink-0 border-r border-gray-200 dark:border-none">
+<div class="px-8 mb-10 flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-gray-100 dark:bg-surface-container-high flex items-center justify-center border border-gray-200 dark:border-outline-variant/15 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shield</span>
+</div>
+<div>
+<h1 class="text-[#4be277] font-bold font-headline text-lg tracking-tight">Verdanist</h1>
+<p class="font-['Manrope'] font-medium text-sm text-gray-500 dark:text-stone-400">Persada Farm</p>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="text-gray-600 dark:text-stone-400 mx-4 px-6 py-4 flex items-center gap-4 hover:bg-gray-100 dark:hover:bg-[#2d2927] hover:text-gray-900 dark:hover:text-white rounded-full transition-all cursor-pointer active:scale-98 font-['Manrope'] font-medium text-sm" href="dashboard.html">
+<span class="material-symbols-outlined text-xl">potted_plant</span>
+<span>Overview</span>
+</a>
+<a class="text-gray-600 dark:text-stone-400 mx-4 px-6 py-4 flex items-center gap-4 hover:bg-gray-100 dark:hover:bg-[#2d2927] hover:text-gray-900 dark:hover:text-white rounded-full transition-all cursor-pointer active:scale-98 font-['Manrope'] font-medium text-sm" href="analytics.html">
+<span class="material-symbols-outlined text-xl">insights</span>
+<span>Analytics</span>
+</a>
+<a class="text-gray-600 dark:text-stone-400 mx-4 px-6 py-4 flex items-center gap-4 hover:bg-gray-100 dark:hover:bg-[#2d2927] hover:text-gray-900 dark:hover:text-white rounded-full transition-all cursor-pointer active:scale-98 font-['Manrope'] font-medium text-sm" href="logs.html">
+<span class="material-symbols-outlined text-xl">receipt_long</span>
+<span>History</span>
+</a>
+<a class="text-gray-600 dark:text-stone-400 mx-4 px-6 py-4 flex items-center gap-4 hover:bg-gray-100 dark:hover:bg-[#2d2927] hover:text-gray-900 dark:hover:text-white rounded-full transition-all cursor-pointer active:scale-98 font-['Manrope'] font-medium text-sm" href="settings.html">
+<span class="material-symbols-outlined text-xl">settings</span>
+<span>Settings</span>
+</a>
+<a class="bg-[#4be277]/10 dark:bg-[#221f1d] text-[#2E7D32] dark:text-[#4be277] rounded-full mx-4 px-6 py-4 flex items-center gap-4 cursor-pointer transition-transform active:scale-98 font-['Manrope'] font-medium text-sm" href="admin-users.html">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
+<span>User Management</span>
+</a>
+</nav>
+<div class="space-y-2 mt-auto pb-4">
+<a onclick="handleLogout()" class="text-stone-400 mx-4 px-6 py-4 flex items-center gap-4 hover:bg-red-500/20 hover:text-red-400 rounded-full transition-all cursor-pointer active:scale-98 font-['Manrope'] font-medium text-sm">
+<span class="material-symbols-outlined text-xl">logout</span>
+<span>Logout</span>
+</a>
+</div>
+</aside>
+
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto pt-24 md:pt-8 px-6 md:px-12 pb-24 relative">
+<div class="max-w-6xl mx-auto">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+<div>
+<h2 class="text-4xl md:text-5xl font-headline font-extrabold text-gray-900 dark:text-on-surface tracking-tight mb-2">User Management</h2>
+<p class="text-gray-500 dark:text-on-surface-variant font-body text-lg">Manage users and approve guests to become farmers.</p>
+</div>
+<div class="flex items-center gap-3">
+<button id="refresh-btn" onclick="loadUsersWithSpin()" class="btn-refresh w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-surface-container hover:bg-gray-100 dark:hover:bg-surface-container-high transition-all text-gray-700 dark:text-on-surface border border-gray-200 dark:border-outline-variant/15" title="Refresh">
+<span class="material-symbols-outlined text-xl">sync</span>
+</button>
+</div>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+<div class="bg-white dark:bg-surface-container rounded-[2rem] p-6 border border-gray-200 dark:border-outline-variant/10 shadow-sm dark:shadow-none">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">people</span>
+</div>
+<span class="text-gray-500 dark:text-on-surface-variant font-medium text-sm">Total Users</span>
+</div>
+<p id="total-users" class="text-3xl font-headline font-bold text-gray-900 dark:text-on-surface">0</p>
+</div>
+<div class="bg-white dark:bg-surface-container rounded-[2rem] p-6 border border-gray-200 dark:border-outline-variant/10 shadow-sm dark:shadow-none">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-green-400">agriculture</span>
+</div>
+<span class="text-gray-500 dark:text-on-surface-variant font-medium text-sm">Farmers</span>
+</div>
+<p id="total-farmers" class="text-3xl font-headline font-bold text-gray-900 dark:text-on-surface">0</p>
+</div>
+<div class="bg-white dark:bg-surface-container rounded-[2rem] p-6 border border-gray-200 dark:border-outline-variant/10 shadow-sm dark:shadow-none">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 rounded-xl bg-gray-500/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-gray-400">person_outline</span>
+</div>
+<span class="text-gray-500 dark:text-on-surface-variant font-medium text-sm">Pending Guests</span>
+</div>
+<p id="total-guests" class="text-3xl font-headline font-bold text-gray-900 dark:text-on-surface">0</p>
+</div>
+</div>
+
+<!-- Users Table -->
+<div class="bg-white dark:bg-surface-container rounded-[2rem] p-6 md:p-8 border border-gray-200 dark:border-outline-variant/10 shadow-sm dark:shadow-none">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-xl font-headline font-bold text-gray-900 dark:text-on-surface">All Users</h3>
+<div id="loading-indicator" class="hidden">
+<div class="loading-spinner"></div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="user-table">
+<thead>
+<tr>
+<th>User</th>
+<th>Email</th>
+<th>Role</th>
+<th>Joined</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="users-table-body">
+<!-- Users will be loaded here -->
+<tr>
+<td colspan="5" class="text-center py-8 text-gray-500 dark:text-on-surface-variant">
+Loading users...
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex lg:hidden justify-around items-center px-4 h-24 pb-safe bg-white/80 dark:bg-surface-container-low/80 backdrop-blur-xl rounded-t-[3rem] shadow-[0_-10px_40px_rgba(0,0,0,0.3)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+<a class="flex flex-col items-center justify-center text-gray-500 dark:text-on-surface-variant hover:text-primary dark:hover:text-secondary transition-transform active:scale-90" href="dashboard.html">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-label text-[10px] uppercase tracking-widest font-bold mt-1">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 dark:text-on-surface-variant hover:text-primary dark:hover:text-secondary transition-transform active:scale-90" href="analytics.html">
+<span class="material-symbols-outlined">show_chart</span>
+<span class="font-label text-[10px] uppercase tracking-widest font-bold mt-1">Charts</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 dark:text-on-surface-variant hover:text-primary dark:hover:text-secondary transition-transform active:scale-90" href="logs.html">
+<span class="material-symbols-outlined">list_alt</span>
+<span class="font-label text-[10px] uppercase tracking-widest font-bold mt-1">Logs</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 dark:text-on-surface-variant hover:text-primary dark:hover:text-secondary transition-transform active:scale-90" href="settings.html">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label text-[10px] uppercase tracking-widest font-bold mt-1">Settings</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary/20 text-primary rounded-full px-6 py-2 transition-transform active:scale-90" href="admin-users.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
+<span class="font-label text-[10px] uppercase tracking-widest font-bold mt-1">Admin</span>
+</a>
+</nav>
+
+<!-- Supabase Client -->
+<script src="../js/auth/supabase-client.js"></script>
+<script src="../js/auth/auth.js"></script>
+
+<!-- Admin User Management Script -->
+<script>
+// Check admin access and load users
+(async function() {
+    const MAX_WAIT = 3000;
+    const INTERVAL = 500;
+    const start = Date.now();
+    
+    const checkAdminAccess = async () => {
+        const supabase = window.initSupabase ? window.initSupabase() : null;
+        if (!supabase) return false;
+        
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return false;
+        
+        // Check if user is admin
+        const { data: profiles, error } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .limit(1);
+        
+        if (error || !profiles || profiles.length === 0) return false;
+        return profiles[0].role === 'admin';
+    };
+    
+    while (Date.now() - start < MAX_WAIT) {
+        const isAdmin = await checkAdminAccess();
+        if (isAdmin) {
+            document.getElementById('admin-check-overlay').style.display = 'none';
+            loadUsers();
+            return;
+        }
+        await new Promise(r => setTimeout(r, INTERVAL));
+    }
+    
+    // Not admin or timeout - redirect to dashboard
+    window.location.href = window.location.origin + '/pages/dashboard.html';
+})();
+
+// Load users with spinning animation
+async function loadUsersWithSpin() {
+    const btn = document.getElementById('refresh-btn');
+    btn.classList.add('spinning');
+    await loadUsers();
+    btn.classList.remove('spinning');
+}
+
+// Load all users
+async function loadUsers() {
+    const loadingIndicator = document.getElementById('loading-indicator');
+    const tbody = document.getElementById('users-table-body');
+    
+    loadingIndicator.classList.remove('hidden');
+    
+    try {
+        const supabase = window.initSupabase ? window.initSupabase() : null;
+        if (!supabase) {
+            console.error('[loadUsers] Supabase client not available');
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-red-400">Database not connected</td></tr>';
+            return;
+        }
+        
+        console.log('[loadUsers] Fetching users from profiles...');
+        const { data: users, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('[loadUsers] Error fetching users:', error);
+            throw error;
+        }
+        
+        console.log('[loadUsers] Users fetched:', users ? users.length : 0, users);
+        
+        // Update stats
+        document.getElementById('total-users').textContent = users.length;
+        document.getElementById('total-farmers').textContent = users.filter(u => u.role === 'farmer').length;
+        document.getElementById('total-guests').textContent = users.filter(u => u.role === 'guest').length;
+        
+        // Render table
+        if (users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-on-surface-variant">No users found</td></tr>';
+        } else {
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center">
+                                <span class="material-symbols-outlined text-on-surface-variant">person</span>
+                            </div>
+                            <span class="font-medium">${user.first_name || ''} ${user.last_name || ''}</span>
+                        </div>
+                    </td>
+                    <td>${user.email ? user.email : 'N/A'}</td>
+                    <td>
+                        <span class="role-badge role-${user.role}">
+                            <span class="material-symbols-outlined text-sm">${getRoleIcon(user.role)}</span>
+                            ${user.role}
+                        </span>
+                    </td>
+                    <td>${formatDate(user.created_at)}</td>
+                    <td>
+                        <div class="flex items-center gap-2">
+                            ${user.role === 'guest' ? `
+                                <button onclick="promoteToFarmer('${user.id}')" class="btn-approve" id="btn-farmer-${user.id}">
+                                    <span class="material-symbols-outlined text-sm">check_circle</span>
+                                    Approve as Farmer
+                                </button>
+                                <button onclick="promoteToAdmin('${user.id}')" class="btn-admin-promote" id="btn-admin-${user.id}">
+                                    <span class="material-symbols-outlined text-sm">shield</span>
+                                    Make Admin
+                                </button>
+                            ` : ''}
+                            ${user.role === 'farmer' ? `
+                                <button onclick="demoteToGuest('${user.id}')" class="btn-demote" id="btn-demote-${user.id}">
+                                    <span class="material-symbols-outlined text-sm">arrow_downward</span>
+                                    Demote to Guest
+                                </button>
+                                <button onclick="promoteToAdmin('${user.id}')" class="btn-admin-promote" id="btn-admin-${user.id}">
+                                    <span class="material-symbols-outlined text-sm">shield</span>
+                                    Make Admin
+                                </button>
+                            ` : ''}
+                            <button onclick="deleteUser('${user.id}')" class="btn-delete" id="btn-delete-${user.id}">
+                                <span class="material-symbols-outlined text-sm">delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    } catch (err) {
+        console.error('[loadUsers] Error loading users:', err);
+        console.error('[loadUsers] Error details:', err.message, err.stack);
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-red-400">Error: ${err.message}<br><small>Check console for details</small></td></tr>`;
+    } finally {
+        loadingIndicator.classList.add('hidden');
+    }
+}
+
+// Promote user to farmer
+async function promoteToFarmer(userId) {
+    const btn = document.getElementById(`btn-farmer-${userId}`);
+    btn.disabled = true;
+    btn.innerHTML = '<div class="loading-spinner"></div> Processing...';
+    
+    try {
+        const supabase = window.initSupabase ? window.initSupabase() : null;
+        if (!supabase) throw new Error('Database not connected');
+        
+        const { error } = await supabase
+            .from('profiles')
+            .update({ role: 'farmer' })
+            .eq('id', userId);
+        
+        if (error) throw error;
+        
+        await loadUsers();
+        alert('User approved as farmer successfully!');
+    } catch (err) {
+        console.error('Error promoting user:', err);
+        alert('Failed to promote user: ' + err.message);
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined text-sm">check_circle</span> Approve as Farmer';
+    }
+}
+
+// Promote user to admin (with confirmation)
+async function promoteToAdmin(userId) {
+    if (!confirm('Are you sure you want to make this user an ADMIN?\n\nThis will give them full access to manage all users and system settings. This action cannot be undone easily.')) {
+        return;
+    }
+    
+    const btn = document.getElementById(`btn-admin-${userId}`);
+    btn.disabled = true;
+    btn.innerHTML = '<div class="loading-spinner"></div> Processing...';
+    
+    try {
+        const supabase = window.initSupabase ? window.initSupabase() : null;
+        if (!supabase) throw new Error('Database not connected');
+        
+        const { error } = await supabase
+            .from('profiles')
+            .update({ role: 'admin' })
+            .eq('id', userId);
+        
+        if (error) throw error;
+        
+        await loadUsers();
+        alert('User promoted to admin successfully!');
+    } catch (err) {
+        console.error('Error promoting to admin:', err);
+        alert('Failed to promote to admin: ' + err.message);
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined text-sm">shield</span> Make Admin';
+    }
+}
+
+// Demote user to guest (with confirmation)
+async function demoteToGuest(userId) {
+    if (!confirm('Are you sure you want to demote this user to GUEST?\n\nThey will lose access to the dashboard and need to be approved again.')) {
+        return;
+    }
+    
+    const btn = document.getElementById(`btn-demote-${userId}`);
+    btn.disabled = true;
+    btn.innerHTML = '<div class="loading-spinner"></div> Processing...';
+    
+    try {
+        const supabase = window.initSupabase ? window.initSupabase() : null;
+        if (!supabase) throw new Error('Database not connected');
+        
+        const { error } = await supabase
+            .from('profiles')
+            .update({ role: 'guest' })
+            .eq('id', userId);
+        
+        if (error) throw error;
+        
+        await loadUsers();
+        alert('User demoted to guest successfully!');
+    } catch (err) {
+        console.error('Error demoting user:', err);
+        alert('Failed to demote user: ' + err.message);
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined text-sm">arrow_downward</span> Demote to Guest';
+    }
+}
+
+// Delete user (with confirmation)
+async function deleteUser(userId) {
+    if (!confirm('Are you sure you want to DELETE this user?\n\nThis action cannot be undone. The user will be permanently removed from the system.')) {
+        return;
+    }
+    
+    const btn = document.getElementById(`btn-delete-${userId}`);
+    btn.disabled = true;
+    btn.innerHTML = '<div class="loading-spinner"></div>';
+    
+    try {
+        const supabase = window.initSupabase ? window.initSupabase() : null;
+        if (!supabase) throw new Error('Database not connected');
+        
+        // Use RPC to delete user (bypasses RLS with SECURITY DEFINER)
+        const { data, error } = await supabase
+            .rpc('delete_user_by_id', { target_user_id: userId });
+        
+        if (error) {
+            console.error('Delete RPC error:', error);
+            throw error;
+        }
+        
+        if (data) {
+            await loadUsers();
+            alert('User deleted successfully!');
+        } else {
+            throw new Error('User not found or already deleted');
+        }
+    } catch (err) {
+        console.error('Error deleting user:', err);
+        alert('Failed to delete user: ' + err.message);
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined text-sm">delete</span>';
+    }
+}
+
+// Helper functions
+function getRoleIcon(role) {
+    switch(role) {
+        case 'admin': return 'shield';
+        case 'farmer': return 'agriculture';
+        case 'guest': return 'person_outline';
+        default: return 'person';
+    }
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+    });
+}
+
+// Logout handler
+async function handleLogout() {
+    const supabase = window.initSupabase ? window.initSupabase() : null;
+    if (supabase) {
+        await supabase.auth.signOut();
+    }
+    window.location.href = window.location.origin + '/pages/login.html';
+}
+</script>
+
+<!-- External JavaScript -->
+<script src="../js/utils/app.js"></script>
+<script src="../js/utils/theme-toggle.js"></script>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Verdanist - System Demo</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4be277",
+                        "secondary": "#96d5a3",
+                        "background": "#161311",
+                        "surface": "#161311",
+                        "surface-container": "#221f1d",
+                        "surface-container-high": "#2d2927",
+                        "surface-container-highest": "#383432",
+                        "on-surface": "#e9e1dd",
+                        "on-surface-variant": "#bccbb9",
+                        "outline-variant": "#3d4a3d",
+                    },
+                    fontFamily: {
+                        headline: ["Plus Jakarta Sans", "sans-serif"],
+                        body: ["Manrope", "sans-serif"],
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Manrope', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-panel {
+            background-color: rgba(34, 31, 29, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .demo-card {
+            transition: all 0.3s ease;
+        }
+        .demo-card:hover {
+            transform: translateY(-8px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 flex items-center px-6 md:px-8 h-20 bg-[#161311]/80 backdrop-blur-xl border-b border-white/5">
+        <a href="../index.html" class="flex items-center gap-2 group">
+            <span class="material-symbols-outlined text-[#4be277] text-3xl" style="font-variation-settings: 'FILL' 1;">spa</span>
+            <span class="text-[#4be277] font-black tracking-tight text-xl font-headline">Verdanist</span>
+        </a>
+        <div class="flex-1"></div>
+        <a href="../index.html" class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-body text-sm">
+            <span class="material-symbols-outlined text-lg">arrow_back</span>
+            Back to Home
+        </a>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-16 px-6 md:px-8">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-high border border-outline-variant/30 text-secondary text-sm font-medium mb-6">
+                <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                Interactive Demo
+            </div>
+            <h1 class="font-headline font-black text-4xl md:text-6xl text-on-surface mb-4">
+                See Verdanist in <span class="text-primary">Action</span>
+            </h1>
+            <p class="text-on-surface-variant text-lg md:text-xl max-w-2xl mx-auto">
+                Experience how our smart greenhouse system transforms farming through precision, automation, and intelligence.
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Video Section -->
+    <section class="px-6 md:px-8 pb-16">
+        <div class="max-w-5xl mx-auto">
+            <div class="relative aspect-video rounded-2xl overflow-hidden bg-surface-container-high border border-outline-variant/20 shadow-2xl group cursor-pointer" onclick="alert('Video player would open here - integrate with your video platform')">
+                <img src="https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=1920&h=1080&fit=crop" 
+                     alt="Smart Greenhouse Demo" 
+                     class="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity">
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="w-20 h-20 rounded-full bg-primary/90 flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                        <span class="material-symbols-outlined text-background text-4xl">play_arrow</span>
+                    </div>
+                </div>
+                <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                    <span class="text-sm font-medium text-on-surface">System Overview (3:45)</span>
+                    <span class="material-symbols-outlined text-on-surface-variant">fullscreen</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Showcases -->
+    <section class="px-6 md:px-8 py-16 bg-surface-container">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="font-headline font-bold text-3xl text-on-surface text-center mb-12">
+                Key Features Demo
+            </h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Feature 1: Real-time Monitoring -->
+                <div class="demo-card glass-panel rounded-2xl p-6 border border-outline-variant/15">
+                    <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-primary text-2xl">sensors</span>
+                    </div>
+                    <h3 class="font-headline font-bold text-lg text-on-surface mb-2">Real-time Monitoring</h3>
+                    <p class="text-on-surface-variant text-sm mb-4">Track soil moisture, humidity, temperature, and light levels 24/7 with live sensor data.</p>
+                    <button onclick="showDemoAlert('Monitoring Demo')" class="text-primary text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all">
+                        Watch Demo <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </button>
+                </div>
+
+                <!-- Feature 2: Smart Irrigation -->
+                <div class="demo-card glass-panel rounded-2xl p-6 border border-outline-variant/15">
+                    <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-primary text-2xl">water_drop</span>
+                    </div>
+                    <h3 class="font-headline font-bold text-lg text-on-surface mb-2">Smart Irrigation</h3>
+                    <p class="text-on-surface-variant text-sm mb-4">AI-powered watering system that optimizes water usage based on plant needs and weather.</p>
+                    <button onclick="showDemoAlert('Irrigation Demo')" class="text-primary text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all">
+                        Watch Demo <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </button>
+                </div>
+
+                <!-- Feature 3: Analytics Dashboard -->
+                <div class="demo-card glass-panel rounded-2xl p-6 border border-outline-variant/15">
+                    <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-primary text-2xl">analytics</span>
+                    </div>
+                    <h3 class="font-headline font-bold text-lg text-on-surface mb-2">Analytics Dashboard</h3>
+                    <p class="text-on-surface-variant text-sm mb-4">Comprehensive insights with beautiful charts showing growth trends and system performance.</p>
+                    <button onclick="showDemoAlert('Analytics Demo')" class="text-primary text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all">
+                        Watch Demo <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </button>
+                </div>
+
+                <!-- Feature 4: Zone Management -->
+                <div class="demo-card glass-panel rounded-2xl p-6 border border-outline-variant/15">
+                    <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-primary text-2xl">view_module</span>
+                    </div>
+                    <h3 class="font-headline font-bold text-lg text-on-surface mb-2">Zone Management</h3>
+                    <p class="text-on-surface-variant text-sm mb-4">Control multiple greenhouse zones independently with customized settings for each area.</p>
+                    <button onclick="showDemoAlert('Zone Management Demo')" class="text-primary text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all">
+                        Watch Demo <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </button>
+                </div>
+
+                <!-- Feature 5: Automated Alerts -->
+                <div class="demo-card glass-panel rounded-2xl p-6 border border-outline-variant/15">
+                    <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-primary text-2xl">notifications_active</span>
+                    </div>
+                    <h3 class="font-headline font-bold text-lg text-on-surface mb-2">Automated Alerts</h3>
+                    <p class="text-on-surface-variant text-sm mb-4">Instant notifications when conditions need attention or when systems require maintenance.</p>
+                    <button onclick="showDemoAlert('Alerts Demo')" class="text-primary text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all">
+                        Watch Demo <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </button>
+                </div>
+
+                <!-- Feature 6: Mobile Control -->
+                <div class="demo-card glass-panel rounded-2xl p-6 border border-outline-variant/15">
+                    <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-primary text-2xl">smartphone</span>
+                    </div>
+                    <h3 class="font-headline font-bold text-lg text-on-surface mb-2">Mobile Control</h3>
+                    <p class="text-on-surface-variant text-sm mb-4">Manage your entire farm from anywhere with our responsive mobile-first dashboard.</p>
+                    <button onclick="showDemoAlert('Mobile App Demo')" class="text-primary text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all">
+                        Watch Demo <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Simulation -->
+    <section class="px-6 md:px-8 py-16">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="font-headline font-bold text-3xl text-on-surface text-center mb-8">
+                Try the Dashboard Preview
+            </h2>
+            
+            <div class="glass-panel rounded-2xl p-6 md:p-8 border border-outline-variant/15">
+                <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <!-- Metric 1 -->
+                    <div class="bg-surface-container-high rounded-xl p-4 text-center">
+                        <div class="text-on-surface-variant text-xs uppercase tracking-wider mb-1">Temperature</div>
+                        <div class="font-headline font-bold text-3xl text-on-surface">
+                            <span id="temp-value">24</span>°C
+                        </div>
+                        <div class="flex items-center justify-center gap-1 mt-2 text-secondary text-xs">
+                            <span class="material-symbols-outlined text-sm">thermostat</span>
+                            Optimal
+                        </div>
+                    </div>
+                    
+                    <!-- Metric 2 -->
+                    <div class="bg-surface-container-high rounded-xl p-4 text-center">
+                        <div class="text-on-surface-variant text-xs uppercase tracking-wider mb-1">Humidity</div>
+                        <div class="font-headline font-bold text-3xl text-on-surface">
+                            <span id="humidity-value">68</span>%
+                        </div>
+                        <div class="flex items-center justify-center gap-1 mt-2 text-secondary text-xs">
+                            <span class="material-symbols-outlined text-sm">water_drop</span>
+                            Good
+                        </div>
+                    </div>
+                    
+                    <!-- Metric 3 -->
+                    <div class="bg-surface-container-high rounded-xl p-4 text-center">
+                        <div class="text-on-surface-variant text-xs uppercase tracking-wider mb-1">Soil Moisture</div>
+                        <div class="font-headline font-bold text-3xl text-on-surface">
+                            <span id="moisture-value">45</span>%
+                        </div>
+                        <div class="flex items-center justify-center gap-1 mt-2 text-primary text-xs">
+                            <span class="material-symbols-outlined text-sm">grass</span>
+                            Perfect
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 justify-center">
+                    <button onclick="simulateData()" class="px-6 py-3 rounded-full bg-primary text-on-primary font-semibold hover:shadow-lg transition-all active:scale-95 flex items-center gap-2">
+                        <span class="material-symbols-outlined">refresh</span>
+                        Simulate Live Data
+                    </button>
+                    <a href="login.html" class="px-6 py-3 rounded-full bg-surface-container-high text-on-surface border border-outline-variant/30 font-semibold hover:bg-surface-container-highest transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined">login</span>
+                        Access Full System
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="px-6 md:px-8 py-16 text-center">
+        <div class="max-w-2xl mx-auto">
+            <h2 class="font-headline font-bold text-3xl md:text-4xl text-on-surface mb-4">
+                Ready to Transform Your Farm?
+            </h2>
+            <p class="text-on-surface-variant text-lg mb-8">
+                Join thousands of farmers already growing smarter with Verdanist.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="create-account.html" class="px-8 py-4 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold text-lg hover:shadow-[0_12px_40px_rgba(75,226,119,0.3)] transition-all active:scale-95 flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">person_add</span>
+                    Start Free Trial
+                </a>
+                <a href="login.html" class="px-8 py-4 rounded-full bg-surface-container-high text-on-surface border border-outline-variant/30 font-headline font-bold text-lg hover:bg-surface-container-highest transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">login</span>
+                    Sign In
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#161311] py-8 border-t border-stone-800/15">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-2xl">spa</span>
+                <span class="text-primary font-bold font-headline">Verdanist</span>
+            </div>
+            <p class="text-on-surface-variant text-sm">
+                © 2026 Verdanist Conservatory. Cultivated with intelligence.
+            </p>
+            <div class="flex gap-4">
+                <a href="#" class="text-on-surface-variant hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined">help</span>
+                </a>
+                <a href="#" class="text-on-surface-variant hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined">mail</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function showDemoAlert(feature) {
+            alert(`${feature} video would play here.\n\nIntegrate with your video hosting platform (YouTube, Vimeo, or self-hosted) to show actual demo content.`);
+        }
+
+        function simulateData() {
+            // Simulate live data changes
+            const tempEl = document.getElementById('temp-value');
+            const humidityEl = document.getElementById('humidity-value');
+            const moistureEl = document.getElementById('moisture-value');
+            
+            // Animate numbers
+            let steps = 0;
+            const interval = setInterval(() => {
+                tempEl.textContent = Math.floor(22 + Math.random() * 6);
+                humidityEl.textContent = Math.floor(60 + Math.random() * 20);
+                moistureEl.textContent = Math.floor(40 + Math.random() * 20);
+                
+                steps++;
+                if (steps >= 10) {
+                    clearInterval(interval);
+                    // Settle on final values
+                    tempEl.textContent = '24';
+                    humidityEl.textContent = '68';
+                    moistureEl.textContent = '45';
+                }
+            }, 100);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VERDANIST | Access Conservatory</title>
+    <!-- Supabase SDK - MUST LOAD FIRST -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: url('https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=1920') center/cover no-repeat;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            z-index: 0;
+        }
+        
+        .login-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px 32px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+        }
+        
+        .logo-section {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .logo-icon {
+            width: 56px;
+            height: 56px;
+            background: #4ade80;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 28px;
+            color: white;
+        }
+        
+        .logo-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            color: white;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+        
+        .logo-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            color: white;
+            background: rgba(74, 222, 128, 0.15);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #4ade80;
+        }
+        
+        .tab:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .google-btn {
+            width: 100%;
+            padding: 14px 20px;
+            background: #1a1a1a;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+        
+        .google-btn:hover {
+            background: #2a2a2a;
+            transform: translateY(-1px);
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .divider span {
+            padding: 0 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 16px;
+        }
+        
+        .input-wrapper input {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .input-wrapper input:focus {
+            border-color: #4ade80;
+            box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2);
+        }
+        
+        .input-wrapper input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .password-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .checkbox-wrapper input {
+            width: 16px;
+            height: 16px;
+            accent-color: #4ade80;
+        }
+        
+        .checkbox-wrapper span {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+        }
+        
+        .forgot-link {
+            color: #4ade80;
+            font-size: 13px;
+            text-decoration: none;
+        }
+        
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+        
+        .access-btn {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            border: none;
+            border-radius: 12px;
+            color: #0f172a;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 222, 128, 0.3);
+        }
+        
+        .access-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 222, 128, 0.4);
+        }
+        
+        .footer-text {
+            text-align: center;
+            margin-top: 28px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+        
+        .footer-text a {
+            color: #4ade80;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 9999;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #4ade80;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .back-to-home {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: color 0.3s ease;
+        }
+        
+        .back-to-home:hover {
+            color: #4be277;
+        }
+        
+        .back-to-home i {
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p style="color: rgba(255,255,255,0.8);">Memverifikasi sesi...</p>
+    </div>
+
+    <div class="login-container">
+        <div class="glass-card">
+            <!-- Back Button -->
+            <a href="../index.html" class="back-to-home">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+            
+            <!-- Logo Section -->
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <h1 class="logo-title">VERDANIST</h1>
+                <p class="logo-subtitle">Access Conservatory</p>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
+                <button class="tab" id="tab-signup" onclick="window.location.href='create-account.html'">Sign Up</button>
+            </div>
+            
+            <!-- Continue with Google -->
+            <button class="google-btn" onclick="signInWithGoogle()">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Continue with Google
+            </button>
+            
+            <!-- Divider -->
+            <div class="divider">
+                <span>or</span>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="auth-form">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" placeholder="manager@verdanist.com" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+                
+                <div class="password-row">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="remember">
+                        <span>Keep me signed in</span>
+                    </label>
+                    <a href="#" class="forgot-link" onclick="showForgotPasswordModal(); return false;">Forgot Password?</a>
+                </div>
+                
+                <button type="submit" class="access-btn">
+                    Access Conservatory <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+            
+            <!-- Footer -->
+            <p class="footer-text">
+                New to the farm? <a href="create-account.html">Cultivate an Account</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgot-password-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div class="bg-surface-container rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl border border-outline-variant/15">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-envelope text-primary text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Reset Password</h3>
+                <p class="text-sm text-gray-300">Enter your email address and we'll send you a link to reset your password.</p>
+            </div>
+            
+            <form id="forgot-password-form" onsubmit="sendResetPasswordEmail(event)">
+                <div class="form-group mb-4">
+                    <label class="form-label text-gray-300">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="reset-email" placeholder="manager@verdanist.com" required>
+                    </div>
+                </div>
+                
+                <div id="reset-message" class="hidden mb-4 p-3 rounded-lg text-sm"></div>
+                
+                <div class="flex gap-3">
+                    <button type="button" onclick="hideForgotPasswordModal()" class="flex-1 py-3 rounded-full border border-gray-600 text-gray-300 hover:bg-gray-800 transition-all">
+                        Cancel
+                    </button>
+                    <button type="submit" id="reset-submit-btn" class="flex-1 py-3 rounded-full bg-gradient-to-r from-green-500 to-green-400 text-black font-semibold hover:shadow-[0_8px_24px_rgba(75,226,119,0.3)] transition-all">
+                        Send Link
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Supabase Client -->
+    <script src="../js/auth/supabase-client.js"></script>
+    <!-- Auth Logic -->
+    <script>
+// Get Supabase client
+function getSupabase() {
+    if (window.supabase) return window.supabase;
+    if (window.initSupabase) return window.initSupabase();
+    return null;
+}
+
+// Show loading overlay
+function showLoading() {
+    document.getElementById('loadingOverlay').classList.add('active');
+}
+
+// Hide loading overlay
+function hideLoading() {
+    document.getElementById('loadingOverlay').classList.remove('active');
+}
+
+// Get user role from profiles
+async function getUserRole(supabase) {
+    if (!supabase) return null;
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return null;
+        
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+        
+        if (error) throw error;
+        return data?.role || 'guest';
+    } catch (err) {
+        console.error('Error getting role:', err);
+        return 'guest';
+    }
+}
+
+// Patient redirect after login (wait 3 seconds)
+async function patientRedirect(supabase) {
+    showLoading();
+    
+    // Wait 3 seconds for session to stabilize
+    await new Promise(r => setTimeout(r, 3000));
+    
+    const role = await getUserRole(supabase);
+    console.log('User role:', role);
+    
+    hideLoading();
+    
+    if (role === 'admin' || role === 'farmer') {
+        window.location.href = window.location.origin + '/pages/dashboard.html';
+    } else if (role === 'guest') {
+        window.location.href = window.location.origin + '/pages/welcome-guest.html';
+    } else {
+        // No role found, still redirect to dashboard
+        window.location.href = window.location.origin + '/pages/dashboard.html';
+    }
+}
+
+// Sign in with Google
+async function signInWithGoogle() {
+    console.log('Google login clicked');
+    const supabase = getSupabase();
+    
+    if (!supabase) {
+        alert('Supabase not initialized. Please try again.');
+        return;
+    }
+    
+    try {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: window.location.origin + '/pages/login.html'
+            }
+        });
+        
+        if (error) throw error;
+        // OAuth will redirect to Google
+    } catch (err) {
+        console.error('Google login error:', err);
+        alert('Failed to login with Google: ' + err.message);
+    }
+}
+
+// Email/Password login
+const loginForm = document.getElementById('auth-form');
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const supabase = getSupabase();
+        if (!supabase) {
+            alert('Supabase not initialized. Please try again.');
+            return;
+        }
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        showLoading();
+        
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            
+            if (error) throw error;
+            
+            console.log('Login successful:', data);
+            await patientRedirect(supabase);
+        } catch (err) {
+            hideLoading();
+            console.error('Login error:', err);
+            alert('Login failed: ' + err.message);
+        }
+    });
+} else {
+    console.warn('Login form not found');
+}
+
+// Handle OAuth callback
+async function handleAuthCallback() {
+    const supabase = getSupabase();
+    if (!supabase) return;
+    
+    // Check if there's an access_token in URL (OAuth callback)
+    if (window.location.hash.includes('access_token') || window.location.search.includes('code=')) {
+        console.log('OAuth callback detected');
+        showLoading();
+        
+        // Wait for Supabase to process the session
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        while (attempts < maxAttempts) {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session) {
+                console.log('Session established after OAuth');
+                await patientRedirect(supabase);
+                return;
+            }
+            
+            attempts++;
+            await new Promise(r => setTimeout(r, 500));
+        }
+        
+        hideLoading();
+        console.error('Timeout waiting for OAuth session');
+    }
+}
+
+// Check existing session on load
+async function checkExistingSession() {
+    const supabase = getSupabase();
+    if (!supabase) return;
+    
+    // Don't redirect if this is an OAuth callback
+    if (window.location.hash.includes('access_token') || window.location.search.includes('code=')) {
+        return;
+    }
+    
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (session) {
+        console.log('Existing session found, redirecting...');
+        await patientRedirect(supabase);
+    }
+}
+
+// Auth mode toggle
+let currentAuthMode = 'login';
+
+window.switchTab = function(mode) {
+    console.log('switchTab called:', mode);
+    alert('Switching to: ' + mode);
+    
+    const tabLogin = document.getElementById('tab-login');
+    const tabSignup = document.getElementById('tab-signup');
+    const form = document.getElementById('auth-form');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    
+    if (!tabLogin || !tabSignup || !form) {
+        console.error('Elements missing:', {tabLogin, tabSignup, form});
+        alert('Error: Elements not found');
+        return;
+    }
+    
+    const submitBtn = form.querySelector('.access-btn');
+    const footerText = document.querySelector('.footer-text');
+    
+    currentAuthMode = mode;
+    
+    if (mode === 'signup') {
+        tabLogin.classList.remove('active');
+        tabSignup.classList.add('active');
+        submitBtn.innerHTML = 'Create Account <i class="fas fa-arrow-right"></i>';
+        footerText.innerHTML = 'Already have an account? <a href="#" onclick="switchTab(\'login\'); return false;">Log In</a>';
+        
+        // Add confirm password field
+        if (!document.getElementById('confirm-password-group')) {
+            const passwordGroup = passwordInput.closest('.form-group');
+            const confirmGroup = document.createElement('div');
+            confirmGroup.className = 'form-group';
+            confirmGroup.id = 'confirm-password-group';
+            confirmGroup.innerHTML = `
+                <label class="form-label">Confirm Password</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="confirm-password" placeholder="Confirm password" required>
+                </div>
+            `;
+            passwordGroup.after(confirmGroup);
+        }
+    } else {
+        tabSignup.classList.remove('active');
+        tabLogin.classList.add('active');
+        submitBtn.innerHTML = 'Access Conservatory <i class="fas fa-arrow-right"></i>';
+        footerText.innerHTML = 'New to the farm? <a href="create-account.html">Cultivate an Account</a>';
+        
+        // Remove confirm password field
+        const confirmGroup = document.getElementById('confirm-password-group');
+        if (confirmGroup) confirmGroup.remove();
+    }
+}
+
+// Forgot Password Modal Functions
+function showForgotPasswordModal() {
+    const modal = document.getElementById('forgot-password-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.getElementById('reset-email').value = '';
+    document.getElementById('reset-message').classList.add('hidden');
+}
+
+function hideForgotPasswordModal() {
+    const modal = document.getElementById('forgot-password-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+// Send password reset email
+async function sendResetPasswordEmail(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('reset-email').value;
+    const messageDiv = document.getElementById('reset-message');
+    const submitBtn = document.getElementById('reset-submit-btn');
+    
+    if (!email) {
+        messageDiv.textContent = 'Please enter your email address';
+        messageDiv.className = 'mb-4 p-3 rounded-lg text-sm bg-red-500/20 text-red-400';
+        messageDiv.classList.remove('hidden');
+        return;
+    }
+    
+    const supabase = getSupabase();
+    if (!supabase) {
+        messageDiv.textContent = 'Database not connected. Please try again later.';
+        messageDiv.className = 'mb-4 p-3 rounded-lg text-sm bg-red-500/20 text-red-400';
+        messageDiv.classList.remove('hidden');
+        return;
+    }
+    
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+    
+    try {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin + '/pages/reset-password.html'
+        });
+        
+        if (error) throw error;
+        
+        // Success message
+        messageDiv.textContent = 'Password reset link sent! Check your email inbox (and spam folder). The link will expire in 1 hour.';
+        messageDiv.className = 'mb-4 p-3 rounded-lg text-sm bg-green-500/20 text-green-400';
+        messageDiv.classList.remove('hidden');
+        
+        // Clear email input
+        document.getElementById('reset-email').value = '';
+        
+        // Close modal after 3 seconds
+        setTimeout(() => {
+            hideForgotPasswordModal();
+        }, 3000);
+        
+    } catch (err) {
+        console.error('Password reset error:', err);
+        messageDiv.textContent = 'Failed to send reset email: ' + err.message;
+        messageDiv.className = 'mb-4 p-3 rounded-lg text-sm bg-red-500/20 text-red-400';
+        messageDiv.classList.remove('hidden');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Send Link';
+    }
+}
+
+// Initialize
+window?.addEventListener('DOMContentLoaded', () => {
+    // Setup tab click handlers with optional chaining
+    document.getElementById('tab-login')?.addEventListener('click', () => switchTab('login'));
+    document.getElementById('tab-signup')?.addEventListener('click', () => window.location.href='create-account.html');
+    
+    handleAuthCallback();
+    checkExistingSession();
+});
+    </script>
+</body>
+</html>

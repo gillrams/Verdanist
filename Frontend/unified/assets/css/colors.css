@@ -1,0 +1,50 @@
+:root {
+    /* Primary - Pakcoy Green */
+    --primary: #4be277;
+    --on-primary: #003917;
+    --primary-container: #1e4f2e;
+    --on-primary-container: #a3f5b8;
+    
+    /* Surface Colors - Warm Stone */
+    --surface: #161311;
+    --on-surface: #e9e1dd;
+    --surface-variant: #4a4542;
+    --on-surface-variant: #cdc6c2;
+    
+    /* Surface Containers */
+    --surface-container: #221f1d;
+    --surface-container-high: #2d2927;
+    --surface-container-highest: #383432;
+    --surface-container-low: #1c1a18;
+    --surface-container-lowest: #0f0d0c;
+    
+    /* Secondary - Sage Green */
+    --secondary: #76d7c4;
+    --on-secondary: #00382d;
+    
+    /* Tertiary - Warm Amber */
+    --tertiary: #f4d03f;
+    --on-tertiary: #3d3000;
+    
+    /* Outline */
+    --outline: #6f6a66;
+    --outline-variant: #4a4542;
+    
+    /* State Colors */
+    --error: #ffb4ab;
+    --on-error: #690005;
+    --success: #4be277;
+    --on-success: #003917;
+    --warning: #f4d03f;
+    --on-warning: #3d3000;
+}
+
+/* Ensure all text defaults to light color on dark backgrounds */
+body {
+    color: var(--on-surface);
+}
+
+/* Override any browser defaults */
+h1, h2, h3, h4, h5, h6, p, span, div, a, li, td, th, label, button {
+    color: inherit;
+}

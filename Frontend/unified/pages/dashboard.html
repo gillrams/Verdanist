@@ -677,6 +677,33 @@ function hideWelcomeToast() {
 <!-- Auth System Enabled -->
 <script src="../js/auth/supabase-client.js"></script>
 <script src="../js/auth/auth.js"></script>
+<!-- Dashboard Protection: Redirect guests to welcome-guest -->
+<script>
+// Protect dashboard - only admin/farmer can access
+if (typeof protectDashboard === 'function') {
+    protectDashboard();
+} else {
+    // Fallback: manual role check if protectDashboard not loaded
+    (async function() {
+        await new Promise(r => setTimeout(r, 1000));
+        if (typeof getUserRole === 'function' && typeof getSupabaseAuth === 'function') {
+            const supabase = getSupabaseAuth();
+            if (supabase) {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    const role = await getUserRole(supabase);
+                    if (role !== 'admin' && role !== 'farmer') {
+                        console.log('Guest detected - redirecting to welcome-guest');
+                        window.location.replace('/pages/welcome-guest.html');
+                    }
+                } else {
+                    window.location.replace('/pages/login.html');
+                }
+            }
+        }
+    })();
+}
+</script>
 <!-- External JavaScript -->
 <script src="../js/utils/app.js"></script>
 <script src="../js/utils/theme-toggle.js"></script>

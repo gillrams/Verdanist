@@ -160,6 +160,16 @@ document.addEventListener('keydown', function(e) {
 // Expose to console for manual removal: window.removeOverlay()
 window.removeOverlay = removeLoadingOverlay;
 
+// IMMEDIATE ROLE CHECK - Run protection immediately when script loads
+(function() {
+    // Wait for DOM to be ready then check role
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', protectDashboard);
+    } else {
+        protectDashboard();
+    }
+})();
+
 // Supabase integration helpers
 let supabaseChannel = null;
 let dashboardSupabaseWaitStart = null;

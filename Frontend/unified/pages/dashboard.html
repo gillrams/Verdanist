@@ -34,56 +34,10 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 </style>
-<!-- Hard block overlay - in HTML so it shows immediately -->
+<!-- Hard block overlay - shown until dashboard.js removes it -->
 <div id="auth-blocker"><div class="spinner"></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/auth/supabase-client.js"></script>
-<script>
-// IMMEDIATE auth check - runs as soon as scripts load
-(function() {
-  async function checkAccess() {
-    // Wait for supabase
-    let attempts = 0;
-    while (typeof supabase === 'undefined' && attempts < 50) {
-      await new Promise(r => setTimeout(r, 100));
-      attempts++;
-    }
-    
-    if (typeof supabase === 'undefined') {
-      window.location.replace('/pages/login.html');
-      return;
-    }
-    
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      window.location.replace('/pages/login.html');
-      return;
-    }
-    
-    // Check role
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', session.user.id)
-      .single();
-    
-    if (!profile || (profile.role !== 'admin' && profile.role !== 'farmer')) {
-      console.log('ACCESS DENIED: role=' + (profile?.role || 'none'));
-      window.location.replace('/pages/welcome-guest.html');
-      return;
-    }
-    
-    // ACCESS GRANTED - show content
-    console.log('ACCESS GRANTED: role=' + profile.role);
-    document.body.classList.add('auth-verified');
-    const blocker = document.getElementById('auth-blocker');
-    if (blocker) blocker.remove();
-  }
-  
-  // Run immediately
-  checkAccess();
-})();
-</script>
 </head>
 <body class="bg-gray-50 dark:bg-background text-gray-900 dark:text-on-surface font-body h-screen overflow-hidden antialiased selection:bg-primary-container selection:text-on-primary-container transition-colors duration-300">
 <!-- Welcome Toast (Shows on login) -->

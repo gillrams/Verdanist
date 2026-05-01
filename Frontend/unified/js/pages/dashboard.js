@@ -58,7 +58,10 @@ async function protectDashboard() {
                     // Show body content (remove hard block)
                     document.body.classList.add('auth-verified');
                     document.body.style.visibility = 'visible';
+                    // Remove both loading overlays
                     removeLoadingOverlay();
+                    const blocker = document.getElementById('auth-blocker');
+                    if (blocker) blocker.remove();
                     return true;
                 } else if (role === 'guest') {
                     console.warn('[protectDashboard] Guest user - redirecting to welcome page');

@@ -132,7 +132,7 @@ async function fetchLatestSensorReadings() {
             .eq('device_id', currentDeviceId)
             .order('recorded_at', { ascending: false })
             .limit(1)
-            .single();
+            .maybeSingle();
 
         if (data) {
              if (systemState['A']) {
@@ -189,7 +189,7 @@ async function fetchInitialSettings() {
             .from('device_settings')
             .select('*')
             .eq('device_id', currentDeviceId)
-            .single();
+            .maybeSingle();
 
         if (data) updateUIBasedOnSettings(data);
     } catch(err) {

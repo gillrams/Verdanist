@@ -1,7 +1,47 @@
 // Verdanist Dashboard - Pump Control & Schedule Logic
 // Page-specific JavaScript for dashboard.html
 
-let currentDeviceId = 'ESP32_INDOOR'; 
+let currentDeviceId = 'ESP32_INDOOR';
+
+/**
+ * Switch between devices (Indoor/Outdoor)
+ * Updates currentDeviceId and reloads data from Supabase
+ */
+async function switchDevice(deviceId) {
+    console.log(`[Device Switch] Changing from ${currentDeviceId} to ${deviceId}`);
+    currentDeviceId = deviceId;
+    
+    // Update button UI states
+    updateDeviceButtonStates(deviceId);
+    
+    // Reload data for new device
+    await fetchInitialSettings();
+    await fetchLatestSensorReadings();
+    
+    console.log(`[Device Switch] Completed switch to ${deviceId}`);
+}
+
+/**
+ * Update device toggle button visual states
+ */
+function updateDeviceButtonStates(activeDeviceId) {
+    const btnIndoor = document.getElementById('btn-indoor');
+    const btnOutdoor = document.getElementById('btn-outdoor');
+    
+    if (!btnIndoor || !btnOutdoor) return;
+    
+    // Reset both to inactive state
+    const inactiveClass = 'px-6 py-2.5 rounded-full font-label text-sm font-medium text-gray-500 dark:text-on-surface-variant hover:text-gray-700 dark:hover:text-on-surface transition-all';
+    const activeClass = 'px-6 py-2.5 rounded-full font-label text-sm font-medium transition-all bg-primary text-on-primary shadow-md';
+    
+    if (activeDeviceId === 'ESP32_INDOOR') {
+        btnIndoor.className = activeClass;
+        btnOutdoor.className = inactiveClass;
+    } else {
+        btnIndoor.className = inactiveClass;
+        btnOutdoor.className = activeClass;
+    }
+}
 
 async function protectDashboard() {
     createLoadingOverlay();
@@ -306,6 +346,9 @@ function updateTimerPanel(zone) {
 }
 
 async function initDashboard() {
+    // Set initial device button states
+    updateDeviceButtonStates(currentDeviceId);
+    
     setupModeSwitch('A');
     setupModeSwitch('B');
     setupPumpToggle('A');

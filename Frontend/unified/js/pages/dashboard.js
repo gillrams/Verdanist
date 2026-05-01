@@ -72,6 +72,8 @@ async function protectDashboard() {
                 console.error('[protectDashboard] Role check error:', roleErr);
                 // Allow access anyway, role will be checked on server
                 removeLoadingOverlay();
+                const blocker = document.getElementById('auth-blocker');
+                if (blocker) blocker.remove();
                 return true;
             }
         }

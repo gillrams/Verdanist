@@ -1524,7 +1524,14 @@ async function loadProfileFromSupabase() {
         }
 
         // SAFETY: Only use farm_name, NEVER use role for display
-        const displayName = (data && data.farm_name) ? data.farm_name : 'Persada Farm';
+        let displayName = (data && data.farm_name) ? data.farm_name : 'Persada Farm';
+        
+        // Special case: specific user gets "Persada Farm" only (remove "Bogor")
+        if (user.email === '1001dreamsof_gilang@apps.ipb.ac.id') {
+            displayName = 'Persada Farm';
+            console.log('Special user detected, using farm name:', displayName);
+        }
+        
         console.log('Updating UI with farm name:', displayName);
         updateFarmNameInUI(displayName);
     } catch (err) {

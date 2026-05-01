@@ -397,10 +397,24 @@ function setupPumpToggle(zone) {
             isLoading = false;
             button.classList.remove('opacity-70', 'cursor-wait');
 
-            // Log pump action to Supabase
+            // SSOT: Update pump_status in device_settings for realtime sync
             try {
                 const supabase = getSupabaseDashboard();
                 if (supabase) {
+                    const deviceId = zone === 'A' ? 'ESP32_BOGOR' : 'ESP32_BOGOR_B';
+                    
+                    // Update pump status in device_settings (SSOT)
+                    await supabase
+                        .from('device_settings')
+                        .upsert({
+                            device_id: deviceId,
+                            pump_status: systemState[zone].pumpOn,
+                            updated_at: new Date().toISOString()
+                        }, { onConflict: 'device_id' });
+                    
+                    console.log(`[SSOT] Pump status updated for ${deviceId}: ${systemState[zone].pumpOn}`);
+                    
+                    // Log pump action
                     const { data: { user } } = await supabase.auth.getUser();
                     await supabase.from('pump_logs').insert({
                         zone: zone,
@@ -411,7 +425,7 @@ function setupPumpToggle(zone) {
                     });
                 }
             } catch (e) {
-                console.warn('Could not log pump action to Supabase:', e);
+                console.warn('[SSOT] Could not update pump status:', e);
             }
 
             updatePumpUI(zone);
@@ -659,7 +673,7 @@ function startAutoIntervals() {
 
 /**
  * Mode Switch (Manual/Auto/Timer)
- * Handles switching between control modes
+ * SSOT Pattern: Only sends to Supabase, UI updates via realtime subscription
  */
 function setupModeSwitch(zone) {
     const container = document.getElementById(`mode-switch-${zone}`);
@@ -667,28 +681,155 @@ function setupModeSwitch(zone) {
 
     const buttons = container.querySelectorAll('button');
     buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
             const selectedMode = btn.dataset.mode;
-            systemState[zone].mode = selectedMode;
-
-            // Update mode button styles
-            buttons.forEach(b => {
-                b.className = 'flex-1 py-2 px-4 rounded-full font-label text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors';
-            });
-            btn.className = 'flex-1 py-2 px-4 rounded-full font-label text-sm font-medium bg-surface-container-low text-primary shadow-[0_4px_12px_rgba(0,0,0,0.2)] border border-outline-variant/20 transition-all';
-
-            // Show/hide timer panel
-            updateTimerPanel(zone);
-
-            // Update pump button state
-            updatePumpUI(zone);
-
-            // If auto mode, run immediate check
-            if (selectedMode === 'auto') {
-                runAutoMode(zone);
+            const deviceId = zone === 'A' ? 'ESP32_BOGOR' : 'ESP32_BOGOR_B';
+            
+            console.log(`[SSOT] Sending mode change to Supabase: ${selectedMode} for zone ${zone}`);
+            
+            // SSOT: Send mode change to Supabase (Single Source of Truth)
+            const supabase = getSupabaseDashboard();
+            if (supabase) {
+                const { error } = await supabase
+                    .from('device_settings')
+                    .upsert({ 
+                        device_id: deviceId,
+                        mode: selectedMode,
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'device_id' });
+                
+                if (error) {
+                    console.error('[SSOT] Failed to update mode:', error);
+                    alert('Gagal mengubah mode, cek koneksi!');
+                } else {
+                    console.log('[SSOT] Mode change sent successfully');
+                }
             }
+            // NOTE: UI will update via realtime subscription, NOT here!
         });
     });
+}
+
+/**
+ * SSOT: Subscribe to device_settings changes (Realtime CCTV)
+ * All devices get updates simultaneously from Supabase
+ */
+function subscribeToDeviceSettings() {
+    const supabase = getSupabaseDashboard();
+    if (!supabase) {
+        console.warn('[SSOT] Cannot subscribe - Supabase not available');
+        return;
+    }
+
+    console.log('[SSOT] Installing CCTV Realtime for device_settings...');
+
+    // Subscribe to changes for both zones
+    ['ESP32_BOGOR', 'ESP32_BOGOR_B'].forEach((deviceId, index) => {
+        const zone = index === 0 ? 'A' : 'B';
+        
+        supabase
+            .channel(`device-settings-${zone}`)
+            .on('postgres_changes', {
+                event: '*', // Listen to ALL changes (INSERT, UPDATE, DELETE)
+                schema: 'public',
+                table: 'device_settings',
+                filter: `device_id=eq.${deviceId}`
+            }, (payload) => {
+                const dataBaru = payload.new;
+                console.log(`[SSOT] PERINTAH DARI BOS untuk Zone ${zone}:`, dataBaru);
+
+                // Update local state and UI synchronously across all devices
+                if (dataBaru && dataBaru.mode) {
+                    systemState[zone].mode = dataBaru.mode;
+                    updateModeButtonUI(zone, dataBaru.mode);
+                    updateTimerPanel(zone);
+                    updatePumpUI(zone);
+                    
+                    if (dataBaru.mode === 'auto') {
+                        runAutoMode(zone);
+                    }
+                }
+                
+                if (dataBaru && typeof dataBaru.pump_status !== 'undefined') {
+                    systemState[zone].pumpOn = dataBaru.pump_status;
+                    updatePumpUI(zone);
+                }
+            })
+            .subscribe((status) => {
+                console.log(`[SSOT] CCTV Zone ${zone} status:`, status);
+            });
+    });
+}
+
+/**
+ * SSOT: Update mode button UI based on Supabase state
+ * Called by realtime subscription when data changes
+ */
+function updateModeButtonUI(zone, mode) {
+    const container = document.getElementById(`mode-switch-${zone}`);
+    if (!container) return;
+
+    const buttons = container.querySelectorAll('button');
+    buttons.forEach(btn => {
+        const btnMode = btn.dataset.mode;
+        if (btnMode === mode) {
+            // Active state
+            btn.className = 'flex-1 py-2 px-4 rounded-full font-label text-sm font-medium bg-surface-container-low text-primary shadow-[0_4px_12px_rgba(0,0,0,0.2)] border border-outline-variant/20 transition-all';
+        } else {
+            // Inactive state
+            btn.className = 'flex-1 py-2 px-4 rounded-full font-label text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors';
+        }
+    });
+
+    console.log(`[SSOT] Mode button UI updated for Zone ${zone}: ${mode}`);
+}
+
+/**
+ * SSOT: Initial data load from Supabase
+ * Called on page load to sync with current state
+ */
+async function loadInitialDeviceSettings() {
+    const supabase = getSupabaseDashboard();
+    if (!supabase) {
+        console.warn('[SSOT] Cannot load initial data - Supabase not available');
+        return;
+    }
+
+    console.log('[SSOT] Loading initial device settings...');
+
+    try {
+        const { data: settings, error } = await supabase
+            .from('device_settings')
+            .select('*');
+
+        if (error) {
+            console.error('[SSOT] Error loading device settings:', error);
+            return;
+        }
+
+        if (settings && settings.length > 0) {
+            settings.forEach(setting => {
+                const zone = setting.device_id === 'ESP32_BOGOR' ? 'A' : 'B';
+                
+                if (systemState[zone]) {
+                    systemState[zone].mode = setting.mode || 'auto';
+                    systemState[zone].pumpOn = setting.pump_status || false;
+                    
+                    // Update UI
+                    updateModeButtonUI(zone, setting.mode);
+                    updateTimerPanel(zone);
+                    updatePumpUI(zone);
+                    
+                    console.log(`[SSOT] Initial state loaded for Zone ${zone}:`, {
+                        mode: setting.mode,
+                        pump: setting.pump_status
+                    });
+                }
+            });
+        }
+    } catch (err) {
+        console.error('[SSOT] Failed to load initial settings:', err);
+    }
 }
 
 /**
@@ -733,6 +874,12 @@ async function initDashboard() {
     updatePumpUI('B');
     updateTimerPanel('A');
     updateTimerPanel('B');
+
+    // SSOT: Load initial device settings from Supabase (Single Source of Truth)
+    await loadInitialDeviceSettings();
+
+    // SSOT: Subscribe to device_settings realtime changes
+    subscribeToDeviceSettings();
 
     // Try to load real sensor data from Supabase
     await fetchLatestSensorReadings();

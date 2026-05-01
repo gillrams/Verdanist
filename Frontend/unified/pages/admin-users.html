@@ -251,7 +251,7 @@
 </a>
 </nav>
 <div class="space-y-2 mt-auto pb-4">
-<a onclick="handleLogout()" class="text-stone-400 mx-4 px-6 py-4 flex items-center gap-4 hover:bg-red-500/20 hover:text-red-400 rounded-full transition-all cursor-pointer active:scale-98 font-['Manrope'] font-medium text-sm">
+<a onclick="handleLogout()" class="text-gray-500 dark:text-stone-400 mx-4 px-6 py-4 flex items-center gap-4 hover:bg-red-500/20 hover:text-red-400 rounded-full transition-all cursor-pointer active:scale-98 font-['Manrope'] font-medium text-sm">
 <span class="material-symbols-outlined text-xl">logout</span>
 <span>Logout</span>
 </a>
@@ -456,7 +456,7 @@ async function loadUsers() {
                 <tr>
                     <td>
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center">
+                            <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-surface-container-high flex items-center justify-center">
                                 <span class="material-symbols-outlined text-on-surface-variant">person</span>
                             </div>
                             <span class="font-medium">${user.first_name || ''} ${user.last_name || ''}</span>

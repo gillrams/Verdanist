@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>API Documentation - Verdanist | Developer Portal</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+    <script src="../js/utils/tailwind-config.js"></script>
+    <!-- Theme initialization - runs immediately to prevent flash -->
+    <script>(function(){const t=localStorage.getItem('verdanist-theme');if(t==='dark')document.documentElement.classList.add('dark');})();</script>
+    <style>
+        body { font-family: 'Manrope', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .glass-panel {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .dark .glass-panel {
+            background-color: rgba(34, 31, 29, 0.85);
+        }
+        .code-block {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .endpoint-method {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+        }
+        .method-get { background-color: rgba(75, 226, 119, 0.2); color: #4ade80; }
+        .method-post { background-color: rgba(150, 213, 163, 0.2); color: #96d5a3; }
+        .method-put { background-color: rgba(255, 183, 77, 0.2); color: #ffb74d; }
+        .method-delete { background-color: rgba(239, 83, 80, 0.2); color: #ef5350; }
+        .nav-link {
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover {
+            color: #4ade80;
+            padding-left: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-background text-gray-900 dark:text-on-surface min-h-screen transition-colors duration-300">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 flex items-center px-6 md:px-8 h-20 bg-white/80 dark:bg-[#161311]/80 backdrop-blur-xl border-b border-gray-200 dark:border-white/5 transition-colors duration-300">
+        <a href="../index.html" class="flex items-center gap-2 group">
+            <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">spa</span>
+            <span class="text-primary font-black tracking-tight text-xl font-headline">Verdanist</span>
+        </a>
+        <div class="flex-1"></div>
+        <!-- Theme Toggle -->
+        <button data-theme-toggle class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-surface-container text-gray-700 dark:text-on-surface hover:bg-gray-200 dark:hover:bg-surface-variant transition-colors mr-4">
+            <span class="material-symbols-outlined">light_mode</span>
+        </button>
+        <a href="../index.html" class="flex items-center gap-2 text-gray-600 dark:text-on-surface-variant hover:text-primary transition-colors font-body text-sm">
+            <span class="material-symbols-outlined text-lg">arrow_back</span>
+            Back to Home
+        </a>
+    </nav>
+
+    <div class="flex pt-20">
+        <!-- Sidebar Navigation -->
+        <aside class="hidden lg:block w-72 h-[calc(100vh-5rem)] sticky top-20 overflow-y-auto py-8 px-6 border-r border-gray-200 dark:border-outline-variant/15">
+            <nav class="space-y-6">
+                <div>
+                    <h3 class="font-headline font-bold text-sm text-gray-500 dark:text-on-surface-variant uppercase tracking-wider mb-3">Getting Started</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#introduction" class="nav-link text-gray-700 dark:text-on-surface text-sm block">Introduction</a></li>
+                        <li><a href="#authentication" class="nav-link text-gray-700 dark:text-on-surface text-sm block">Authentication</a></li>
+                        <li><a href="#base-url" class="nav-link text-gray-700 dark:text-on-surface text-sm block">Base URL</a></li>
+                        <li><a href="#rate-limiting" class="nav-link text-gray-700 dark:text-on-surface text-sm block">Rate Limiting</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-headline font-bold text-sm text-gray-500 dark:text-on-surface-variant uppercase tracking-wider mb-3">Core Endpoints</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#sensors" class="nav-link text-gray-700 dark:text-on-surface text-sm block">Sensor Data</a></li>
+                        <li><a href="#irrigation" class="nav-link text-gray-700 dark:text-on-surface text-sm block">Irrigation Control</a></li>
+                        <li><a href="#zones" class="nav-link text-gray-700 dark:text-on-surface text-sm block">Zone Management</a></li>
+                        <li><a href="#analytics" class="nav-link text-gray-700 dark:text-on-surface text-sm block">Analytics</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-headline font-bold text-sm text-gray-500 dark:text-on-surface-variant uppercase tracking-wider mb-3">Advanced</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#webhooks" class="nav-link text-gray-700 dark:text-on-surface text-sm block">Webhooks</a></li>
+                        <li><a href="#errors" class="nav-link text-gray-700 dark:text-on-surface text-sm block">Error Handling</a></li>
+                        <li><a href="#sdks" class="nav-link text-gray-700 dark:text-on-surface text-sm block">SDKs & Libraries</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 min-w-0 px-6 md:px-12 py-12 max-w-5xl">
+            <!-- Introduction -->
+            <section id="introduction" class="mb-16">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 dark:bg-surface-container-high border border-gray-200 dark:border-outline-variant/30 text-primary dark:text-secondary text-sm font-medium mb-6">
+                    <span class="material-symbols-outlined text-lg">code</span>
+                    Developer Portal
+                </div>
+                <h1 class="font-headline font-black text-4xl md:text-5xl text-gray-900 dark:text-on-surface mb-6">
+                    Verdanist API Documentation
+                </h1>
+                <p class="text-gray-600 dark:text-on-surface-variant text-lg mb-8">
+                    Welcome to the Verdanist API. Our RESTful API enables developers to integrate smart greenhouse management capabilities into their applications, automate irrigation systems, and retrieve real-time sensor data.
+                </p>
+                
+                <div class="glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15">
+                    <h3 class="font-headline font-bold text-lg text-gray-900 dark:text-on-surface mb-4">Quick Start</h3>
+                    <div class="bg-gray-900 rounded-xl p-4 overflow-x-auto">
+                        <code class="code-block text-gray-100">
+<span class="text-gray-500"># Install the Verdanist SDK</span><br>
+npm install @verdanist/sdk<br><br>
+<span class="text-gray-500"># Or use cURL for direct API calls</span><br>
+curl -H <span class="text-green-400">"Authorization: Bearer YOUR_API_KEY"</span> \\<br>
+&nbsp;&nbsp;https://api.verdanist.io/v1/sensors/current
+                        </code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Authentication -->
+            <section id="authentication" class="mb-16">
+                <h2 class="font-headline font-bold text-3xl text-gray-900 dark:text-on-surface mb-6">Authentication</h2>
+                <p class="text-gray-600 dark:text-on-surface-variant mb-6">
+                    All API requests require authentication using an API key. Include your API key in the Authorization header of each request.
+                </p>
+                
+                <div class="glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15 mb-6">
+                    <h3 class="font-headline font-bold text-lg text-gray-900 dark:text-on-surface mb-4">API Key Header</h3>
+                    <div class="bg-gray-900 rounded-xl p-4 overflow-x-auto">
+                        <code class="code-block text-gray-100">
+Authorization: Bearer <span class="text-green-400">{your_api_key}</span>
+                        </code>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15">
+                    <h3 class="font-headline font-bold text-lg text-gray-900 dark:text-on-surface mb-4">Example Request</h3>
+                    <div class="bg-gray-900 rounded-xl p-4 overflow-x-auto">
+                        <code class="code-block text-gray-100">
+<span class="text-purple-400">const</span> response = <span class="text-purple-400">await</span> fetch(<span class="text-green-400">'https://api.verdanist.io/v1/sensors'</span>, {<br>
+&nbsp;&nbsp;headers: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-green-400">'Authorization'</span>: <span class="text-green-400">'Bearer YOUR_API_KEY'</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-green-400">'Content-Type'</span>: <span class="text-green-400">'application/json'</span><br>
+&nbsp;&nbsp;}<br>
+});<br><br>
+<span class="text-purple-400">const</span> data = <span class="text-purple-400">await</span> response.json();
+                        </code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Base URL -->
+            <section id="base-url" class="mb-16">
+                <h2 class="font-headline font-bold text-3xl text-gray-900 dark:text-on-surface mb-6">Base URL</h2>
+                <p class="text-gray-600 dark:text-on-surface-variant mb-6">
+                    All API requests should be made to the following base URL:
+                </p>
+                <div class="glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm font-mono font-semibold">PRODUCTION</span>
+                    </div>
+                    <code class="font-mono text-lg text-primary">https://api.verdanist.io/v1</code>
+                </div>
+            </section>
+
+            <!-- Sensors Endpoint -->
+            <section id="sensors" class="mb-16">
+                <h2 class="font-headline font-bold text-3xl text-gray-900 dark:text-on-surface mb-6">Sensor Data</h2>
+                
+                <!-- GET Sensors -->
+                <div class="glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15 mb-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="endpoint-method method-get">GET</span>
+                        <code class="font-mono text-gray-900 dark:text-on-surface">/sensors/current</code>
+                    </div>
+                    <p class="text-gray-600 dark:text-on-surface-variant mb-4">
+                        Retrieve current sensor readings from all active zones.
+                    </p>
+                    <div class="bg-gray-900 rounded-xl p-4 overflow-x-auto">
+                        <code class="code-block text-gray-100">
+<span class="text-gray-500">// Response</span><br>
+{<br>
+&nbsp;&nbsp;<span class="text-green-400">"status"</span>: <span class="text-green-400">"success"</span>,<br>
+&nbsp;&nbsp;<span class="text-green-400">"data"</span>: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-green-400">"timestamp"</span>: <span class="text-green-400">"2026-04-30T12:00:00Z"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-green-400">"zones"</span>: [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-green-400">"id"</span>: <span class="text-green-400">"zone_a"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-green-400">"name"</span>: <span class="text-green-400">"Indoor Hydroponics"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-green-400">"temperature"</span>: 24.5,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-green-400">"humidity"</span>: 68,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-green-400">"soil_moisture"</span>: 45,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-green-400">"light_level"</span>: 850<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;]<br>
+&nbsp;&nbsp;}<br>
+}
+                        </code>
+                    </div>
+                </div>
+
+                <!-- POST Sensor History -->
+                <div class="glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="endpoint-method method-post">POST</span>
+                        <code class="font-mono text-gray-900 dark:text-on-surface">/sensors/history</code>
+                    </div>
+                    <p class="text-gray-600 dark:text-on-surface-variant mb-4">
+                        Retrieve historical sensor data with filtering options.
+                    </p>
+                    <div class="bg-gray-900 rounded-xl p-4 overflow-x-auto">
+                        <code class="code-block text-gray-100">
+<span class="text-gray-500">// Request Body</span><br>
+{<br>
+&nbsp;&nbsp;<span class="text-green-400">"zone_id"</span>: <span class="text-green-400">"zone_a"</span>,<br>
+&nbsp;&nbsp;<span class="text-green-400">"start_date"</span>: <span class="text-green-400">"2026-04-01"</span>,<br>
+&nbsp;&nbsp;<span class="text-green-400">"end_date"</span>: <span class="text-green-400">"2026-04-30"</span>,<br>
+&nbsp;&nbsp;<span class="text-green-400">"metrics"</span>: [<span class="text-green-400">"temperature"</span>, <span class="text-green-400">"humidity"</span>],<br>
+&nbsp;&nbsp;<span class="text-green-400">"interval"</span>: <span class="text-green-400">"hourly"</span><br>
+}
+                        </code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Irrigation Endpoint -->
+            <section id="irrigation" class="mb-16">
+                <h2 class="font-headline font-bold text-3xl text-gray-900 dark:text-on-surface mb-6">Irrigation Control</h2>
+                
+                <div class="glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15 mb-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="endpoint-method method-post">POST</span>
+                        <code class="font-mono text-gray-900 dark:text-on-surface">/irrigation/trigger</code>
+                    </div>
+                    <p class="text-gray-600 dark:text-on-surface-variant mb-4">
+                        Manually trigger irrigation for a specific zone.
+                    </p>
+                    <div class="bg-gray-900 rounded-xl p-4 overflow-x-auto">
+                        <code class="code-block text-gray-100">
+<span class="text-gray-500">// Request Body</span><br>
+{<br>
+&nbsp;&nbsp;<span class="text-green-400">"zone_id"</span>: <span class="text-green-400">"zone_a"</span>,<br>
+&nbsp;&nbsp;<span class="text-green-400">"duration"</span>: 300,<br>
+&nbsp;&nbsp;<span class="text-green-400">"mode"</span>: <span class="text-green-400">"manual"</span><br>
+}<br><br>
+<span class="text-gray-500">// Response</span><br>
+{<br>
+&nbsp;&nbsp;<span class="text-green-400">"status"</span>: <span class="text-green-400">"success"</span>,<br>
+&nbsp;&nbsp;<span class="text-green-400">"message"</span>: <span class="text-green-400">"Irrigation triggered"</span>,<br>
+&nbsp;&nbsp;<span class="text-green-400">"job_id"</span>: <span class="text-green-400">"irr_1234567890"</span>,<br>
+&nbsp;&nbsp;<span class="text-green-400">"estimated_completion"</span>: <span class="text-green-400">"2026-04-30T12:05:00Z"</span><br>
+}
+                        </code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Zone Management -->
+            <section id="zones" class="mb-16">
+                <h2 class="font-headline font-bold text-3xl text-gray-900 dark:text-on-surface mb-6">Zone Management</h2>
+                
+                <div class="grid gap-6">
+                    <div class="glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="endpoint-method method-get">GET</span>
+                            <code class="font-mono text-gray-900 dark:text-on-surface">/zones</code>
+                        </div>
+                        <p class="text-gray-600 dark:text-on-surface-variant">List all configured zones with their settings.</p>
+                    </div>
+                    
+                    <div class="glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="endpoint-method method-post">POST</span>
+                            <code class="font-mono text-gray-900 dark:text-on-surface">/zones</code>
+                        </div>
+                        <p class="text-gray-600 dark:text-on-surface-variant">Create a new zone with specified configuration.</p>
+                    </div>
+                    
+                    <div class="glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="endpoint-method method-put">PUT</span>
+                            <code class="font-mono text-gray-900 dark:text-on-surface">/zones/{zone_id}</code>
+                        </div>
+                        <p class="text-gray-600 dark:text-on-surface-variant">Update zone configuration and thresholds.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Error Handling -->
+            <section id="errors" class="mb-16">
+                <h2 class="font-headline font-bold text-3xl text-gray-900 dark:text-on-surface mb-6">Error Handling</h2>
+                <p class="text-gray-600 dark:text-on-surface-variant mb-6">
+                    The API returns standard HTTP status codes. Error responses include a descriptive message and error code.
+                </p>
+                
+                <div class="glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="border-b border-gray-200 dark:border-outline-variant/15">
+                                <th class="pb-3 text-gray-900 dark:text-on-surface font-semibold">Code</th>
+                                <th class="pb-3 text-gray-900 dark:text-on-surface font-semibold">Status</th>
+                                <th class="pb-3 text-gray-900 dark:text-on-surface font-semibold">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            <tr class="border-b border-gray-200 dark:border-outline-variant/10">
+                                <td class="py-3 font-mono text-primary">200</td>
+                                <td class="py-3 text-gray-600 dark:text-on-surface-variant">OK</td>
+                                <td class="py-3 text-gray-600 dark:text-on-surface-variant">Request successful</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 dark:border-outline-variant/10">
+                                <td class="py-3 font-mono text-primary">400</td>
+                                <td class="py-3 text-gray-600 dark:text-on-surface-variant">Bad Request</td>
+                                <td class="py-3 text-gray-600 dark:text-on-surface-variant">Invalid parameters</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 dark:border-outline-variant/10">
+                                <td class="py-3 font-mono text-primary">401</td>
+                                <td class="py-3 text-gray-600 dark:text-on-surface-variant">Unauthorized</td>
+                                <td class="py-3 text-gray-600 dark:text-on-surface-variant">Invalid or missing API key</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 dark:border-outline-variant/10">
+                                <td class="py-3 font-mono text-primary">404</td>
+                                <td class="py-3 text-gray-600 dark:text-on-surface-variant">Not Found</td>
+                                <td class="py-3 text-gray-600 dark:text-on-surface-variant">Resource not found</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 font-mono text-primary">500</td>
+                                <td class="py-3 text-gray-600 dark:text-on-surface-variant">Server Error</td>
+                                <td class="py-3 text-gray-600 dark:text-on-surface-variant">Internal server error</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SDKs -->
+            <section id="sdks" class="mb-16">
+                <h2 class="font-headline font-bold text-3xl text-gray-900 dark:text-on-surface mb-6">SDKs & Libraries</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15">
+                        <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                            <span class="material-symbols-outlined text-primary text-2xl">javascript</span>
+                        </div>
+                        <h3 class="font-headline font-bold text-lg text-gray-900 dark:text-on-surface mb-2">JavaScript/Node.js</h3>
+                        <code class="font-mono text-sm text-gray-600 dark:text-on-surface-variant block mb-4">npm install @verdanist/sdk</code>
+                        <a href="#" class="text-primary text-sm font-medium">Documentation →</a>
+                    </div>
+                    <div class="glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15">
+                        <div class="w-14 h-14 rounded-xl bg-secondary/20 flex items-center justify-center mb-4">
+                            <span class="material-symbols-outlined text-secondary text-2xl">terminal</span>
+                        </div>
+                        <h3 class="font-headline font-bold text-lg text-gray-900 dark:text-on-surface mb-2">Python</h3>
+                        <code class="font-mono text-sm text-gray-600 dark:text-on-surface-variant block mb-4">pip install verdanist</code>
+                        <a href="#" class="text-primary text-sm font-medium">Documentation →</a>
+                    </div>
+                    <div class="glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15">
+                        <div class="w-14 h-14 rounded-xl bg-tertiary/20 flex items-center justify-center mb-4">
+                            <span class="material-symbols-outlined text-tertiary text-2xl">smartphone</span>
+                        </div>
+                        <h3 class="font-headline font-bold text-lg text-gray-900 dark:text-on-surface mb-2">Mobile SDK</h3>
+                        <p class="text-sm text-gray-600 dark:text-on-surface-variant mb-4">iOS & Android support</p>
+                        <a href="#" class="text-primary text-sm font-medium">Documentation →</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Need Help -->
+            <section class="mb-16">
+                <div class="glass-panel rounded-2xl p-8 border border-gray-200 dark:border-outline-variant/15 text-center">
+                    <div class="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-primary text-3xl">support_agent</span>
+                    </div>
+                    <h3 class="font-headline font-bold text-2xl text-gray-900 dark:text-on-surface mb-2">Need Help?</h3>
+                    <p class="text-gray-600 dark:text-on-surface-variant mb-6">Our developer support team is here to assist you with integration.</p>
+                    <a href="mailto:dev@verdanist.io" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-white dark:text-on-primary font-semibold hover:shadow-lg transition-all">
+                        <span class="material-symbols-outlined">mail</span>
+                        dev@verdanist.io
+                    </a>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-[#161311] py-12 border-t border-gray-200 dark:border-stone-800/15 transition-colors duration-300">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-2xl">spa</span>
+                    <span class="text-primary font-bold font-headline text-xl">Verdanist</span>
+                </div>
+                <div class="flex items-center gap-8">
+                    <a href="sustainability.html" class="text-gray-500 dark:text-on-surface-variant hover:text-primary transition-colors text-sm font-medium">Sustainability</a>
+                    <a href="api-docs.html" class="text-gray-500 dark:text-on-surface-variant hover:text-primary transition-colors text-sm font-medium">API Docs</a>
+                    <a href="privacy.html" class="text-gray-500 dark:text-on-surface-variant hover:text-primary transition-colors text-sm font-medium">Privacy</a>
+                </div>
+                <p class="text-gray-500 dark:text-on-surface-variant text-sm">
+                    © 2026 Verdanist Conservatory. Cultivated with intelligence.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/utils/theme-toggle.js"></script>
+</body>
+</html>

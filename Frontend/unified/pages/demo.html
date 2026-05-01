@@ -7,38 +7,19 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#4be277",
-                        "secondary": "#96d5a3",
-                        "background": "#161311",
-                        "surface": "#161311",
-                        "surface-container": "#221f1d",
-                        "surface-container-high": "#2d2927",
-                        "surface-container-highest": "#383432",
-                        "on-surface": "#e9e1dd",
-                        "on-surface-variant": "#bccbb9",
-                        "outline-variant": "#3d4a3d",
-                    },
-                    fontFamily: {
-                        headline: ["Plus Jakarta Sans", "sans-serif"],
-                        body: ["Manrope", "sans-serif"],
-                    }
-                },
-            },
-        }
-    </script>
+    <script src="../js/utils/tailwind-config.js"></script>
+    <!-- Theme initialization - runs immediately to prevent flash -->
+    <script>(function(){const t=localStorage.getItem('verdanist-theme');if(t==='dark')document.documentElement.classList.add('dark');})();</script>
     <style>
         body { font-family: 'Manrope', sans-serif; }
         h1, h2, h3, h4, h5, h6, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
         .glass-panel {
-            background-color: rgba(34, 31, 29, 0.85);
+            background-color: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
+        }
+        .dark .glass-panel {
+            background-color: rgba(34, 31, 29, 0.85);
         }
         .demo-card {
             transition: all 0.3s ease;
@@ -48,15 +29,19 @@
         }
     </style>
 </head>
-<body class="bg-background text-on-surface min-h-screen">
+<body class="bg-gray-50 dark:bg-background text-gray-900 dark:text-on-surface min-h-screen transition-colors duration-300">
     <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-50 flex items-center px-6 md:px-8 h-20 bg-[#161311]/80 backdrop-blur-xl border-b border-white/5">
+    <nav class="fixed top-0 w-full z-50 flex items-center px-6 md:px-8 h-20 bg-white/80 dark:bg-[#161311]/80 backdrop-blur-xl border-b border-gray-200 dark:border-white/5 transition-colors duration-300">
         <a href="../index.html" class="flex items-center gap-2 group">
-            <span class="material-symbols-outlined text-[#4be277] text-3xl" style="font-variation-settings: 'FILL' 1;">spa</span>
-            <span class="text-[#4be277] font-black tracking-tight text-xl font-headline">Verdanist</span>
+            <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">spa</span>
+            <span class="text-primary font-black tracking-tight text-xl font-headline">Verdanist</span>
         </a>
         <div class="flex-1"></div>
-        <a href="../index.html" class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-body text-sm">
+        <!-- Theme Toggle -->
+        <button data-theme-toggle class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-surface-container text-gray-700 dark:text-on-surface hover:bg-gray-200 dark:hover:bg-surface-variant transition-colors mr-4">
+            <span class="material-symbols-outlined">light_mode</span>
+        </button>
+        <a href="../index.html" class="flex items-center gap-2 text-gray-600 dark:text-on-surface-variant hover:text-primary transition-colors font-body text-sm">
             <span class="material-symbols-outlined text-lg">arrow_back</span>
             Back to Home
         </a>
@@ -65,14 +50,14 @@
     <!-- Hero Section -->
     <section class="pt-32 pb-16 px-6 md:px-8">
         <div class="max-w-6xl mx-auto text-center">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-high border border-outline-variant/30 text-secondary text-sm font-medium mb-6">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-100 dark:bg-surface-container-high border border-gray-200 dark:border-outline-variant/30 text-primary dark:text-secondary text-sm font-medium mb-6">
                 <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
                 Interactive Demo
             </div>
-            <h1 class="font-headline font-black text-4xl md:text-6xl text-on-surface mb-4">
+            <h1 class="font-headline font-black text-4xl md:text-6xl text-gray-900 dark:text-on-surface mb-4">
                 See Verdanist in <span class="text-primary">Action</span>
             </h1>
-            <p class="text-on-surface-variant text-lg md:text-xl max-w-2xl mx-auto">
+            <p class="text-gray-600 dark:text-on-surface-variant text-lg md:text-xl max-w-2xl mx-auto">
                 Experience how our smart greenhouse system transforms farming through precision, automation, and intelligence.
             </p>
         </div>
@@ -81,7 +66,7 @@
     <!-- Main Video Section -->
     <section class="px-6 md:px-8 pb-16">
         <div class="max-w-5xl mx-auto">
-            <div class="relative aspect-video rounded-2xl overflow-hidden bg-surface-container-high border border-outline-variant/20 shadow-2xl group cursor-pointer" onclick="alert('Video player would open here - integrate with your video platform')">
+            <div class="relative aspect-video rounded-2xl overflow-hidden bg-gray-100 dark:bg-surface-container-high border border-outline-variant/20 shadow-2xl group cursor-pointer" onclick="alert('Video player would open here - integrate with your video platform')">
                 <img src="https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=1920&h=1080&fit=crop" 
                      alt="Smart Greenhouse Demo" 
                      class="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity">
@@ -99,80 +84,80 @@
     </section>
 
     <!-- Feature Showcases -->
-    <section class="px-6 md:px-8 py-16 bg-surface-container">
+    <section class="px-6 md:px-8 py-16 bg-gray-100 dark:bg-surface-container transition-colors duration-300">
         <div class="max-w-6xl mx-auto">
-            <h2 class="font-headline font-bold text-3xl text-on-surface text-center mb-12">
+            <h2 class="font-headline font-bold text-3xl text-gray-900 dark:text-on-surface text-center mb-12">
                 Key Features Demo
             </h2>
             
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Feature 1: Real-time Monitoring -->
-                <div class="demo-card glass-panel rounded-2xl p-6 border border-outline-variant/15">
+                <div class="demo-card glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15">
                     <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                         <span class="material-symbols-outlined text-primary text-2xl">sensors</span>
                     </div>
-                    <h3 class="font-headline font-bold text-lg text-on-surface mb-2">Real-time Monitoring</h3>
-                    <p class="text-on-surface-variant text-sm mb-4">Track soil moisture, humidity, temperature, and light levels 24/7 with live sensor data.</p>
+                    <h3 class="font-headline font-bold text-lg text-gray-900 dark:text-on-surface mb-2">Real-time Monitoring</h3>
+                    <p class="text-gray-600 dark:text-on-surface-variant text-sm mb-4">Track soil moisture, humidity, temperature, and light levels 24/7 with live sensor data.</p>
                     <button onclick="showDemoAlert('Monitoring Demo')" class="text-primary text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all">
                         Watch Demo <span class="material-symbols-outlined text-sm">arrow_forward</span>
                     </button>
                 </div>
 
                 <!-- Feature 2: Smart Irrigation -->
-                <div class="demo-card glass-panel rounded-2xl p-6 border border-outline-variant/15">
+                <div class="demo-card glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15">
                     <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                         <span class="material-symbols-outlined text-primary text-2xl">water_drop</span>
                     </div>
-                    <h3 class="font-headline font-bold text-lg text-on-surface mb-2">Smart Irrigation</h3>
-                    <p class="text-on-surface-variant text-sm mb-4">AI-powered watering system that optimizes water usage based on plant needs and weather.</p>
+                    <h3 class="font-headline font-bold text-lg text-gray-900 dark:text-on-surface mb-2">Smart Irrigation</h3>
+                    <p class="text-gray-600 dark:text-on-surface-variant text-sm mb-4">AI-powered watering system that optimizes water usage based on plant needs and weather.</p>
                     <button onclick="showDemoAlert('Irrigation Demo')" class="text-primary text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all">
                         Watch Demo <span class="material-symbols-outlined text-sm">arrow_forward</span>
                     </button>
                 </div>
 
                 <!-- Feature 3: Analytics Dashboard -->
-                <div class="demo-card glass-panel rounded-2xl p-6 border border-outline-variant/15">
+                <div class="demo-card glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15">
                     <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                         <span class="material-symbols-outlined text-primary text-2xl">analytics</span>
                     </div>
-                    <h3 class="font-headline font-bold text-lg text-on-surface mb-2">Analytics Dashboard</h3>
-                    <p class="text-on-surface-variant text-sm mb-4">Comprehensive insights with beautiful charts showing growth trends and system performance.</p>
+                    <h3 class="font-headline font-bold text-lg text-gray-900 dark:text-on-surface mb-2">Analytics Dashboard</h3>
+                    <p class="text-gray-600 dark:text-on-surface-variant text-sm mb-4">Comprehensive insights with beautiful charts showing growth trends and system performance.</p>
                     <button onclick="showDemoAlert('Analytics Demo')" class="text-primary text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all">
                         Watch Demo <span class="material-symbols-outlined text-sm">arrow_forward</span>
                     </button>
                 </div>
 
                 <!-- Feature 4: Zone Management -->
-                <div class="demo-card glass-panel rounded-2xl p-6 border border-outline-variant/15">
+                <div class="demo-card glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15">
                     <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                         <span class="material-symbols-outlined text-primary text-2xl">view_module</span>
                     </div>
-                    <h3 class="font-headline font-bold text-lg text-on-surface mb-2">Zone Management</h3>
-                    <p class="text-on-surface-variant text-sm mb-4">Control multiple greenhouse zones independently with customized settings for each area.</p>
+                    <h3 class="font-headline font-bold text-lg text-gray-900 dark:text-on-surface mb-2">Zone Management</h3>
+                    <p class="text-gray-600 dark:text-on-surface-variant text-sm mb-4">Control multiple greenhouse zones independently with customized settings for each area.</p>
                     <button onclick="showDemoAlert('Zone Management Demo')" class="text-primary text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all">
                         Watch Demo <span class="material-symbols-outlined text-sm">arrow_forward</span>
                     </button>
                 </div>
 
                 <!-- Feature 5: Automated Alerts -->
-                <div class="demo-card glass-panel rounded-2xl p-6 border border-outline-variant/15">
+                <div class="demo-card glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15">
                     <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                         <span class="material-symbols-outlined text-primary text-2xl">notifications_active</span>
                     </div>
-                    <h3 class="font-headline font-bold text-lg text-on-surface mb-2">Automated Alerts</h3>
-                    <p class="text-on-surface-variant text-sm mb-4">Instant notifications when conditions need attention or when systems require maintenance.</p>
+                    <h3 class="font-headline font-bold text-lg text-gray-900 dark:text-on-surface mb-2">Automated Alerts</h3>
+                    <p class="text-gray-600 dark:text-on-surface-variant text-sm mb-4">Instant notifications when conditions need attention or when systems require maintenance.</p>
                     <button onclick="showDemoAlert('Alerts Demo')" class="text-primary text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all">
                         Watch Demo <span class="material-symbols-outlined text-sm">arrow_forward</span>
                     </button>
                 </div>
 
                 <!-- Feature 6: Mobile Control -->
-                <div class="demo-card glass-panel rounded-2xl p-6 border border-outline-variant/15">
+                <div class="demo-card glass-panel rounded-2xl p-6 border border-gray-200 dark:border-outline-variant/15">
                     <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                         <span class="material-symbols-outlined text-primary text-2xl">smartphone</span>
                     </div>
-                    <h3 class="font-headline font-bold text-lg text-on-surface mb-2">Mobile Control</h3>
-                    <p class="text-on-surface-variant text-sm mb-4">Manage your entire farm from anywhere with our responsive mobile-first dashboard.</p>
+                    <h3 class="font-headline font-bold text-lg text-gray-900 dark:text-on-surface mb-2">Mobile Control</h3>
+                    <p class="text-gray-600 dark:text-on-surface-variant text-sm mb-4">Manage your entire farm from anywhere with our responsive mobile-first dashboard.</p>
                     <button onclick="showDemoAlert('Mobile App Demo')" class="text-primary text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all">
                         Watch Demo <span class="material-symbols-outlined text-sm">arrow_forward</span>
                     </button>
@@ -184,16 +169,16 @@
     <!-- Interactive Simulation -->
     <section class="px-6 md:px-8 py-16">
         <div class="max-w-4xl mx-auto">
-            <h2 class="font-headline font-bold text-3xl text-on-surface text-center mb-8">
+            <h2 class="font-headline font-bold text-3xl text-gray-900 dark:text-on-surface text-center mb-8">
                 Try the Dashboard Preview
             </h2>
             
-            <div class="glass-panel rounded-2xl p-6 md:p-8 border border-outline-variant/15">
+            <div class="glass-panel rounded-2xl p-6 md:p-8 border border-gray-200 dark:border-outline-variant/15">
                 <div class="grid md:grid-cols-3 gap-4 mb-6">
                     <!-- Metric 1 -->
-                    <div class="bg-surface-container-high rounded-xl p-4 text-center">
-                        <div class="text-on-surface-variant text-xs uppercase tracking-wider mb-1">Temperature</div>
-                        <div class="font-headline font-bold text-3xl text-on-surface">
+                    <div class="bg-gray-100 dark:bg-surface-container-high rounded-xl p-4 text-center">
+                        <div class="text-gray-500 dark:text-on-surface-variant text-xs uppercase tracking-wider mb-1">Temperature</div>
+                        <div class="font-headline font-bold text-3xl text-gray-900 dark:text-on-surface">
                             <span id="temp-value">24</span>°C
                         </div>
                         <div class="flex items-center justify-center gap-1 mt-2 text-secondary text-xs">
@@ -203,9 +188,9 @@
                     </div>
                     
                     <!-- Metric 2 -->
-                    <div class="bg-surface-container-high rounded-xl p-4 text-center">
-                        <div class="text-on-surface-variant text-xs uppercase tracking-wider mb-1">Humidity</div>
-                        <div class="font-headline font-bold text-3xl text-on-surface">
+                    <div class="bg-gray-100 dark:bg-surface-container-high rounded-xl p-4 text-center">
+                        <div class="text-gray-500 dark:text-on-surface-variant text-xs uppercase tracking-wider mb-1">Humidity</div>
+                        <div class="font-headline font-bold text-3xl text-gray-900 dark:text-on-surface">
                             <span id="humidity-value">68</span>%
                         </div>
                         <div class="flex items-center justify-center gap-1 mt-2 text-secondary text-xs">
@@ -215,9 +200,9 @@
                     </div>
                     
                     <!-- Metric 3 -->
-                    <div class="bg-surface-container-high rounded-xl p-4 text-center">
-                        <div class="text-on-surface-variant text-xs uppercase tracking-wider mb-1">Soil Moisture</div>
-                        <div class="font-headline font-bold text-3xl text-on-surface">
+                    <div class="bg-gray-100 dark:bg-surface-container-high rounded-xl p-4 text-center">
+                        <div class="text-gray-500 dark:text-on-surface-variant text-xs uppercase tracking-wider mb-1">Soil Moisture</div>
+                        <div class="font-headline font-bold text-3xl text-gray-900 dark:text-on-surface">
                             <span id="moisture-value">45</span>%
                         </div>
                         <div class="flex items-center justify-center gap-1 mt-2 text-primary text-xs">
@@ -228,11 +213,11 @@
                 </div>
                 
                 <div class="flex gap-3 justify-center">
-                    <button onclick="simulateData()" class="px-6 py-3 rounded-full bg-primary text-on-primary font-semibold hover:shadow-lg transition-all active:scale-95 flex items-center gap-2">
+                    <button onclick="simulateData()" class="px-6 py-3 rounded-full bg-primary text-white dark:text-on-primary font-semibold hover:shadow-lg transition-all active:scale-95 flex items-center gap-2">
                         <span class="material-symbols-outlined">refresh</span>
                         Simulate Live Data
                     </button>
-                    <a href="login.html" class="px-6 py-3 rounded-full bg-surface-container-high text-on-surface border border-outline-variant/30 font-semibold hover:bg-surface-container-highest transition-all flex items-center gap-2">
+                    <a href="login.html" class="px-6 py-3 rounded-full bg-gray-100 dark:bg-surface-container-high text-gray-900 dark:text-on-surface border border-gray-200 dark:border-outline-variant/30 font-semibold hover:bg-gray-200 dark:hover:bg-surface-container-highest transition-all flex items-center gap-2">
                         <span class="material-symbols-outlined">login</span>
                         Access Full System
                     </a>
@@ -247,15 +232,15 @@
             <h2 class="font-headline font-bold text-3xl md:text-4xl text-on-surface mb-4">
                 Ready to Transform Your Farm?
             </h2>
-            <p class="text-on-surface-variant text-lg mb-8">
+            <p class="text-gray-600 dark:text-on-surface-variant text-lg mb-8">
                 Join thousands of farmers already growing smarter with Verdanist.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="create-account.html" class="px-8 py-4 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold text-lg hover:shadow-[0_12px_40px_rgba(75,226,119,0.3)] transition-all active:scale-95 flex items-center justify-center gap-2">
+                <a href="create-account.html" class="px-8 py-4 rounded-full bg-gradient-to-r from-primary to-primary-container text-white dark:text-on-primary font-headline font-bold text-lg hover:shadow-[0_12px_40px_rgba(75,226,119,0.3)] transition-all active:scale-95 flex items-center justify-center gap-2">
                     <span class="material-symbols-outlined">person_add</span>
                     Start Free Trial
                 </a>
-                <a href="login.html" class="px-8 py-4 rounded-full bg-surface-container-high text-on-surface border border-outline-variant/30 font-headline font-bold text-lg hover:bg-surface-container-highest transition-all flex items-center justify-center gap-2">
+                <a href="login.html" class="px-8 py-4 rounded-full bg-gray-100 dark:bg-surface-container-high text-gray-900 dark:text-on-surface border border-gray-200 dark:border-outline-variant/30 font-headline font-bold text-lg hover:bg-gray-200 dark:hover:bg-surface-container-highest transition-all flex items-center justify-center gap-2">
                     <span class="material-symbols-outlined">login</span>
                     Sign In
                 </a>
@@ -264,20 +249,20 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-[#161311] py-8 border-t border-stone-800/15">
+    <footer class="bg-white dark:bg-[#161311] py-8 border-t border-gray-200 dark:border-stone-800/15 transition-colors duration-300">
         <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-primary text-2xl">spa</span>
                 <span class="text-primary font-bold font-headline">Verdanist</span>
             </div>
-            <p class="text-on-surface-variant text-sm">
+            <p class="text-gray-500 dark:text-on-surface-variant text-sm">
                 © 2026 Verdanist Conservatory. Cultivated with intelligence.
             </p>
             <div class="flex gap-4">
-                <a href="#" class="text-on-surface-variant hover:text-primary transition-colors">
+                <a href="#" class="text-gray-500 dark:text-on-surface-variant hover:text-primary transition-colors">
                     <span class="material-symbols-outlined">help</span>
                 </a>
-                <a href="#" class="text-on-surface-variant hover:text-primary transition-colors">
+                <a href="#" class="text-gray-500 dark:text-on-surface-variant hover:text-primary transition-colors">
                     <span class="material-symbols-outlined">mail</span>
                 </a>
             </div>
@@ -313,5 +298,6 @@
             }, 100);
         }
     </script>
+    <script src="../js/utils/theme-toggle.js"></script>
 </body>
 </html>

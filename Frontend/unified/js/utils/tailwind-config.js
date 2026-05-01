@@ -7,8 +7,8 @@ tailwind.config = {
         extend: {
             colors: {
                 // Primary Brand Colors (consistent across modes)
-                "primary": "#2E7D32",
-                "primary-light": "#4be277",
+                "primary": "#4ade80",
+                "primary-light": "#6bff8f",
                 "primary-container": "#22c55e",
                 "on-primary": "#ffffff",
                 "on-primary-container": "#004b1e",

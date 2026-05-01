@@ -13,65 +13,75 @@
 <link rel="stylesheet" href="../assets/css/style.css"/>
 <!-- Theme initialization - runs immediately to prevent flash -->
 <script>(function(){const t=localStorage.getItem('verdanist-theme');if(t==='dark')document.documentElement.classList.add('dark');})();</script>
-<!-- CRITICAL: Dashboard Protection - MUST run before any content shows -->
+<!-- CRITICAL: Dashboard Protection - HARD BLOCK -->
 <style>
-  #auth-loading { position: fixed; inset: 0; background: #fff; z-index: 99999; display: flex; align-items: center; justify-content: center; }
-  .dark #auth-loading { background: #161311; }
-  #auth-loading .spinner { width: 40px; height: 40px; border: 3px solid #e5e7eb; border-top-color: #4be277; border-radius: 50%; animation: spin 1s linear infinite; }
+  /* Hide all content until auth verified */
+  body { visibility: hidden !important; }
+  body.auth-verified { visibility: visible !important; }
+  
+  /* Loading overlay - always visible until auth passes */
+  #auth-blocker { 
+    position: fixed; inset: 0; 
+    background: #fff; z-index: 99999; 
+    display: flex; align-items: center; justify-content: center;
+    visibility: visible !important;
+  }
+  .dark #auth-blocker { background: #161311; }
+  #auth-blocker .spinner { 
+    width: 40px; height: 40px; 
+    border: 3px solid #e5e7eb; border-top-color: #4be277; 
+    border-radius: 50%; animation: spin 1s linear infinite; 
+  }
   @keyframes spin { to { transform: rotate(360deg); } }
 </style>
+<!-- Hard block overlay - in HTML so it shows immediately -->
+<div id="auth-blocker"><div class="spinner"></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/auth/supabase-client.js"></script>
 <script>
-// IMMEDIATE protection - runs before body renders
+// IMMEDIATE auth check - runs as soon as scripts load
 (function() {
-  // Create loading overlay immediately
-  const loading = document.createElement('div');
-  loading.id = 'auth-loading';
-  loading.innerHTML = '<div class="spinner"></div>';
-  
-  // Block rendering until auth check completes
-  document.write = function() {}; // Prevent premature writes
-  
-  // Wait for DOM to add overlay
-  if (document.body) {
-    document.body.appendChild(loading);
-  } else {
-    document.addEventListener('DOMContentLoaded', function() {
-      document.body.appendChild(loading);
-    });
+  async function checkAccess() {
+    // Wait for supabase
+    let attempts = 0;
+    while (typeof supabase === 'undefined' && attempts < 50) {
+      await new Promise(r => setTimeout(r, 100));
+      attempts++;
+    }
+    
+    if (typeof supabase === 'undefined') {
+      window.location.replace('/pages/login.html');
+      return;
+    }
+    
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      window.location.replace('/pages/login.html');
+      return;
+    }
+    
+    // Check role
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', session.user.id)
+      .single();
+    
+    if (!profile || (profile.role !== 'admin' && profile.role !== 'farmer')) {
+      console.log('ACCESS DENIED: role=' + (profile?.role || 'none'));
+      window.location.replace('/pages/welcome-guest.html');
+      return;
+    }
+    
+    // ACCESS GRANTED - show content
+    console.log('ACCESS GRANTED: role=' + profile.role);
+    document.body.classList.add('auth-verified');
+    const blocker = document.getElementById('auth-blocker');
+    if (blocker) blocker.remove();
   }
   
-  // Check auth after scripts load
-  window.addEventListener('load', async function() {
-    await new Promise(r => setTimeout(r, 500)); // Wait for supabase init
-    
-    if (typeof supabase !== 'undefined') {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        window.location.replace('/pages/login.html');
-        return;
-      }
-      
-      // Check role from profiles
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single();
-      
-      if (!profile || (profile.role !== 'admin' && profile.role !== 'farmer')) {
-        console.log('ACCESS DENIED: role=' + (profile?.role || 'none'));
-        window.location.replace('/pages/welcome-guest.html');
-        return;
-      }
-      
-      // Access granted - remove loading
-      const loader = document.getElementById('auth-loading');
-      if (loader) loader.remove();
-      console.log('ACCESS GRANTED: role=' + profile.role);
-    }
-  });
+  // Run immediately
+  checkAccess();
 })();
 </script>
 </head>

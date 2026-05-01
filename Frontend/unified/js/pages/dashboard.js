@@ -1,7 +1,7 @@
 // Verdanist Dashboard - Pump Control & Schedule Logic
 // Page-specific JavaScript for dashboard.html
 
-let currentDeviceId = 'esp32_indoor'; 
+let currentDeviceId = 'ESP32_INDOOR'; 
 
 async function protectDashboard() {
     createLoadingOverlay();

@@ -253,6 +253,7 @@ async function fetchLatestSensorReadings() {
 
         if (profile?.role === 'guest') {
             console.warn('BLOCKED: Guest user cannot fetch sensor data');
+            window.location.replace('/pages/welcome-guest.html');
             return;
         }
     } catch (e) {

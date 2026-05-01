@@ -123,6 +123,10 @@ function removeLoadingOverlay() {
         overlay.style.transition = 'opacity 0.3s ease';
         setTimeout(() => overlay.remove(), 300);
     }
+    
+    // Also remove auth-blocker from dashboard.html
+    const authBlocker = document.getElementById('auth-blocker');
+    if (authBlocker) authBlocker.remove();
 }
 
 document.addEventListener('keydown', function(e) {

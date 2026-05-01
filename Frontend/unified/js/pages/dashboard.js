@@ -55,6 +55,9 @@ async function protectDashboard() {
                 // Only allow admin and farmer
                 if (role === 'admin' || role === 'farmer') {
                     console.log('[protectDashboard] Access granted for', role);
+                    // Show body content (remove hard block)
+                    document.body.classList.add('auth-verified');
+                    document.body.style.visibility = 'visible';
                     removeLoadingOverlay();
                     return true;
                 } else if (role === 'guest') {

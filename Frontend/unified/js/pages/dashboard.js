@@ -242,6 +242,7 @@ async function fetchInitialSettings() {
 }
 
 function updateUIBasedOnSettings(settings) {
+    console.log('[SSOT] Updating UI for device:', settings.device_id, 'Mode:', settings.mode, 'Pump:', settings.pump_status);
     const zone = 'A'; 
     systemState[zone].mode = settings.mode;
     systemState[zone].pumpOn = settings.pump_status;
@@ -261,12 +262,6 @@ function updateUIBasedOnSettings(settings) {
     
     updateTimerPanel(zone);
     updatePumpUI(zone);
-}
-
-async function switchDevice(deviceId) {
-    currentDeviceId = deviceId;
-    await fetchInitialSettings();
-    await fetchLatestSensorReadings();
 }
 
 const systemState = {

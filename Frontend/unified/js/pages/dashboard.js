@@ -357,6 +357,18 @@ async function initDashboard() {
     await fetchInitialSettings();
     await fetchLatestSensorReadings();
     setupRealtimeListeners();
+    
+    // --- MANTRA BUKA PINTU ---
+    // Force remove loading overlay and show content
+    document.body.classList.add('auth-verified');
+    document.body.style.visibility = 'visible';
+    const loadingScreen = document.getElementById('role-check-overlay');
+    if (loadingScreen) {
+        loadingScreen.style.opacity = '0';
+        loadingScreen.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => loadingScreen.remove(), 300);
+    }
+    // -------------------------
 }
 
 if (document.readyState === 'loading') {

@@ -30,6 +30,12 @@ async function switchDevice(deviceId) {
         sensorTypeEl.textContent = deviceId === 'ESP32_INDOOR' ? 'Air Humidity' : 'Soil Moisture';
     }
     
+    // Show/hide temperature card (only for Indoor)
+    const tempCard = document.getElementById('temp-card');
+    if (tempCard) {
+        tempCard.style.display = deviceId === 'ESP32_INDOOR' ? 'flex' : 'none';
+    }
+    
     // Kosongkan tampilan sementara (biar user tau data lagi loading)
     const tempEl = document.querySelector('.font-headline.text-6xl, .font-headline.text-\\[5rem\\]');
     if (tempEl) tempEl.textContent = '--';
@@ -214,9 +220,11 @@ async function fetchLatestSensorReadings() {
                 if(sensorEl) sensorEl.textContent = systemState['A'].sensorValue;
             }
             
-            // Update temperature display
-            const tempEl = document.querySelector('.font-headline.text-6xl, .font-headline.text-\\[5rem\\]');
-            if (tempEl && tempReading) tempEl.textContent = Math.round(tempReading.value);
+            // Update temperature display (only for Indoor)
+            if (isIndoor) {
+                const tempEl = document.querySelector('.font-headline.text-6xl, .font-headline.text-\\[5rem\\]');
+                if (tempEl && tempReading) tempEl.textContent = Math.round(tempReading.value);
+            }
         }
     } catch (e) {
         console.warn('Could not fetch sensor readings:', e);
@@ -252,8 +260,8 @@ function setupRealtimeListeners() {
                 if (sensorEl) sensorEl.textContent = systemState['A'].sensorValue;
             }
             
-            // Update temperature if type is temperature
-            if (sensorBaru.type === 'temperature') {
+            // Update temperature if type is temperature (only for Indoor)
+            if (sensorBaru.type === 'temperature' && isIndoor) {
                 const tempEl = document.querySelector('.font-headline.text-6xl, .font-headline.text-\\[5rem\\]');
                 if (tempEl) tempEl.textContent = Math.round(sensorBaru.value);
             }

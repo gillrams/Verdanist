@@ -185,16 +185,16 @@ function hideWelcomeToast() {
 </div>
 </section>
 <!-- Control Modules Bento Grid -->
-<section class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
+<section class="grid grid-cols-1 gap-6 lg:gap-10 max-w-2xl mx-auto">
 <!-- Indoor Misting Card -->
 <div class="bg-white dark:bg-surface-container rounded-xl p-6 lg:p-8 flex flex-col relative z-10 shadow-sm dark:shadow-none">
 <div class="flex justify-between items-center mb-8">
 <div>
 <h3 class="font-headline text-xl font-bold text-gray-900 dark:text-on-surface flex items-center gap-2">
-                    Indoor Misting
+                    <span id="dynamic-zone-title">Indoor Pump Control</span>
                     <span class="material-symbols-outlined text-[16px] device-heartbeat" id="heartbeat-A" style="font-variation-settings: 'FILL' 1; color: #4be277;">wifi</span>
 </h3>
-<p class="font-label text-sm text-gray-500 dark:text-on-surface-variant mt-1">Zone A • Overhead</p>
+<p class="font-label text-sm text-gray-500 dark:text-on-surface-variant mt-1" id="dynamic-zone-subtitle">Zone A • Overhead</p>
 </div>
 <div class="card-menu-container">
 <button class="w-10 h-10 rounded-full bg-gray-100 dark:bg-surface-container-high flex items-center justify-center text-gray-700 dark:text-on-surface hover:text-primary transition-colors card-menu-btn" data-zone="A">
@@ -286,110 +286,11 @@ function hideWelcomeToast() {
                              PUMP ON
                          </button>
 </div>
-<!-- Outdoor Polybag Card -->
-<div class="bg-white dark:bg-surface-container rounded-xl p-6 lg:p-8 flex flex-col relative z-10 shadow-sm dark:shadow-none">
-<div class="flex justify-between items-center mb-8">
-<div>
-<h3 class="font-headline text-xl font-bold text-gray-900 dark:text-on-surface flex items-center gap-2">
-                    Outdoor Polybag
-                    <span class="material-symbols-outlined text-[16px] device-heartbeat" id="heartbeat-B" style="font-variation-settings: 'FILL' 1; color: #4be277;">wifi</span>
-</h3>
-<p class="font-label text-sm text-gray-500 dark:text-on-surface-variant mt-1">Zone B • Drip Lines</p>
-</div>
-<div class="card-menu-container">
-<button class="w-10 h-10 rounded-full bg-gray-100 dark:bg-surface-container-high flex items-center justify-center text-gray-700 dark:text-on-surface hover:text-primary transition-colors card-menu-btn" data-zone="B">
-<span class="material-symbols-outlined">more_vert</span>
-</button>
-<div class="dropdown-menu" id="dropdown-menu-B">
-<div class="dropdown-header">Quick Settings</div>
-<a href="#" class="dropdown-item" onclick="showThresholdModal('B')">
-<span class="material-symbols-outlined">tune</span>
-<span>Edit Threshold</span>
-</a>
-<a href="#" class="dropdown-item" onclick="calibrateSensor('B')">
-<span class="material-symbols-outlined">adjust</span>
-<span>Calibrate Sensor</span>
-</a>
-<a href="#" class="dropdown-item" onclick="showScheduleModal('B')">
-<span class="material-symbols-outlined">schedule</span>
-<span>Set Schedule</span>
-</a>
-<div class="dropdown-divider"></div>
-<div class="dropdown-header">Device Health</div>
-<a href="#" class="dropdown-item" onclick="showDeviceInfo('B')">
-<span class="material-symbols-outlined">wifi_tethering</span>
-<span>Signal Strength</span>
-</a>
-<a href="#" class="dropdown-item" onclick="showPowerStatus('B')">
-<span class="material-symbols-outlined">battery_full</span>
-<span>Power Status</span>
-</a>
-<div class="dropdown-divider"></div>
-<div class="dropdown-header">Maintenance</div>
-<a href="#" class="dropdown-item" onclick="forceSleep('B')">
-<span class="material-symbols-outlined">bedtime</span>
-<span>Force Sleep</span>
-</a>
-<a href="#" class="dropdown-item" onclick="restartController('B')">
-<span class="material-symbols-outlined">restart_alt</span>
-<span>Restart Controller</span>
-</a>
-</div>
-</div>
-</div>
-<div class="flex flex-col items-center justify-center my-6 relative">
-<!-- Circular Gauge representation -->
-<div class="w-48 h-48 rounded-full border-[12px] border-gray-200 dark:border-surface-container-high relative flex items-center justify-center">
-<!-- Fake arc for moisture -->
-<svg class="absolute inset-0 w-full h-full -rotate-90 transform" viewbox="0 0 100 100">
-<circle class="text-gray-300 dark:text-surface-container-highest" cx="50" cy="50" fill="none" r="44" stroke="currentColor" stroke-width="12"></circle>
-<circle class="text-tertiary drop-shadow-[0_0_8px_rgba(139,207,255,0.3)] stroke-linecap-round" cx="50" cy="50" fill="none" r="44" stroke="currentColor" stroke-dasharray="276" stroke-dashoffset="150" stroke-width="12"></circle>
-</svg>
-<div class="text-center z-10 flex flex-col items-center">
-<span class="material-symbols-outlined text-tertiary mb-1">grass</span>
-<div class="flex items-baseline">
-<span id="sensor-B" class="font-headline text-4xl font-bold text-gray-900 dark:text-on-surface tracking-tight">42</span>
-<span class="font-label text-lg text-tertiary">%</span>
-</div>
-<span class="font-label text-xs text-gray-500 dark:text-on-surface-variant mt-1">Soil Moisture</span>
-</div>
-</div>
-</div>
-<!-- 3 Way Switch -->
-<div id="mode-switch-B" class="bg-gray-100 dark:bg-surface-container-high rounded-full p-1.5 flex mt-auto mb-4 border border-gray-200 dark:border-outline-variant/15">
-<button data-mode="manual" class="flex-1 py-2 px-4 rounded-full font-label text-sm font-medium bg-white dark:bg-surface-container-low text-gray-900 dark:text-on-surface shadow-[0_4px_12px_rgba(0,0,0,0.2)] border border-gray-200 dark:border-outline-variant/20 transition-all">Manual</button>
-<button data-mode="auto" class="flex-1 py-2 px-4 rounded-full font-label text-sm font-medium text-gray-500 dark:text-on-surface-variant hover:text-gray-700 dark:hover:text-on-surface transition-colors">Auto</button>
-<button data-mode="timer" class="flex-1 py-2 px-4 rounded-full font-label text-sm font-medium text-gray-500 dark:text-on-surface-variant hover:text-gray-700 dark:hover:text-on-surface transition-colors">Timer</button>
-</div>
-<!-- Schedule Panel (hidden by default) -->
-<div id="timer-panel-B" class="hidden mb-4 bg-gray-100 dark:bg-surface-container-high rounded-2xl p-4 border border-gray-200 dark:border-outline-variant/15">
-<div class="flex items-center justify-between mb-3">
-<span class="font-label text-sm text-gray-500 dark:text-on-surface-variant">Daily Schedule</span>
-<span id="schedule-status-B" class="font-label text-xs text-tertiary">Auto-run based on time</span>
-</div>
-<div id="schedule-list-B" class="space-y-2 mb-3 max-h-32 overflow-y-auto">
-<!-- Schedule slots will be rendered here -->
-</div>
-<div class="flex gap-2 mb-3">
-<input id="schedule-time-B" class="flex-1 bg-white dark:bg-surface-container-low text-gray-900 dark:text-on-surface rounded-xl px-3 py-2 font-label text-sm text-center border border-gray-200 dark:border-outline-variant/20 focus:outline-none focus:border-primary/50" type="time" value="06:00"/>
-<input id="schedule-duration-B" class="w-20 bg-white dark:bg-surface-container-low text-gray-900 dark:text-on-surface rounded-xl px-3 py-2 font-headline text-sm text-center border border-gray-200 dark:border-outline-variant/20 focus:outline-none focus:border-primary/50" min="1" max="120" type="number" value="15"/>
-<span class="font-label text-xs text-gray-500 dark:text-on-surface-variant self-center">min</span>
-</div>
-<button id="schedule-add-B" class="w-full py-3 rounded-xl bg-[#4be277]/20 text-[#2E7D32] dark:text-primary font-label text-sm font-bold hover:bg-[#4be277]/30 transition-all flex items-center justify-center gap-2">
-<span class="material-symbols-outlined text-[18px]">add</span>
-                        ADD SCHEDULE
-                    </button>
-</div>
-<!-- Large Toggle OFF state -->
-<button id="pump-btn-B" class="w-full py-5 rounded-full bg-gray-200 dark:bg-surface-container-highest text-gray-600 dark:text-on-surface-variant font-headline font-bold text-lg border border-gray-300 dark:border-outline-variant/20 hover:bg-gray-300 dark:hover:bg-surface-variant active:scale-[0.98] transition-all flex items-center justify-center gap-3">
-<span class="material-symbols-outlined">power_settings_new</span>
-                            PUMP OFF
-                        </button>
-</div>
 </section>
 <!-- Bottom Section: Chart & Logs -->
-<section class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
+<section class="grid grid-cols-1 gap-6 lg:gap-10">
 <!-- Analytics Chart (Span 2 cols) -->
+<div class="bg-white dark:bg-surface-container rounded-xl p-6 lg:p-8 shadow-sm dark:shadow-none">
 <div class="lg:col-span-2 bg-white dark:bg-surface-container rounded-xl p-6 lg:p-8 shadow-sm dark:shadow-none">
 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
 <h3 class="font-headline text-xl font-bold text-gray-900 dark:text-on-surface">Real-time Trends</h3>

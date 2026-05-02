@@ -14,6 +14,20 @@ async function switchDevice(deviceId) {
     // Update button UI states
     updateDeviceButtonStates(deviceId);
     
+    // Update dynamic zone title
+    const titleEl = document.getElementById('dynamic-zone-title');
+    const subtitleEl = document.getElementById('dynamic-zone-subtitle');
+    if (titleEl) {
+        titleEl.textContent = deviceId === 'ESP32_INDOOR' ? 'Indoor Pump Control' : 'Outdoor Pump Control';
+    }
+    if (subtitleEl) {
+        subtitleEl.textContent = deviceId === 'ESP32_INDOOR' ? 'Zone A • Overhead' : 'Zone B • Drip Lines';
+    }
+    
+    // Kosongkan tampilan sementara (biar user tau data lagi loading)
+    const tempEl = document.querySelector('.font-headline.text-6xl, .font-headline.text-\\[5rem\\]');
+    if (tempEl) tempEl.textContent = '--';
+    
     // Reload data for new device
     await fetchInitialSettings();
     await fetchLatestSensorReadings();
@@ -265,8 +279,7 @@ function updateUIBasedOnSettings(settings) {
 }
 
 const systemState = {
-    A: { mode: 'auto', pumpOn: true, sensorValue: 75, target: 75, schedule: [], activeScheduleSlot: null },
-    B: { mode: 'manual', pumpOn: false, sensorValue: 42, target: 65, schedule: [], activeScheduleSlot: null }
+    A: { mode: 'auto', pumpOn: true, sensorValue: 75, target: 75, schedule: [], activeScheduleSlot: null }
 };
 
 // TAHAP 2: REFACTOR TOMBOL POMPA (HANYA UPDATE KE DB)
@@ -349,9 +362,7 @@ async function initDashboard() {
     updateDeviceButtonStates(currentDeviceId);
     
     setupModeSwitch('A');
-    setupModeSwitch('B');
     setupPumpToggle('A');
-    setupPumpToggle('B');
 
     await fetchInitialSettings();
     await fetchLatestSensorReadings();

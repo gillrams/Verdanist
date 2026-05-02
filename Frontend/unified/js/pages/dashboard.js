@@ -24,6 +24,12 @@ async function switchDevice(deviceId) {
         subtitleEl.textContent = deviceId === 'ESP32_INDOOR' ? 'Zone A • Overhead' : 'Zone B • Drip Lines';
     }
     
+    // Update sensor type label (Indoor=Air Humidity, Outdoor=Soil Moisture)
+    const sensorTypeEl = document.getElementById('sensor-type-label');
+    if (sensorTypeEl) {
+        sensorTypeEl.textContent = deviceId === 'ESP32_INDOOR' ? 'Air Humidity' : 'Soil Moisture';
+    }
+    
     // Kosongkan tampilan sementara (biar user tau data lagi loading)
     const tempEl = document.querySelector('.font-headline.text-6xl, .font-headline.text-\\[5rem\\]');
     if (tempEl) tempEl.textContent = '--';

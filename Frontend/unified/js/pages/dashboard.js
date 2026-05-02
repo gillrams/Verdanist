@@ -190,23 +190,33 @@ async function fetchLatestSensorReadings() {
     if (!supabase) return;
 
     try {
+        // Fetch latest readings (get multiple to cover temp + humidity/soil)
         const { data, error } = await supabase
             .from('sensor_readings')
             .select('*')
             .eq('device_id', currentDeviceId)
             .order('recorded_at', { ascending: false })
-            .limit(1)
-            .maybeSingle();
+            .limit(5);
 
-        if (data) {
-             if (systemState['A']) {
-                systemState['A'].sensorValue = Math.round(data.humidity || 0);
+        if (data && data.length > 0) {
+            // Determine expected sensor type based on device
+            const isIndoor = currentDeviceId === 'ESP32_INDOOR';
+            const moistureType = isIndoor ? 'humidity' : 'soil_moisture';
+            
+            // Find moisture reading (humidity for indoor, soil_moisture for outdoor)
+            const moistureReading = data.find(r => r.type === moistureType || r.type === 'humidity' || r.type === 'soil');
+            const tempReading = data.find(r => r.type === 'temperature');
+            
+            // Update moisture gauge
+            if (moistureReading && systemState['A']) {
+                systemState['A'].sensorValue = Math.round(moistureReading.value || 0);
                 const sensorEl = document.getElementById('sensor-A');
                 if(sensorEl) sensorEl.textContent = systemState['A'].sensorValue;
-             }
-             
-             const tempEl = document.querySelector('.font-headline.text-6xl, .font-headline.text-\\[5rem\\]');
-             if (tempEl && data.temperature) tempEl.textContent = Math.round(data.temperature);
+            }
+            
+            // Update temperature display
+            const tempEl = document.querySelector('.font-headline.text-6xl, .font-headline.text-\\[5rem\\]');
+            if (tempEl && tempReading) tempEl.textContent = Math.round(tempReading.value);
         }
     } catch (e) {
         console.warn('Could not fetch sensor readings:', e);
@@ -232,13 +242,21 @@ function setupRealtimeListeners() {
     }, (payload) => {
         const sensorBaru = payload.new;
         if (sensorBaru.device_id === currentDeviceId) {
-            if (systemState['A']) {
-                systemState['A'].sensorValue = Math.round(sensorBaru.humidity || 0);
+            const isIndoor = currentDeviceId === 'ESP32_INDOOR';
+            const moistureTypes = isIndoor ? ['humidity'] : ['soil_moisture', 'soil'];
+            
+            // Update moisture gauge if type matches
+            if (moistureTypes.includes(sensorBaru.type) && systemState['A']) {
+                systemState['A'].sensorValue = Math.round(sensorBaru.value || 0);
                 const sensorEl = document.getElementById('sensor-A');
                 if (sensorEl) sensorEl.textContent = systemState['A'].sensorValue;
             }
-            const tempEl = document.querySelector('.font-headline.text-6xl, .font-headline.text-\\[5rem\\]');
-            if (tempEl && sensorBaru.temperature) tempEl.textContent = Math.round(sensorBaru.temperature);
+            
+            // Update temperature if type is temperature
+            if (sensorBaru.type === 'temperature') {
+                const tempEl = document.querySelector('.font-headline.text-6xl, .font-headline.text-\\[5rem\\]');
+                if (tempEl) tempEl.textContent = Math.round(sensorBaru.value);
+            }
         }
     }).subscribe();
 }

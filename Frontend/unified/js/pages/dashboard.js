@@ -527,6 +527,9 @@ function setupModeSwitch(zone) {
                         console.error('[Mode Switch] Error:', error);
                     } else {
                         console.log(`[Mode Switch] Successfully updated to ${selectedMode}`);
+                        // CRITICAL: Update local state to prevent desynchronization
+                        systemState[zone].mode = selectedMode;
+                        console.log(`[Mode Switch] Local state updated: systemState[${zone}].mode = '${selectedMode}'`);
                     }
                 } catch (e) {
                     console.error('[Mode Switch] Exception:', e);

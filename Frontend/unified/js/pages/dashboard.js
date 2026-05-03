@@ -288,29 +288,42 @@ async function fetchInitialSettings() {
 }
 
 function updateUIBasedOnSettings(settings) {
-    console.log('[SSOT] Updating UI for device:', settings.device_id, 'Mode:', settings.mode, 'Pump:', settings.pump_status);
-    const zone = 'A'; 
-    systemState[zone].mode = settings.mode;
-    systemState[zone].pumpOn = settings.pump_status;
-    
-    const container = document.getElementById(`mode-switch-${zone}`);
-    if (container) {
-        const buttons = container.querySelectorAll('button');
-        buttons.forEach(b => {
-             b.className = 'flex-1 py-2 px-4 rounded-full font-label text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors';
-             // Re-enable buttons after SSOT update
-             b.disabled = false;
-             b.style.opacity = '1';
-        });
+    try {
+        console.log('[SSOT] Updating UI for device:', settings.device_id, 'Mode:', settings.mode, 'Pump:', settings.pump_status);
+        const zone = 'A'; 
+        systemState[zone].mode = settings.mode;
+        systemState[zone].pumpOn = settings.pump_status;
         
-        const activeBtn = container.querySelector(`button[data-mode="${settings.mode}"]`);
-        if (activeBtn) {
-            activeBtn.className = 'flex-1 py-2 px-4 rounded-full font-label text-sm font-medium bg-surface-container-low text-primary shadow-[0_4px_12px_rgba(0,0,0,0.2)] border border-outline-variant/20 transition-all';
+        const container = document.getElementById(`mode-switch-${zone}`);
+        if (container) {
+            const buttons = container.querySelectorAll('button');
+            buttons.forEach(b => {
+                 b.className = 'flex-1 py-2 px-4 rounded-full font-label text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors';
+                 // Re-enable buttons after SSOT update
+                 b.disabled = false;
+                 b.style.opacity = '1';
+            });
+            
+            const activeBtn = container.querySelector(`button[data-mode="${settings.mode}"]`);
+            if (activeBtn) {
+                activeBtn.className = 'flex-1 py-2 px-4 rounded-full font-label text-sm font-medium bg-surface-container-low text-primary shadow-[0_4px_12px_rgba(0,0,0,0.2)] border border-outline-variant/20 transition-all';
+            }
+        }
+        
+        updateTimerPanel(zone);
+        updatePumpUI(zone);
+    } catch (err) {
+        console.error('[SSOT] Error in updateUIBasedOnSettings:', err);
+        // Emergency: always try to re-enable buttons
+        const container = document.getElementById('mode-switch-A');
+        if (container) {
+            const buttons = container.querySelectorAll('button');
+            buttons.forEach(b => {
+                b.disabled = false;
+                b.style.opacity = '1';
+            });
         }
     }
-    
-    updateTimerPanel(zone);
-    updatePumpUI(zone);
 }
 
 const systemState = {
@@ -359,22 +372,28 @@ function setupPumpToggle(zone) {
 }
 
 function updatePumpUI(zone) {
-    const button = document.getElementById(`pump-btn-${zone}`);
-    if (!button) return;
+    try {
+        const button = document.getElementById(`pump-btn-${zone}`);
+        if (!button) return;
 
-    const state = systemState[zone];
-    const isManual = state.mode === 'manual';
-    let statusText = state.pumpOn ? 'PUMP ON' : 'PUMP OFF';
+        const state = systemState[zone];
+        if (!state) return;
+        
+        const isManual = state.mode === 'manual';
+        let statusText = state.pumpOn ? 'PUMP ON' : 'PUMP OFF';
 
-    if (state.pumpOn) {
-        button.className = 'w-full py-5 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-headline font-bold text-lg shadow-[0_8px_24px_rgba(75,226,119,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-3' + (isManual ? ' hover:opacity-90' : ' opacity-80 cursor-not-allowed');
-        button.innerHTML = `<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">power_settings_new</span> ${statusText}`;
-    } else {
-        button.className = 'w-full py-5 rounded-full bg-surface-container-highest text-on-surface-variant font-headline font-bold text-lg border border-outline-variant/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3' + (isManual ? ' hover:bg-surface-variant' : ' opacity-80 cursor-not-allowed');
-        button.innerHTML = `<span class="material-symbols-outlined">power_settings_new</span> ${statusText}`;
+        if (state.pumpOn) {
+            button.className = 'w-full py-5 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-headline font-bold text-lg shadow-[0_8px_24px_rgba(75,226,119,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-3' + (isManual ? ' hover:opacity-90' : ' opacity-80 cursor-not-allowed');
+            button.innerHTML = `<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">power_settings_new</span> ${statusText}`;
+        } else {
+            button.className = 'w-full py-5 rounded-full bg-surface-container-highest text-on-surface-variant font-headline font-bold text-lg border border-outline-variant/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3' + (isManual ? ' hover:bg-surface-variant' : ' opacity-80 cursor-not-allowed');
+            button.innerHTML = `<span class="material-symbols-outlined">power_settings_new</span> ${statusText}`;
+        }
+
+        button.disabled = !isManual;
+    } catch (err) {
+        console.error('[updatePumpUI] Error:', err);
     }
-
-    button.disabled = !isManual;
 }
 
 // TAHAP 2: REFACTOR TOMBOL MODE (HANYA UPDATE KE DB)
@@ -406,33 +425,36 @@ function setupModeSwitch(zone) {
                     
                     if (error) {
                         console.error('[Mode Switch] Error:', error);
-                        // Re-enable buttons on error
-                        buttons.forEach(b => {
-                            b.disabled = false;
-                            b.style.opacity = '1';
-                        });
                     } else {
                         console.log(`[Mode Switch] Successfully updated to ${selectedMode}`);
                     }
                 } catch (e) {
                     console.error('[Mode Switch] Exception:', e);
-                    buttons.forEach(b => {
-                        b.disabled = false;
-                        b.style.opacity = '1';
-                    });
                 }
+            } else {
+                console.warn('[Mode Switch] Supabase not available');
             }
+            
+            // ALWAYS re-enable buttons after attempt (even if Supabase fails)
+            buttons.forEach(b => {
+                b.disabled = false;
+                b.style.opacity = '1';
+            });
         });
     });
 }
 
 function updateTimerPanel(zone) {
-    const panel = document.getElementById(`timer-panel-${zone}`);
-    if (!panel) return;
-    if (systemState[zone].mode === 'timer') {
-        panel.classList.remove('hidden');
-    } else {
-        panel.classList.add('hidden');
+    try {
+        const panel = document.getElementById(`timer-panel-${zone}`);
+        if (!panel) return;
+        if (systemState[zone] && systemState[zone].mode === 'timer') {
+            panel.classList.remove('hidden');
+        } else {
+            panel.classList.add('hidden');
+        }
+    } catch (err) {
+        console.error('[updateTimerPanel] Error:', err);
     }
 }
 

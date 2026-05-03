@@ -405,7 +405,58 @@ function setupModeSwitch(zone) {
     buttons.forEach(btn => {
         btn.addEventListener('click', async () => {
             const selectedMode = btn.dataset.mode;
+            const previousMode = systemState[zone].mode;
             console.log(`[Mode Switch] Clicked: ${selectedMode} for device ${currentDeviceId}`);
+            
+            // Check if confirmation is needed (Manual or Timer mode)
+            let showConfirmation = false;
+            let alertTitle = '';
+            let alertText = '';
+            
+            if (selectedMode === 'manual') {
+                showConfirmation = true;
+                alertTitle = 'Beralih ke Manual?';
+                alertText = 'Perhatian! Penyiraman otomatis berhenti. Jangan lupa nyalakan pompa secara manual jika tanah mulai kering.';
+            } else if (selectedMode === 'timer') {
+                showConfirmation = true;
+                alertTitle = 'Beralih ke Timer?';
+                alertText = 'Perhatian! Penyiraman otomatis berhenti. Pastikan Anda sudah menentukan jadwal di menu navigasi agar tanaman tersiram tepat waktu.';
+            }
+            
+            // If confirmation needed, show SweetAlert2
+            if (showConfirmation) {
+                const isDarkMode = document.documentElement.classList.contains('dark');
+                
+                const result = await Swal.fire({
+                    title: alertTitle,
+                    text: alertText,
+                    icon: 'warning',
+                    background: isDarkMode ? '#161311' : '#ffffff',
+                    color: isDarkMode ? '#f5f5f4' : '#1c1917',
+                    showCancelButton: true,
+                    confirmButtonText: 'Oke',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#dc2626', // red-600
+                    cancelButtonColor: '#6c757d', // gray
+                    reverseButtons: true,
+                    customClass: {
+                        popup: 'rounded-2xl shadow-2xl',
+                        confirmButton: 'px-6 py-2 rounded-full font-medium',
+                        cancelButton: 'px-6 py-2 rounded-full font-medium'
+                    }
+                });
+                
+                if (!result.isConfirmed) {
+                    // User clicked Cancel - revert UI to previous mode
+                    console.log(`[Mode Switch] Cancelled by user, reverting to ${previousMode}`);
+                    updateUIBasedOnSettings({
+                        device_id: currentDeviceId,
+                        mode: previousMode,
+                        pump_status: systemState[zone].pumpOn
+                    });
+                    return; // Don't proceed with database update
+                }
+            }
             
             // Immediate visual feedback (optimistic UI)
             buttons.forEach(b => {

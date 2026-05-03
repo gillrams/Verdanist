@@ -376,7 +376,10 @@ function setupPumpToggle(zone) {
         const newPumpStatus = !systemState[zone].pumpOn;
         console.log(`[Pump Toggle] Changing pump to: ${newPumpStatus ? 'ON' : 'OFF'}`);
         
-        button.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Processing...';
+        // OPTIMISTIC UI: Show loading state immediately
+        const originalHTML = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Memproses...';
         button.classList.add('opacity-70', 'cursor-wait');
 
         const supabase = getSupabaseDashboard();
@@ -389,14 +392,22 @@ function setupPumpToggle(zone) {
                     
                 if (error) {
                     console.error('[Pump Toggle] Error:', error);
-                    updatePumpUI(zone);
                 } else {
-                    console.log('[Pump Toggle] Successfully updated pump status');
+                    console.log('[Pump Toggle] Successfully updated pump status to:', newPumpStatus);
+                    // Optimistic update: update local state immediately
+                    systemState[zone].pumpOn = newPumpStatus;
                 }
             } catch (e) {
                 console.error('[Pump Toggle] Exception:', e);
+            } finally {
+                // ALWAYS reset button state (disabled = false if manual mode)
                 updatePumpUI(zone);
             }
+        } else {
+            console.warn('[Pump Toggle] Supabase not available');
+            // Reset button if supabase unavailable
+            button.disabled = false;
+            button.classList.remove('opacity-70', 'cursor-wait');
         }
     });
 }

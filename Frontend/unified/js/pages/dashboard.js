@@ -298,6 +298,9 @@ function updateUIBasedOnSettings(settings) {
         const buttons = container.querySelectorAll('button');
         buttons.forEach(b => {
              b.className = 'flex-1 py-2 px-4 rounded-full font-label text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors';
+             // Re-enable buttons after SSOT update
+             b.disabled = false;
+             b.style.opacity = '1';
         });
         
         const activeBtn = container.querySelector(`button[data-mode="${settings.mode}"]`);
@@ -320,20 +323,35 @@ function setupPumpToggle(zone) {
     if (!button) return;
 
     button.addEventListener('click', async () => {
-        if (systemState[zone].mode !== 'manual') return;
+        console.log(`[Pump Toggle] Clicked. Current mode: ${systemState[zone].mode}`);
+        
+        if (systemState[zone].mode !== 'manual') {
+            console.warn('[Pump Toggle] Ignored - not in manual mode');
+            return;
+        }
         
         const newPumpStatus = !systemState[zone].pumpOn;
+        console.log(`[Pump Toggle] Changing pump to: ${newPumpStatus ? 'ON' : 'OFF'}`);
+        
         button.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Processing...';
         button.classList.add('opacity-70', 'cursor-wait');
 
         const supabase = getSupabaseDashboard();
         if (supabase) {
-            const { error } = await supabase
-                .from('device_settings')
-                .update({ pump_status: newPumpStatus })
-                .eq('device_id', currentDeviceId);
-                
-            if (error) {
+            try {
+                const { error } = await supabase
+                    .from('device_settings')
+                    .update({ pump_status: newPumpStatus })
+                    .eq('device_id', currentDeviceId);
+                    
+                if (error) {
+                    console.error('[Pump Toggle] Error:', error);
+                    updatePumpUI(zone);
+                } else {
+                    console.log('[Pump Toggle] Successfully updated pump status');
+                }
+            } catch (e) {
+                console.error('[Pump Toggle] Exception:', e);
                 updatePumpUI(zone);
             }
         }
@@ -368,12 +386,41 @@ function setupModeSwitch(zone) {
     buttons.forEach(btn => {
         btn.addEventListener('click', async () => {
             const selectedMode = btn.dataset.mode;
+            console.log(`[Mode Switch] Clicked: ${selectedMode} for device ${currentDeviceId}`);
+            
+            // Immediate visual feedback (optimistic UI)
+            buttons.forEach(b => {
+                b.className = 'flex-1 py-2 px-4 rounded-full font-label text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors';
+                b.disabled = true;
+                b.style.opacity = '0.5';
+            });
+            btn.className = 'flex-1 py-2 px-4 rounded-full font-label text-sm font-medium bg-surface-container-low text-primary shadow-[0_4px_12px_rgba(0,0,0,0.2)] border border-outline-variant/20 transition-all';
+            
             const supabase = getSupabaseDashboard();
             if (supabase) {
-                await supabase
-                    .from('device_settings')
-                    .update({ mode: selectedMode })
-                    .eq('device_id', currentDeviceId);
+                try {
+                    const { error } = await supabase
+                        .from('device_settings')
+                        .update({ mode: selectedMode })
+                        .eq('device_id', currentDeviceId);
+                    
+                    if (error) {
+                        console.error('[Mode Switch] Error:', error);
+                        // Re-enable buttons on error
+                        buttons.forEach(b => {
+                            b.disabled = false;
+                            b.style.opacity = '1';
+                        });
+                    } else {
+                        console.log(`[Mode Switch] Successfully updated to ${selectedMode}`);
+                    }
+                } catch (e) {
+                    console.error('[Mode Switch] Exception:', e);
+                    buttons.forEach(b => {
+                        b.disabled = false;
+                        b.style.opacity = '1';
+                    });
+                }
             }
         });
     });

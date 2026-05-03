@@ -8,6 +8,36 @@ let currentDeviceId = 'ESP32_INDOOR';
  * Updates currentDeviceId and reloads data from Supabase
  */
 async function switchDevice(deviceId) {
+    console.log(`[Device Switch] Requested change from ${currentDeviceId} to ${deviceId}`);
+    
+    // Show confirmation dialog for device switch
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    const targetDevice = deviceId === 'ESP32_INDOOR' ? 'Indoor' : 'Outdoor';
+    
+    const result = await Swal.fire({
+        title: `Beralih ke ${targetDevice}?`,
+        text: `Anda akan mengontrol area ${targetDevice === 'Indoor' ? 'dalam ruangan' : 'luar ruangan (polybag)'}. Pastikan Anda memantau kondisi tanaman di area tersebut.`,
+        icon: 'question',
+        background: isDarkMode ? '#161311' : '#ffffff',
+        color: isDarkMode ? '#f5f5f4' : '#1c1917',
+        showCancelButton: true,
+        confirmButtonText: 'Oke',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#dc2626', // red-600
+        cancelButtonColor: '#6c757d', // gray
+        reverseButtons: true,
+        customClass: {
+            popup: 'rounded-2xl shadow-2xl',
+            confirmButton: 'px-6 py-2 rounded-full font-medium',
+            cancelButton: 'px-6 py-2 rounded-full font-medium'
+        }
+    });
+    
+    if (!result.isConfirmed) {
+        console.log('[Device Switch] Cancelled by user');
+        return; // Don't switch device
+    }
+    
     console.log(`[Device Switch] Changing from ${currentDeviceId} to ${deviceId}`);
     currentDeviceId = deviceId;
     

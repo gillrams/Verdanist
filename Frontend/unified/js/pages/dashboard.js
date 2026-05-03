@@ -362,54 +362,62 @@ const systemState = {
 
 // TAHAP 2: REFACTOR TOMBOL POMPA (HANYA UPDATE KE DB)
 function setupPumpToggle(zone) {
-    const button = document.getElementById(`pump-btn-${zone}`);
-    if (!button) return;
-
-    button.addEventListener('click', async () => {
-        console.log(`[Pump Toggle] Clicked. Current mode: ${systemState[zone].mode}`);
+    // Use event delegation - attach listener to document once
+    document.addEventListener('click', async (e) => {
+        // Check if clicked element is the pump button or its child
+        const button = e.target.closest(`#pump-btn-${zone}`);
+        if (!button) return; // Not the pump button, ignore
         
-        if (systemState[zone].mode !== 'manual') {
-            console.warn('[Pump Toggle] Ignored - not in manual mode');
+        console.log(`[Pump Toggle] Button clicked! Zone: ${zone}, Current mode: ${systemState[zone]?.mode}`);
+        
+        // IMPORTANT: Check manual mode before processing
+        if (!systemState[zone] || systemState[zone].mode !== 'manual') {
+            console.warn('[Pump Toggle] Ignored - not in manual mode. Current mode:', systemState[zone]?.mode);
+            // Show visual feedback that button is disabled
+            button.classList.add('shake');
+            setTimeout(() => button.classList.remove('shake'), 500);
             return;
         }
         
         const newPumpStatus = !systemState[zone].pumpOn;
-        console.log(`[Pump Toggle] Changing pump to: ${newPumpStatus ? 'ON' : 'OFF'}`);
+        console.log(`[Pump Toggle] Changing pump from ${systemState[zone].pumpOn ? 'ON' : 'OFF'} to ${newPumpStatus ? 'ON' : 'OFF'}`);
         
         // OPTIMISTIC UI: Show loading state immediately
-        const originalHTML = button.innerHTML;
         button.disabled = true;
         button.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Memproses...';
         button.classList.add('opacity-70', 'cursor-wait');
 
         const supabase = getSupabaseDashboard();
-        if (supabase) {
-            try {
-                const { error } = await supabase
-                    .from('device_settings')
-                    .update({ pump_status: newPumpStatus })
-                    .eq('device_id', currentDeviceId);
-                    
-                if (error) {
-                    console.error('[Pump Toggle] Error:', error);
-                } else {
-                    console.log('[Pump Toggle] Successfully updated pump status to:', newPumpStatus);
-                    // Optimistic update: update local state immediately
-                    systemState[zone].pumpOn = newPumpStatus;
-                }
-            } catch (e) {
-                console.error('[Pump Toggle] Exception:', e);
-            } finally {
-                // ALWAYS reset button state (disabled = false if manual mode)
-                updatePumpUI(zone);
+        if (!supabase) {
+            console.error('[Pump Toggle] Supabase not available');
+            // Reset button state
+            updatePumpUI(zone);
+            return;
+        }
+
+        try {
+            const { error } = await supabase
+                .from('device_settings')
+                .update({ pump_status: newPumpStatus })
+                .eq('device_id', currentDeviceId);
+                
+            if (error) {
+                console.error('[Pump Toggle] Database error:', error);
+            } else {
+                console.log('[Pump Toggle] Successfully updated pump status to:', newPumpStatus);
+                // Optimistic update: update local state immediately
+                systemState[zone].pumpOn = newPumpStatus;
             }
-        } else {
-            console.warn('[Pump Toggle] Supabase not available');
-            // Reset button if supabase unavailable
-            button.disabled = false;
-            button.classList.remove('opacity-70', 'cursor-wait');
+        } catch (e) {
+            console.error('[Pump Toggle] Exception:', e);
+        } finally {
+            // ALWAYS reset button state via updatePumpUI (handles disabled state based on mode)
+            console.log('[Pump Toggle] Resetting button UI');
+            updatePumpUI(zone);
         }
     });
+    
+    console.log(`[Pump Toggle] Event delegation setup complete for zone ${zone}`);
 }
 
 function updatePumpUI(zone) {

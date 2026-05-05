@@ -429,17 +429,22 @@ function updatePumpUI(zone) {
         if (!state) return;
         
         const isManual = state.mode === 'manual';
-        let statusText = state.pumpOn ? 'PUMP ON' : 'PUMP OFF';
-
+        
+        // ACTION BUTTON LOGIC: Show what will happen when clicked
+        // If pump is OFF → Show "PUMP ON" (Green, ready to turn on)
+        // If pump is ON → Show "PUMP OFF" (Gray, ready to turn off)
         if (state.pumpOn) {
-            button.className = 'w-full py-5 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-headline font-bold text-lg shadow-[0_8px_24px_rgba(75,226,119,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-3' + (isManual ? ' hover:opacity-90' : ' opacity-80 cursor-not-allowed');
-            button.innerHTML = `<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">power_settings_new</span> ${statusText}`;
+            // Pump is currently ON → Action is to turn OFF
+            button.className = 'w-full py-5 rounded-full bg-surface-container-highest text-on-surface-variant font-headline font-bold text-lg border border-outline-variant/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3' + (isManual ? ' hover:bg-surface-variant hover:text-on-surface' : ' opacity-80 cursor-not-allowed');
+            button.innerHTML = `<span class="material-symbols-outlined">power_settings_new</span> PUMP OFF`;
         } else {
-            button.className = 'w-full py-5 rounded-full bg-surface-container-highest text-on-surface-variant font-headline font-bold text-lg border border-outline-variant/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3' + (isManual ? ' hover:bg-surface-variant' : ' opacity-80 cursor-not-allowed');
-            button.innerHTML = `<span class="material-symbols-outlined">power_settings_new</span> ${statusText}`;
+            // Pump is currently OFF → Action is to turn ON
+            button.className = 'w-full py-5 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-headline font-bold text-lg shadow-[0_8px_24px_rgba(75,226,119,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-3' + (isManual ? ' hover:opacity-90' : ' opacity-80 cursor-not-allowed');
+            button.innerHTML = `<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">power_settings_new</span> PUMP ON`;
         }
 
         button.disabled = !isManual;
+        console.log(`[updatePumpUI] Zone ${zone}: pumpOn=${state.pumpOn}, mode=${state.mode}, disabled=${button.disabled}`);
     } catch (err) {
         console.error('[updatePumpUI] Error:', err);
     }

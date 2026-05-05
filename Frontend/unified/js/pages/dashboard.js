@@ -422,6 +422,7 @@ function setupPumpToggle(zone) {
 
 function updatePumpUI(zone) {
     try {
+        const container = document.getElementById(`pump-container-${zone}`);
         const button = document.getElementById(`pump-btn-${zone}`);
         if (!button) return;
 
@@ -429,6 +430,12 @@ function updatePumpUI(zone) {
         if (!state) return;
         
         const isManual = state.mode === 'manual';
+        const isTimer = state.mode === 'timer';
+        
+        // Hide pump button in timer mode
+        if (container) {
+            container.style.display = isTimer ? 'none' : 'block';
+        }
         
         // ACTION BUTTON LOGIC: Show what will happen when clicked
         // If pump is OFF → Show "PUMP ON" (Green, ready to turn on)
@@ -444,7 +451,7 @@ function updatePumpUI(zone) {
         }
 
         button.disabled = !isManual;
-        console.log(`[updatePumpUI] Zone ${zone}: pumpOn=${state.pumpOn}, mode=${state.mode}, disabled=${button.disabled}`);
+        console.log(`[updatePumpUI] Zone ${zone}: pumpOn=${state.pumpOn}, mode=${state.mode}, disabled=${button.disabled}, timer=${isTimer}`);
     } catch (err) {
         console.error('[updatePumpUI] Error:', err);
     }

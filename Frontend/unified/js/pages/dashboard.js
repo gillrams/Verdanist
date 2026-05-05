@@ -558,6 +558,8 @@ function updateTimerPanel(zone) {
         if (!panel) return;
         if (systemState[zone] && systemState[zone].mode === 'timer') {
             panel.classList.remove('hidden');
+            // Fetch and display schedules when panel is shown
+            fetchSchedules(zone);
         } else {
             panel.classList.add('hidden');
         }
@@ -566,12 +568,192 @@ function updateTimerPanel(zone) {
     }
 }
 
+// TAHAP 3: MANAJEMEN JADWAL POMPA (pump_schedules)
+async function fetchSchedules(zone) {
+    const supabase = getSupabaseDashboard();
+    if (!supabase) {
+        console.error('[fetchSchedules] Supabase not available');
+        return;
+    }
+
+    try {
+        console.log(`[fetchSchedules] Fetching schedules for zone ${zone}, device ${currentDeviceId}`);
+        const { data, error } = await supabase
+            .from('pump_schedules')
+            .select('*')
+            .eq('zone', zone)
+            .eq('is_active', true)
+            .order('start_time', { ascending: true });
+
+        if (error) {
+            console.error('[fetchSchedules] Error:', error);
+            return;
+        }
+
+        console.log(`[fetchSchedules] Found ${data?.length || 0} schedules`);
+        systemState[zone].schedule = data || [];
+        renderSchedules(zone);
+    } catch (e) {
+        console.error('[fetchSchedules] Exception:', e);
+    }
+}
+
+function renderSchedules(zone) {
+    const container = document.getElementById(`schedule-list-${zone}`);
+    if (!container) return;
+
+    const schedules = systemState[zone]?.schedule || [];
+
+    if (schedules.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-4 text-gray-500 dark:text-on-surface-variant font-label text-sm">
+                Belum ada jadwal. Tambahkan jadwal di atas.
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = schedules.map(schedule => `
+        <div class="flex items-center justify-between bg-white dark:bg-surface-container-low rounded-xl px-3 py-2 border border-gray-200 dark:border-outline-variant/20">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary text-[18px]">schedule</span>
+                <div>
+                    <div class="font-headline text-sm font-semibold text-gray-900 dark:text-on-surface">${schedule.start_time}</div>
+                    <div class="font-label text-xs text-gray-500 dark:text-on-surface-variant">${schedule.duration} menit</div>
+                </div>
+            </div>
+            <button onclick="deleteSchedule('${zone}', ${schedule.id})" 
+                    class="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    title="Hapus jadwal">
+                <span class="material-symbols-outlined text-[18px]">delete</span>
+            </button>
+        </div>
+    `).join('');
+
+    console.log(`[renderSchedules] Rendered ${schedules.length} schedules for zone ${zone}`);
+}
+
+async function addSchedule(zone) {
+    const timeInput = document.getElementById(`schedule-time-${zone}`);
+    const durationInput = document.getElementById(`schedule-duration-${zone}`);
+    const addButton = document.getElementById(`schedule-add-${zone}`);
+
+    if (!timeInput || !durationInput) {
+        console.error('[addSchedule] Input elements not found');
+        return;
+    }
+
+    const startTime = timeInput.value;
+    const duration = parseInt(durationInput.value);
+
+    if (!startTime || !duration || duration < 1) {
+        alert('Mohon isi waktu dan durasi yang valid');
+        return;
+    }
+
+    // Show loading state
+    const originalHTML = addButton.innerHTML;
+    addButton.disabled = true;
+    addButton.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Menyimpan...';
+
+    const supabase = getSupabaseDashboard();
+    if (!supabase) {
+        console.error('[addSchedule] Supabase not available');
+        addButton.disabled = false;
+        addButton.innerHTML = originalHTML;
+        return;
+    }
+
+    try {
+        console.log(`[addSchedule] Adding schedule: zone=${zone}, time=${startTime}, duration=${duration}`);
+        const { data, error } = await supabase
+            .from('pump_schedules')
+            .insert({
+                zone: zone,
+                start_time: startTime,
+                duration: duration,
+                is_active: true
+            })
+            .select();
+
+        if (error) {
+            console.error('[addSchedule] Error:', error);
+            alert('Gagal menambahkan jadwal: ' + error.message);
+        } else {
+            console.log('[addSchedule] Successfully added:', data);
+            // Clear inputs
+            timeInput.value = '06:00';
+            durationInput.value = '15';
+            // Refresh list
+            await fetchSchedules(zone);
+        }
+    } catch (e) {
+        console.error('[addSchedule] Exception:', e);
+        alert('Terjadi kesalahan saat menambahkan jadwal');
+    } finally {
+        addButton.disabled = false;
+        addButton.innerHTML = originalHTML;
+    }
+}
+
+async function deleteSchedule(zone, scheduleId) {
+    if (!confirm('Yakin ingin menghapus jadwal ini?')) {
+        return;
+    }
+
+    const supabase = getSupabaseDashboard();
+    if (!supabase) {
+        console.error('[deleteSchedule] Supabase not available');
+        return;
+    }
+
+    try {
+        console.log(`[deleteSchedule] Deleting schedule ${scheduleId} from zone ${zone}`);
+        const { error } = await supabase
+            .from('pump_schedules')
+            .delete()
+            .eq('id', scheduleId);
+
+        if (error) {
+            console.error('[deleteSchedule] Error:', error);
+            alert('Gagal menghapus jadwal: ' + error.message);
+        } else {
+            console.log('[deleteSchedule] Successfully deleted schedule');
+            // Refresh list
+            await fetchSchedules(zone);
+        }
+    } catch (e) {
+        console.error('[deleteSchedule] Exception:', e);
+        alert('Terjadi kesalahan saat menghapus jadwal');
+    }
+}
+
+function setupScheduleManager(zone) {
+    const addButton = document.getElementById(`schedule-add-${zone}`);
+    if (!addButton) {
+        console.warn(`[setupScheduleManager] Add button not found for zone ${zone}`);
+        return;
+    }
+
+    // Use event delegation for add button
+    addButton.addEventListener('click', () => {
+        console.log(`[setupScheduleManager] Add schedule clicked for zone ${zone}`);
+        addSchedule(zone);
+    });
+
+    // Make deleteSchedule globally accessible
+    window.deleteSchedule = deleteSchedule;
+
+    console.log(`[setupScheduleManager] Setup complete for zone ${zone}`);
+}
+
 async function initDashboard() {
     // Set initial device button states
     updateDeviceButtonStates(currentDeviceId);
     
     setupModeSwitch('A');
     setupPumpToggle('A');
+    setupScheduleManager('A');
 
     await fetchInitialSettings();
     await fetchLatestSensorReadings();

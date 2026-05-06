@@ -1,22 +1,14 @@
 /*
  * Smart Greenhouse ESP32 Controller
  * 
- * This ESP32 acts as a client that:
- * 1. Polls Supabase for pump control commands (every 5 seconds)
- * 2. Reads DHT11/DHT22 sensor and sends data to Supabase (every 10 seconds)
+ * Tugas ESP32:
+ * 1. Poll Supabase tiap 5 detik -> ambil pump_status -> kontrol relay
+ * 2. Baca sensor DHT11/DHT22 tiap 10 detik -> kirim temp/humidity ke Supabase
  * 
- * Hardware Requirements:
- * - ESP32 Board
- * - Relay Module (connected to GPIO 5)
- * - DHT11 or DHT22 Sensor (connected to GPIO 4)
- * - WiFi Connection
- * 
- * Library Requirements:
- * - WiFi.h (built-in)
- * - HTTPClient.h (built-in) 
- * - ArduinoJson (install via Library Manager)
- * - DHT sensor library (install via Library Manager)
- * - Adafruit Unified Sensor (install via Library Manager - dependency for DHT)
+ * Library yang harus di-install:
+ * - ArduinoJson (Library Manager)
+ * - DHT sensor library by Adafruit (Library Manager)
+ * - Adafruit Unified Sensor (auto-install dependency)
  */
 
 #include <WiFi.h>
@@ -24,285 +16,207 @@
 #include <ArduinoJson.h>
 #include <DHT.h>
 
-// WiFi Configuration - GANTI DENGAN WiFi ANDA
-const char* WIFI_SSID = "YOUR_WIFI_SSID";
-const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
+// ================= KONFIGURASI =================
 
-// Supabase Configuration - GANTI DENGAN DATA SUPABASE ANDA
-const String SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
-const String SUPABASE_KEY = "YOUR_SUPABASE_ANON_KEY";
+// WiFi
+const char* WIFI_SSID     = "TEKOM1";
+const char* WIFI_PASSWORD = "12345678";
 
-// Device Configuration
-const String DEVICE_ID = "ESP32_INDOOR"; // GANTI jadi ESP32_OUTDOOR untuk unit outdoor
+// Supabase (dari Project Settings > API)
+const String SUPABASE_URL = "https://pzktyggopmvyrkwcnwfo.supabase.co";
+const String SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6a3R5Z2dvcG12eXJrd2Nud2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4ODA3NDEsImV4cCI6MjA5MjQ1Njc0MX0.p-h9x0mswjwjremYia7idtaPpLdi7IEdh7an36UKmEc";
 
-// Hardware Configuration
-const int RELAY_PIN = 5; // GPIO pin untuk relay
-const int DHT_PIN = 4;   // GPIO pin untuk sensor DHT
+// Device
+const String DEVICE_ID = "ESP32_INDOOR";  // atau "ESP32_OUTDOOR"
 
-// DHT Sensor Configuration
-// Uncomment sesuai sensor yang digunakan:
-#define DHT_TYPE DHT11   // untuk DHT11
-// #define DHT_TYPE DHT22   // untuk DHT22 (AM2302)
+// Pin hardware
+const int RELAY_PIN = 5;   // Relay ke GPIO 5
+const int DHT_PIN   = 4;   // DHT sensor ke GPIO 4
+const int LED_PIN   = 2;   // LED bawaan ESP32 (GPIO 2)
 
-// Relay Type Configuration
-// true = relay ON when pin is HIGH (active-high)
-// false = relay ON when pin is LOW (active-low) 
-const bool RELAY_ACTIVE_HIGH = false; // SESUAIKAN dengan jenis relay Anda
+// Pilih sensor DHT (uncomment salah satu)
+#define DHT_TYPE DHT11
+// #define DHT_TYPE DHT22
 
-// Global Variables
-unsigned long lastPollTime = 0;
-const unsigned long POLL_INTERVAL = 5000; // 5 detik untuk polling pump
+// Tipe relay: true=active-high, false=active-low
+const bool RELAY_ACTIVE_HIGH = false;
+
+// ================= VARIABEL GLOBAL =================
+
+unsigned long lastPollTime   = 0;
 unsigned long lastSensorTime = 0;
-const unsigned long SENSOR_INTERVAL = 10000; // 10 detik untuk sensor
-bool currentPumpStatus = false;
-float lastTemperature = 0.0;
-float lastHumidity = 0.0;
+const unsigned long POLL_INTERVAL    = 5000;   // 5 detik
+const unsigned long SENSOR_INTERVAL  = 10000;  // 10 detik
 
-// Initialize DHT sensor
+bool currentPumpStatus = false;
 DHT dht(DHT_PIN, DHT_TYPE);
+
+// ================= SETUP =================
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("=== Smart Greenhouse ESP32 Starting ===");
-  
-  // Setup Relay Pin
+  Serial.println("\n=== Smart Greenhouse ESP32 ===");
+
+  // Pin setup
   pinMode(RELAY_PIN, OUTPUT);
-  digitalWrite(RELAY_PIN, RELAY_ACTIVE_HIGH ? LOW : HIGH); // Initial state: OFF
-  
-  // Setup built-in LED for visual feedback
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
-  
-  // Initialize DHT sensor
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(RELAY_PIN, RELAY_ACTIVE_HIGH ? LOW : HIGH);
+  digitalWrite(LED_PIN, LOW);
+
+  // Test LED nyala sebentar
+  digitalWrite(LED_PIN, HIGH);
+  delay(1000);
+  digitalWrite(LED_PIN, LOW);
+
+  // Init DHT
   dht.begin();
-  Serial.println("DHT sensor initialized on GPIO " + String(DHT_PIN));
-  
-  // Connect to WiFi
+  Serial.println("DHT sensor ready on GPIO " + String(DHT_PIN));
+
+  // Connect WiFi
   connectWiFi();
-  
-  Serial.println("Setup completed! Starting main loop...");
+
+  Serial.println("Setup done. Running loop...\n");
 }
+
+// ================= LOOP UTAMA =================
 
 void loop() {
-  // Check WiFi connection
+  // Reconnect WiFi kalau putus
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("WiFi disconnected! Reconnecting...");
+    Serial.println("WiFi putus! Reconnecting...");
     connectWiFi();
   }
-  
-  unsigned long currentTime = millis();
-  
-  // Poll Supabase for pump status every 5 seconds
-  if (currentTime - lastPollTime >= POLL_INTERVAL) {
-    lastPollTime = currentTime;
-    pollSupabase();
+
+  unsigned long now = millis();
+
+  // 1. Poll pump status tiap 5 detik
+  if (now - lastPollTime >= POLL_INTERVAL) {
+    lastPollTime = now;
+    checkPumpStatus();
   }
-  
-  // Read DHT sensor and send data every 10 seconds
-  if (currentTime - lastSensorTime >= SENSOR_INTERVAL) {
-    lastSensorTime = currentTime;
-    readAndSendSensorData();
+
+  // 2. Baca sensor tiap 10 detik
+  if (now - lastSensorTime >= SENSOR_INTERVAL) {
+    lastSensorTime = now;
+    readAndSendSensor();
   }
-  
-  delay(100); // Small delay to prevent overwhelming the loop
+
+  delay(100);
 }
 
+// ================= WIFI =================
+
 void connectWiFi() {
-  Serial.print("Connecting to WiFi: ");
-  Serial.println(WIFI_SSID);
-  
+  Serial.print("Connecting to ");
+  Serial.print(WIFI_SSID);
+
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  
+
   int attempts = 0;
   while (WiFi.status() != WL_CONNECTED && attempts < 20) {
     delay(500);
     Serial.print(".");
     attempts++;
   }
-  
+
   if (WiFi.status() == WL_CONNECTED) {
-    Serial.println();
-    Serial.print("WiFi connected! IP: ");
-    Serial.println(WiFi.localIP());
+    Serial.println("\nWiFi OK! IP: " + WiFi.localIP().toString());
   } else {
-    Serial.println();
-    Serial.println("Failed to connect to WiFi!");
+    Serial.println("\nWiFi gagal connect!");
   }
 }
 
-// ============================================================
-// PUMP CONTROL - Polling Supabase every 5 seconds
-// ============================================================
+// ================= PUMP CONTROL =================
 
-void pollSupabase() {
-  Serial.println("\n--- Polling Supabase for Pump Status ---");
-  
+void checkPumpStatus() {
+  Serial.println("--- Check Pump Status ---");
+
   HTTPClient http;
-  
-  // Build Supabase REST API URL
-  String url = SUPABASE_URL + "/rest/v1/device_settings";
-  url += "?device_id=eq." + DEVICE_ID;
-  url += "&select=pump_status";
-  
-  Serial.println("Request URL: " + url);
-  
-  // Configure HTTP headers
+  String url = SUPABASE_URL + "/rest/v1/device_settings?device_id=eq." + DEVICE_ID + "&select=pump_status";
+
   http.begin(url);
   http.addHeader("apikey", SUPABASE_KEY);
   http.addHeader("Authorization", "Bearer " + SUPABASE_KEY);
-  http.addHeader("Content-Type", "application/json");
-  
-  // Send GET request
-  int httpResponseCode = http.GET();
-  
-  if (httpResponseCode == 200) {
+
+  int code = http.GET();
+
+  if (code == 200) {
     String payload = http.getString();
-    Serial.println("Response payload: " + payload);
-    
-    // Parse JSON response
-    parsePumpStatusResponse(payload);
+    Serial.println("Response: " + payload);
+
+    DynamicJsonDocument doc(1024);
+    DeserializationError err = deserializeJson(doc, payload);
+
+    if (!err && doc.is<JsonArray>() && doc.size() > 0) {
+      bool newStatus = doc[0]["pump_status"];
+
+      if (newStatus != currentPumpStatus) {
+        currentPumpStatus = newStatus;
+        setRelay(currentPumpStatus);
+      } else {
+        Serial.println("Pump status sama, tidak berubah");
+      }
+    }
   } else {
-    Serial.print("HTTP Error: ");
-    Serial.println(httpResponseCode);
-    Serial.println("Error payload: " + http.getString());
+    Serial.println("HTTP Error: " + String(code));
   }
-  
+
   http.end();
 }
 
-void parsePumpStatusResponse(String payload) {
-  // Parse JSON using ArduinoJson
-  DynamicJsonDocument doc(1024);
-  
-  DeserializationError error = deserializeJson(doc, payload);
-  
-  if (error) {
-    Serial.print("JSON Parsing Error: ");
-    Serial.println(error.c_str());
-    return;
-  }
-  
-  // Check if we got valid data
-  if (doc.is<JsonArray>() && doc.size() > 0) {
-    JsonObject device = doc[0];
-    
-    if (device.containsKey("pump_status")) {
-      bool newPumpStatus = device["pump_status"];
-      
-      Serial.print("Current pump_status: ");
-      Serial.print(currentPumpStatus ? "true" : "false");
-      Serial.print(", New pump_status: ");
-      Serial.println(newPumpStatus ? "true" : "false");
-      
-      // Only update relay if status changed
-      if (newPumpStatus != currentPumpStatus) {
-        currentPumpStatus = newPumpStatus;
-        controlRelay(currentPumpStatus);
-      } else {
-        Serial.println("Pump status unchanged, no action needed");
-      }
-    } else {
-      Serial.println("No pump_status field in response");
-    }
-  } else {
-    Serial.println("Invalid or empty response from Supabase");
-  }
-}
-
-void controlRelay(bool turnOn) {
-  Serial.print("Controlling relay - Turn ");
+void setRelay(bool turnOn) {
+  Serial.print("Relay -> ");
   Serial.println(turnOn ? "ON" : "OFF");
-  
-  if (turnOn) {
-    // Turn relay ON
-    if (RELAY_ACTIVE_HIGH) {
-      digitalWrite(RELAY_PIN, HIGH);
-    } else {
-      digitalWrite(RELAY_PIN, LOW);
-    }
-    Serial.println("Relay activated - Pump should be ON");
+
+  if (RELAY_ACTIVE_HIGH) {
+    digitalWrite(RELAY_PIN, turnOn ? HIGH : LOW);
   } else {
-    // Turn relay OFF
-    if (RELAY_ACTIVE_HIGH) {
-      digitalWrite(RELAY_PIN, LOW);
-    } else {
-      digitalWrite(RELAY_PIN, HIGH);
-    }
-    Serial.println("Relay deactivated - Pump should be OFF");
+    digitalWrite(RELAY_PIN, turnOn ? LOW : HIGH);
   }
-  
-  // Visual feedback on built-in LED
-  digitalWrite(LED_BUILTIN, turnOn ? HIGH : LOW);
+
+  // LED indicator
+  digitalWrite(LED_PIN, turnOn ? HIGH : LOW);
 }
 
-// ============================================================
-// SENSOR READING - DHT11/DHT22 every 10 seconds
-// ============================================================
+// ================= SENSOR DHT =================
 
-void readAndSendSensorData() {
-  Serial.println("\n--- Reading DHT Sensor ---");
-  
-  // Read temperature and humidity
-  float temperature = dht.readTemperature(); // Celsius
-  float humidity = dht.readHumidity();       // Percentage
-  
-  // Check if readings are valid
-  if (isnan(temperature) || isnan(humidity)) {
-    Serial.println("Failed to read from DHT sensor! Check wiring.");
+void readAndSendSensor() {
+  Serial.println("--- Read DHT Sensor ---");
+
+  float temp = dht.readTemperature();
+  float hum  = dht.readHumidity();
+
+  if (isnan(temp) || isnan(hum)) {
+    Serial.println("DHT read failed! Check wiring.");
     return;
   }
-  
-  // Update global variables
-  lastTemperature = temperature;
-  lastHumidity = humidity;
-  
-  Serial.print("Temperature: ");
-  Serial.print(temperature);
-  Serial.print(" C, Humidity: ");
-  Serial.print(humidity);
-  Serial.println(" %");
-  
-  // Send data to Supabase
-  sendSensorDataToSupabase(temperature, humidity);
-}
 
-void sendSensorDataToSupabase(float temperature, float humidity) {
-  Serial.println("--- Sending Sensor Data to Supabase ---");
-  
+  Serial.println("Temp: " + String(temp) + " C, Hum: " + String(hum) + " %");
+
+  // Kirim ke Supabase
   HTTPClient http;
-  
-  // Build Supabase REST API URL for PATCH
-  String url = SUPABASE_URL + "/rest/v1/device_settings";
-  url += "?device_id=eq." + DEVICE_ID;
-  
-  Serial.println("PATCH URL: " + url);
-  
-  // Build JSON payload
+  String url = SUPABASE_URL + "/rest/v1/device_settings?device_id=eq." + DEVICE_ID;
+
   DynamicJsonDocument doc(256);
-  doc["temperature"] = temperature;
-  doc["humidity"] = humidity;
-  
+  doc["temperature"] = temp;
+  doc["humidity"]    = hum;
+
   String payload;
   serializeJson(doc, payload);
-  Serial.println("Payload: " + payload);
-  
-  // Configure HTTP headers
+
   http.begin(url);
   http.addHeader("apikey", SUPABASE_KEY);
   http.addHeader("Authorization", "Bearer " + SUPABASE_KEY);
   http.addHeader("Content-Type", "application/json");
-  http.addHeader("Prefer", "return=minimal"); // Don't return data, just update
-  
-  // Send PATCH request
-  int httpResponseCode = http.PATCH(payload);
-  
-  if (httpResponseCode == 200 || httpResponseCode == 204) {
-    Serial.println("Sensor data sent successfully! HTTP: " + String(httpResponseCode));
+  http.addHeader("Prefer", "return=minimal");
+
+  int code = http.PATCH(payload);
+
+  if (code == 200 || code == 204) {
+    Serial.println("Sensor data sent OK!");
   } else {
-    Serial.print("Failed to send sensor data. HTTP Error: ");
-    Serial.println(httpResponseCode);
-    Serial.println("Error payload: " + http.getString());
+    Serial.println("Send failed! HTTP: " + String(code));
   }
-  
+
   http.end();
 }

@@ -919,9 +919,56 @@ function stopScheduleChecker() {
     }
 }
 
+/**
+ * Check user role and hide Admin menu for non-admin users
+ */
+async function checkUserRoleAndHideAdminMenu() {
+    const supabase = getSupabaseDashboard();
+    if (!supabase) return;
+
+    try {
+        // Get current user
+        const { data: { user }, error } = await supabase.auth.getUser();
+        
+        if (error || !user) {
+            console.warn('[Role Check] No user logged in:', error);
+            return;
+        }
+
+        // Fetch user role from profiles table
+        const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+        if (profileError) {
+            console.warn('[Role Check] Error fetching profile:', profileError);
+            return;
+        }
+
+        const userRole = profile?.role;
+        console.log(`[Role Check] User role: ${userRole}`);
+
+        // Hide Admin menu if user is not admin
+        const adminMenu = document.getElementById('nav-admin-menu');
+        if (adminMenu && userRole !== 'admin') {
+            adminMenu.style.display = 'none';
+            console.log('[Role Check] Admin menu hidden for non-admin user');
+        } else if (adminMenu) {
+            console.log('[Role Check] Admin menu visible for admin user');
+        }
+    } catch (e) {
+        console.error('[Role Check] Exception:', e);
+    }
+}
+
 async function initDashboard() {
     // Set initial device button states
     updateDeviceButtonStates(currentDeviceId);
+    
+    // Check user role and hide Admin menu if needed
+    await checkUserRoleAndHideAdminMenu();
     
     setupModeSwitch('A');
     setupPumpToggle('A');

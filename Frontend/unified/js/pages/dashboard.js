@@ -540,13 +540,19 @@ function setupModeSwitch(zone) {
                         .eq('device_id', currentDeviceId);
                     
                     if (error) {
-                        console.error('[Mode Switch] Error:', error);
+                        console.error('[Mode Switch] Supabase UPDATE failed:', error);
+                        alert('Gagal mengubah mode: ' + error.message);
                     } else {
                         console.log(`[Mode Switch] Successfully updated to ${selectedMode}, pump reset to OFF`);
                         // CRITICAL: Update local state to prevent desynchronization
                         systemState[zone].mode = selectedMode;
                         systemState[zone].pumpOn = false;  // Update local pump state
                         console.log(`[Mode Switch] Local state updated: mode='${selectedMode}', pumpOn=false`);
+                        
+                        // IMMEDIATELY update UI to reflect new state
+                        updatePumpUI(zone);
+                        updateTimerPanel(zone);
+                        console.log(`[Mode Switch] UI updated: pump button should now show OFF state`);
                     }
                 } catch (e) {
                     console.error('[Mode Switch] Exception:', e);

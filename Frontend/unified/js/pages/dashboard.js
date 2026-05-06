@@ -950,13 +950,21 @@ async function checkUserRoleAndHideAdminMenu() {
         const userRole = profile?.role;
         console.log(`[Role Check] User role: ${userRole}`);
 
-        // Hide Admin menu if user is not admin
-        const adminMenu = document.getElementById('nav-admin-menu');
-        if (adminMenu && userRole !== 'admin') {
-            adminMenu.style.display = 'none';
-            console.log('[Role Check] Admin menu hidden for non-admin user');
-        } else if (adminMenu) {
-            console.log('[Role Check] Admin menu visible for admin user');
+        // Hide Admin menus (desktop and mobile) if user is not admin
+        const adminMenuDesktop = document.getElementById('nav-admin-menu');
+        const adminMenuMobile = document.getElementById('nav-admin-menu-mobile');
+        
+        if (userRole !== 'admin') {
+            if (adminMenuDesktop) {
+                adminMenuDesktop.style.display = 'none';
+                console.log('[Role Check] Admin menu (desktop) hidden for non-admin user');
+            }
+            if (adminMenuMobile) {
+                adminMenuMobile.style.display = 'none';
+                console.log('[Role Check] Admin menu (mobile) hidden for non-admin user');
+            }
+        } else {
+            console.log('[Role Check] Admin menus visible for admin user');
         }
     } catch (e) {
         console.error('[Role Check] Exception:', e);

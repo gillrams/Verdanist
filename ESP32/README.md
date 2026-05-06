@@ -1,15 +1,20 @@
 # Smart Greenhouse ESP32 Controller
 
 ## Overview
-ESP32 microcontroller that acts as a client for Smart Greenhouse system. It polls Supabase database every 5 seconds to check pump status and controls relay accordingly.
+ESP32 microcontroller that acts as a client for Smart Greenhouse system.
+- **Pump Control**: Polls Supabase every 5 seconds for pump_status and controls relay
+- **Sensor Monitoring**: Reads DHT11/DHT22 sensor every 10 seconds and sends temperature/humidity to Supabase
 
 ## Hardware Requirements
 - ESP32 Development Board
 - Relay Module (5V or 3.3V)
+- DHT11 or DHT22 Temperature/Humidity Sensor
 - Jumper Wires
-- Power Supply for ESP32 and Relay
+- Power Supply for ESP32, Relay, and Sensor
 
 ## Wiring Diagram
+
+### Relay Module
 ```
 ESP32    ->    Relay Module
 GPIO 5   ->    IN (Signal)
@@ -17,10 +22,21 @@ GPIO 5   ->    IN (Signal)
 GND      ->    GND
 ```
 
+### DHT Sensor (DHT11/DHT22)
+```
+ESP32    ->    DHT Sensor
+GPIO 4   ->    DATA/OUT
+3.3V     ->    VCC (+)
+GND      ->    GND (-)
+```
+**Note**: If using bare DHT sensor (not module), add 10k Ohm pull-up resistor between VCC and DATA pins.
+
 ## Software Requirements
 - Arduino IDE
 - ESP32 Board Manager (add: https://dl.espressif.com/dl/package_esp32_index.json)
 - ArduinoJson Library (install via Library Manager)
+- DHT sensor library by Adafruit (install via Library Manager)
+- Adafruit Unified Sensor (dependency, auto-installed)
 
 ## Configuration
 
@@ -50,6 +66,13 @@ const String DEVICE_ID = "ESP32_INDOOR"; // or "ESP32_OUTDOOR"
 ### 4. Relay Configuration
 ```cpp
 const bool RELAY_ACTIVE_HIGH = false; // true for active-high, false for active-low
+```
+
+### 5. DHT Sensor Configuration
+```cpp
+// Uncomment sesuai sensor yang digunakan:
+#define DHT_TYPE DHT11   // untuk DHT11
+// #define DHT_TYPE DHT22   // untuk DHT22 (AM2302)
 ```
 
 ## Installation Steps

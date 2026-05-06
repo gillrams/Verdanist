@@ -608,8 +608,12 @@ function updateTimerPanel(zone) {
             panel.classList.remove('hidden');
             // Fetch and display schedules when panel is shown
             fetchSchedules(zone);
+            // Start the schedule checker
+            startScheduleChecker(zone);
         } else {
             panel.classList.add('hidden');
+            // Stop the schedule checker when not in timer mode
+            stopScheduleChecker();
         }
     } catch (err) {
         console.error('[updateTimerPanel] Error:', err);
@@ -808,6 +812,113 @@ function setupScheduleManager(zone) {
     console.log(`[setupScheduleManager] Setup complete for zone ${zone}`);
 }
 
+// SATPAM WAKTU: Background interval checker for schedules
+let scheduleCheckerInterval = null;
+
+function startScheduleChecker(zone) {
+    // Stop any existing checker
+    if (scheduleCheckerInterval) {
+        clearInterval(scheduleCheckerInterval);
+        scheduleCheckerInterval = null;
+    }
+    
+    console.log(`[Satpam Waktu] Starting schedule checker for zone ${zone}`);
+    
+    // Run every 10 seconds
+    scheduleCheckerInterval = setInterval(async () => {
+        // Only run if mode is timer
+        if (systemState[zone]?.mode !== 'timer') {
+            return;
+        }
+        
+        const supabase = getSupabaseDashboard();
+        if (!supabase) return;
+        
+        try {
+            // Get current time (HH:mm format)
+            const now = new Date();
+            const currentTime = now.toTimeString().slice(0, 5); // "13:25"
+            const currentMinutes = (now.getHours() * 60) + now.getMinutes();
+            
+            // Fetch active schedules
+            const { data: schedules, error } = await supabase
+                .from('pump_schedules')
+                .select('*')
+                .eq('zone', zone)
+                .eq('is_active', true);
+            
+            if (error) {
+                console.error('[Satpam Waktu] Error fetching schedules:', error);
+                return;
+            }
+            
+            // Check if current time falls within any schedule
+            let shouldPumpBeOn = false;
+            
+            for (const schedule of schedules || []) {
+                const [startHour, startMin] = schedule.start_time.split(':').map(Number);
+                const startMinutes = (startHour * 60) + startMin;
+                const endMinutes = startMinutes + schedule.duration;
+                
+                // Check if current time is within schedule range
+                if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
+                    shouldPumpBeOn = true;
+                    console.log(`[Satpam Waktu] ACTIVE: Schedule ${schedule.start_time} (${schedule.duration}min) is running now (${currentTime})`);
+                    break;
+                }
+            }
+            
+            // Update pump status if needed
+            const currentPumpStatus = systemState[zone]?.pumpOn;
+            
+            if (shouldPumpBeOn && !currentPumpStatus) {
+                // Should be ON but currently OFF
+                console.log(`[Satpam Waktu] TURNING PUMP ON - Schedule active at ${currentTime}`);
+                const { error: updateError } = await supabase
+                    .from('device_settings')
+                    .update({ pump_status: true })
+                    .eq('device_id', currentDeviceId);
+                
+                if (updateError) {
+                    console.error('[Satpam Waktu] Failed to turn pump ON:', updateError);
+                } else {
+                    systemState[zone].pumpOn = true;
+                    updatePumpUI(zone);
+                    console.log('[Satpam Waktu] Pump is now ON');
+                }
+            } else if (!shouldPumpBeOn && currentPumpStatus) {
+                // Should be OFF but currently ON
+                console.log(`[Satpam Waktu] TURNING PUMP OFF - No active schedule at ${currentTime}`);
+                const { error: updateError } = await supabase
+                    .from('device_settings')
+                    .update({ pump_status: false })
+                    .eq('device_id', currentDeviceId);
+                
+                if (updateError) {
+                    console.error('[Satpam Waktu] Failed to turn pump OFF:', updateError);
+                } else {
+                    systemState[zone].pumpOn = false;
+                    updatePumpUI(zone);
+                    console.log('[Satpam Waktu] Pump is now OFF');
+                }
+            }
+            
+        } catch (e) {
+            console.error('[Satpam Waktu] Exception:', e);
+        }
+    }, 10000); // Every 10 seconds
+    
+    console.log(`[Satpam Waktu] Checker started - runs every 10 seconds`);
+}
+
+function stopScheduleChecker() {
+    if (scheduleCheckerInterval) {
+        clearInterval(scheduleCheckerInterval);
+        scheduleCheckerInterval = null;
+        console.log('[Satpam Waktu] Checker stopped');
+    }
+}
+
 async function initDashboard() {
     // Set initial device button states
     updateDeviceButtonStates(currentDeviceId);
@@ -819,6 +930,12 @@ async function initDashboard() {
     await fetchInitialSettings();
     await fetchLatestSensorReadings();
     setupRealtimeListeners();
+    
+    // Start schedule checker if initial mode is timer
+    if (systemState['A']?.mode === 'timer') {
+        console.log('[initDashboard] Initial mode is timer, starting schedule checker');
+        startScheduleChecker('A');
+    }
     
     // --- MANTRA BUKA PINTU ---
     // Force remove loading overlay and show content

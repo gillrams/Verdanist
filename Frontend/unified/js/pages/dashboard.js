@@ -621,7 +621,7 @@ function renderSchedules(zone) {
     }
 
     container.innerHTML = schedules.map(schedule => `
-        <div class="flex items-center justify-between bg-white dark:bg-surface-container-low rounded-xl px-3 py-2 border border-gray-200 dark:border-outline-variant/20">
+        <div class="flex items-center justify-between bg-white dark:bg-surface-container-low rounded-xl px-3 py-2 border border-gray-200 dark:border-outline-variant/20" data-schedule-id="${schedule.id}">
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-primary text-[18px]">schedule</span>
                 <div>
@@ -629,8 +629,9 @@ function renderSchedules(zone) {
                     <div class="font-label text-xs text-gray-500 dark:text-on-surface-variant">${schedule.duration} menit</div>
                 </div>
             </div>
-            <button onclick="deleteSchedule('${zone}', ${schedule.id})" 
-                    class="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+            <button class="delete-schedule-btn p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    data-zone="${zone}"
+                    data-schedule-id="${schedule.id}"
                     title="Hapus jadwal">
                 <span class="material-symbols-outlined text-[18px]">delete</span>
             </button>
@@ -737,6 +738,8 @@ async function deleteSchedule(zone, scheduleId) {
 
 function setupScheduleManager(zone) {
     const addButton = document.getElementById(`schedule-add-${zone}`);
+    const listContainer = document.getElementById(`schedule-list-${zone}`);
+    
     if (!addButton) {
         console.warn(`[setupScheduleManager] Add button not found for zone ${zone}`);
         return;
@@ -748,8 +751,18 @@ function setupScheduleManager(zone) {
         addSchedule(zone);
     });
 
-    // Make deleteSchedule globally accessible
-    window.deleteSchedule = deleteSchedule;
+    // Use event delegation for delete buttons (works even after re-rendering)
+    if (listContainer) {
+        listContainer.addEventListener('click', (e) => {
+            const deleteBtn = e.target.closest('.delete-schedule-btn');
+            if (deleteBtn) {
+                const scheduleId = deleteBtn.dataset.scheduleId;
+                const btnZone = deleteBtn.dataset.zone;
+                console.log(`[ScheduleManager] Delete clicked for schedule ${scheduleId} in zone ${btnZone}`);
+                deleteSchedule(btnZone, parseInt(scheduleId));
+            }
+        });
+    }
 
     console.log(`[setupScheduleManager] Setup complete for zone ${zone}`);
 }

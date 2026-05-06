@@ -530,18 +530,23 @@ function setupModeSwitch(zone) {
             const supabase = getSupabaseDashboard();
             if (supabase) {
                 try {
+                    // SAFE STATE: Reset pump to OFF when switching any mode
                     const { error } = await supabase
                         .from('device_settings')
-                        .update({ mode: selectedMode })
+                        .update({ 
+                            mode: selectedMode,
+                            pump_status: false  // Always reset pump to OFF for safety
+                        })
                         .eq('device_id', currentDeviceId);
                     
                     if (error) {
                         console.error('[Mode Switch] Error:', error);
                     } else {
-                        console.log(`[Mode Switch] Successfully updated to ${selectedMode}`);
+                        console.log(`[Mode Switch] Successfully updated to ${selectedMode}, pump reset to OFF`);
                         // CRITICAL: Update local state to prevent desynchronization
                         systemState[zone].mode = selectedMode;
-                        console.log(`[Mode Switch] Local state updated: systemState[${zone}].mode = '${selectedMode}'`);
+                        systemState[zone].pumpOn = false;  // Update local pump state
+                        console.log(`[Mode Switch] Local state updated: mode='${selectedMode}', pumpOn=false`);
                     }
                 } catch (e) {
                     console.error('[Mode Switch] Exception:', e);

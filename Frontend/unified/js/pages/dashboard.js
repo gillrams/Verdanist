@@ -2,6 +2,7 @@
 // Page-specific JavaScript for dashboard.html
 
 let currentDeviceId = 'ESP32_INDOOR';
+let lastModeSwitchTime = 0; // Track when mode was switched to prevent realtime override
 
 /**
  * Switch between devices (Indoor/Outdoor)
@@ -271,6 +272,18 @@ function setupRealtimeListeners() {
     }, (payload) => {
         const dataBaru = payload.new;
         if (dataBaru.device_id === currentDeviceId) {
+            // Check if we just switched mode (within last 2 seconds)
+            // If so, we trust our local state more than the realtime update
+            // because we already set pump_status to false in our update
+            const timeSinceModeSwitch = Date.now() - lastModeSwitchTime;
+            if (timeSinceModeSwitch < 2000) {
+                console.log(`[Realtime] Ignoring update - mode switched ${timeSinceModeSwitch}ms ago. Our local state: pumpOn=${systemState['A'].pumpOn}`);
+                console.log(`[Realtime] Payload pump_status: ${dataBaru.pump_status}, mode: ${dataBaru.mode}`);
+                // Still update the mode from payload, but keep our pump state
+                systemState['A'].mode = dataBaru.mode;
+                updateTimerPanel('A');
+                return;
+            }
             updateUIBasedOnSettings(dataBaru);
         }
     }).subscribe();
@@ -527,23 +540,34 @@ function setupModeSwitch(zone) {
             });
             btn.className = 'flex-1 py-2 px-4 rounded-full font-label text-sm font-medium bg-surface-container-low text-primary shadow-[0_4px_12px_rgba(0,0,0,0.2)] border border-outline-variant/20 transition-all';
             
+            // Track mode switch time to prevent realtime override
+            lastModeSwitchTime = Date.now();
+            
             const supabase = getSupabaseDashboard();
             if (supabase) {
                 try {
                     // SAFE STATE: Reset pump to OFF when switching any mode
-                    const { error } = await supabase
+                    const { data, error } = await supabase
                         .from('device_settings')
                         .update({ 
                             mode: selectedMode,
                             pump_status: false  // Always reset pump to OFF for safety
                         })
-                        .eq('device_id', currentDeviceId);
+                        .eq('device_id', currentDeviceId)
+                        .select(); // Return updated data to verify
                     
                     if (error) {
                         console.error('[Mode Switch] Supabase UPDATE failed:', error);
                         alert('Gagal mengubah mode: ' + error.message);
                     } else {
-                        console.log(`[Mode Switch] Successfully updated to ${selectedMode}, pump reset to OFF`);
+                        console.log(`[Mode Switch] Successfully updated to ${selectedMode}`);
+                        console.log(`[Mode Switch] Returned data:`, data);
+                        
+                        // Verify pump_status was actually updated
+                        if (data && data[0]) {
+                            console.log(`[Mode Switch] DB pump_status: ${data[0].pump_status}, mode: ${data[0].mode}`);
+                        }
+                        
                         // CRITICAL: Update local state to prevent desynchronization
                         systemState[zone].mode = selectedMode;
                         systemState[zone].pumpOn = false;  // Update local pump state

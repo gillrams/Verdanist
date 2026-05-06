@@ -562,15 +562,21 @@ function setupModeSwitch(zone) {
                     } else {
                         console.log(`[Mode Switch] Successfully updated to ${selectedMode}`);
                         console.log(`[Mode Switch] Returned data:`, data);
+                        console.log(`[Mode Switch] Device ID used: ${currentDeviceId}`);
                         
                         // Verify pump_status was actually updated
-                        if (data && data[0]) {
+                        if (data && data.length > 0) {
                             console.log(`[Mode Switch] DB pump_status: ${data[0].pump_status}, mode: ${data[0].mode}`);
+                            if (data[0].pump_status === true) {
+                                console.error('[Mode Switch] WARNING: pump_status is still TRUE! Update may have been blocked by RLS or trigger.');
+                            }
+                        } else {
+                            console.error('[Mode Switch] WARNING: No data returned. Row may not exist for device_id:', currentDeviceId);
                         }
                         
                         // CRITICAL: Update local state to prevent desynchronization
                         systemState[zone].mode = selectedMode;
-                        systemState[zone].pumpOn = false;  // Update local pump state
+                        systemState[zone].pumpOn = false;  // Force local pump state to OFF regardless of DB
                         console.log(`[Mode Switch] Local state updated: mode='${selectedMode}', pumpOn=false`);
                         
                         // IMMEDIATELY update UI to reflect new state

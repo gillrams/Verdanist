@@ -759,7 +759,7 @@ function setupScheduleManager(zone) {
                 const scheduleId = deleteBtn.dataset.scheduleId;
                 const btnZone = deleteBtn.dataset.zone;
                 console.log(`[ScheduleManager] Delete clicked for schedule ${scheduleId} in zone ${btnZone}`);
-                deleteSchedule(btnZone, parseInt(scheduleId));
+                deleteSchedule(btnZone, scheduleId);
             }
         });
     }

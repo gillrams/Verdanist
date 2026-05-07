@@ -1011,6 +1011,115 @@ if (document.readyState === 'loading') {
     initDashboard();
 }
 
+// ================= THRESHOLD MODAL FUNCTIONS =================
+
+function showThresholdModal(zone) {
+    const modal = document.getElementById('threshold-modal');
+    if (!modal) return;
+
+    // Close dropdown menu
+    const dropdown = document.getElementById(`dropdown-menu-${zone}`);
+    if (dropdown) dropdown.classList.remove('active');
+
+    // Update zone label
+    const label = document.getElementById('threshold-zone-label');
+    if (label) {
+        label.textContent = zone === 'A' ? 'Zone A • Indoor' : 'Zone B • Outdoor';
+    }
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    console.log(`[Threshold Modal] Opened for zone ${zone}`);
+}
+
+function hideThresholdModal() {
+    const modal = document.getElementById('threshold-modal');
+    if (!modal) return;
+
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    console.log('[Threshold Modal] Closed');
+}
+
+async function saveThreshold() {
+    const tempInput = document.getElementById('temp-threshold-input');
+    const humInput = document.getElementById('hum-threshold-input');
+
+    if (!tempInput || !humInput) {
+        console.error('[Save Threshold] Input elements not found');
+        return;
+    }
+
+    const tempThreshold = parseFloat(tempInput.value);
+    const humThreshold = parseFloat(humInput.value);
+
+    if (isNaN(tempThreshold) || isNaN(humThreshold)) {
+        console.error('[Save Threshold] Invalid input values');
+        return;
+    }
+
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    const supabase = getSupabaseDashboard();
+    if (!supabase) {
+        console.error('[Save Threshold] Supabase not available');
+        return;
+    }
+
+    try {
+        console.log(`[Save Threshold] Inserting: temp=${tempThreshold}°C, hum=${humThreshold}%`);
+
+        const { data, error } = await supabase
+            .from('sensor_readings')
+            .insert({
+                zone: 'A',
+                type: 'system_config',
+                device_id: 'ESP32_INDOOR',
+                temp_threshold: tempThreshold,
+                hum_threshold: humThreshold
+            })
+            .select();
+
+        if (error) {
+            console.error('[Save Threshold] Supabase error:', error);
+            Swal.fire({
+                title: 'Gagal!',
+                text: 'Tidak dapat menyimpan threshold: ' + error.message,
+                icon: 'error',
+                background: isDarkMode ? '#161311' : '#ffffff',
+                color: isDarkMode ? '#f5f5f4' : '#1c1917',
+                customClass: { popup: 'rounded-2xl shadow-2xl' }
+            });
+            return;
+        }
+
+        console.log('[Save Threshold] Success:', data);
+
+        Swal.fire({
+            title: 'Berhasil!',
+            html: `Threshold tersimpan:<br>Temperature: <strong>${tempThreshold}°C</strong><br>Humidity: <strong>${humThreshold}%</strong>`,
+            icon: 'success',
+            timer: 2500,
+            showConfirmButton: false,
+            background: isDarkMode ? '#161311' : '#ffffff',
+            color: isDarkMode ? '#f5f5f4' : '#1c1917',
+            customClass: { popup: 'rounded-2xl shadow-2xl' }
+        });
+
+        hideThresholdModal();
+
+    } catch (e) {
+        console.error('[Save Threshold] Exception:', e);
+        Swal.fire({
+            title: 'Error!',
+            text: 'Terjadi kesalahan saat menyimpan threshold.',
+            icon: 'error',
+            background: isDarkMode ? '#161311' : '#ffffff',
+            color: isDarkMode ? '#f5f5f4' : '#1c1917',
+            customClass: { popup: 'rounded-2xl shadow-2xl' }
+        });
+    }
+}
+
 async function handleLogout() {
     const supabase = getSupabaseDashboard();
     if (supabase) await supabase.auth.signOut();

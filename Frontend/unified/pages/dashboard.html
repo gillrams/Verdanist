@@ -207,7 +207,7 @@ function hideWelcomeToast() {
 <div class="dropdown-header">Quick Settings</div>
 <a href="#" class="dropdown-item" onclick="showThresholdModal('A')">
 <span class="material-symbols-outlined">tune</span>
-<span>Edit Threshold</span>
+<span>Set Threshold</span>
 </a>
 <a href="#" class="dropdown-item" onclick="calibrateSensor('A')">
 <span class="material-symbols-outlined">adjust</span>
@@ -611,6 +611,78 @@ function hideWelcomeToast() {
             <p class="font-label text-xs text-gray-500 dark:text-on-surface-variant text-center">
                 <span class="material-symbols-outlined text-[14px] align-text-bottom">info</span>
                 Schedules run automatically based on device clock
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Threshold Modal -->
+<div id="threshold-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-surface-container rounded-2xl p-6 lg:p-8 max-w-lg w-full shadow-2xl border border-gray-200 dark:border-outline-variant/15 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h3 class="font-headline text-xl font-bold text-gray-900 dark:text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">tune</span>
+                    Set Threshold
+                </h3>
+                <p class="font-label text-xs text-gray-500 dark:text-on-surface-variant mt-1" id="threshold-zone-label">Zone A • Indoor</p>
+            </div>
+            <button onclick="hideThresholdModal()" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-surface-container-high flex items-center justify-center text-gray-700 dark:text-on-surface hover:text-primary transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <!-- Temperature Threshold -->
+        <div class="space-y-4 mb-6">
+            <div class="p-4 bg-gray-100 dark:bg-surface-container-high rounded-xl">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-error/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-error text-sm">thermostat</span>
+                    </div>
+                    <div>
+                        <p class="font-label text-sm font-medium text-gray-900 dark:text-on-surface">Temperature Threshold</p>
+                        <p class="font-label text-xs text-gray-500 dark:text-on-surface-variant">Pompa nyala jika suhu melebihi nilai ini</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 mt-3">
+                    <input type="number" id="temp-threshold-input" value="30" min="15" max="50" step="0.5" class="flex-1 bg-white dark:bg-surface-container border border-gray-300 dark:border-outline-variant rounded-lg px-4 py-3 font-label text-lg text-gray-900 dark:text-on-surface text-center focus:outline-none focus:border-primary">
+                    <span class="font-label text-sm text-gray-500 dark:text-on-surface-variant">°C</span>
+                </div>
+            </div>
+
+            <!-- Humidity Threshold -->
+            <div class="p-4 bg-gray-100 dark:bg-surface-container-high rounded-xl">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-secondary text-sm">water_drop</span>
+                    </div>
+                    <div>
+                        <p class="font-label text-sm font-medium text-gray-900 dark:text-on-surface">Humidity Threshold</p>
+                        <p class="font-label text-xs text-gray-500 dark:text-on-surface-variant">Pompa nyala jika kelembapan di bawah nilai ini</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 mt-3">
+                    <input type="number" id="hum-threshold-input" value="60" min="10" max="95" step="1" class="flex-1 bg-white dark:bg-surface-container border border-gray-300 dark:border-outline-variant rounded-lg px-4 py-3 font-label text-lg text-gray-900 dark:text-on-surface text-center focus:outline-none focus:border-secondary">
+                    <span class="font-label text-sm text-gray-500 dark:text-on-surface-variant">%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-3">
+            <button onclick="hideThresholdModal()" class="flex-1 py-3 rounded-xl border border-gray-300 dark:border-outline-variant text-gray-600 dark:text-on-surface-variant font-label text-sm font-medium hover:bg-gray-100 dark:hover:bg-surface-container-high transition-all">
+                Cancel
+            </button>
+            <button onclick="saveThreshold()" class="flex-1 py-3 rounded-xl bg-primary text-on-primary font-label text-sm font-medium hover:shadow-[0_8px_24px_rgba(75,226,119,0.3)] transition-all">
+                Save Threshold
+            </button>
+        </div>
+
+        <!-- Info Note -->
+        <div class="mt-4 p-3 bg-gray-200/50 dark:bg-surface-variant/30 rounded-xl border border-gray-200 dark:border-outline-variant/10">
+            <p class="font-label text-xs text-gray-500 dark:text-on-surface-variant text-center">
+                <span class="material-symbols-outlined text-[14px] align-text-bottom">info</span>
+                Threshold tersimpan sebagai system config di Supabase. ESP32 akan menarik data ini untuk logika Auto-Mode.
             </p>
         </div>
     </div>

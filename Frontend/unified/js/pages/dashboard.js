@@ -274,17 +274,35 @@ function setupRealtimeListeners() {
         if (dataBaru.device_id === currentDeviceId) {
             // Check if we just switched mode (within last 2 seconds)
             // If so, we trust our local state more than the realtime update
-            // because we already set pump_status to false in our update
             const timeSinceModeSwitch = Date.now() - lastModeSwitchTime;
             if (timeSinceModeSwitch < 2000) {
                 console.log(`[Realtime] Ignoring update - mode switched ${timeSinceModeSwitch}ms ago. Our local state: pumpOn=${systemState['A'].pumpOn}`);
-                console.log(`[Realtime] Payload pump_status: ${dataBaru.pump_status}, mode: ${dataBaru.mode}`);
+                console.log(`[Realtime] Payload mode: ${dataBaru.mode}`);
                 // Still update the mode from payload, but keep our pump state
                 systemState['A'].mode = dataBaru.mode;
                 updateTimerPanel('A');
                 return;
             }
-            updateUIBasedOnSettings(dataBaru);
+            // Merge with current pump state (from device_status listener)
+            const merged = { ...dataBaru, pump_active: systemState['A']?.pumpOn ?? false };
+            updateUIBasedOnSettings(merged);
+        }
+    }).subscribe();
+
+    // Realtime listener for pump status (device_status table)
+    supabase.channel('pantau-pump').on('postgres_changes', { 
+        event: 'UPDATE', schema: 'public', table: 'device_status'
+    }, (payload) => {
+        const dataBaru = payload.new;
+        if (dataBaru.device_id === currentDeviceId) {
+            const timeSinceModeSwitch = Date.now() - lastModeSwitchTime;
+            if (timeSinceModeSwitch < 2000) {
+                console.log(`[Realtime Pump] Ignoring update - mode switched ${timeSinceModeSwitch}ms ago`);
+                return;
+            }
+            console.log(`[Realtime Pump] pump_active changed to: ${dataBaru.pump_active}`);
+            systemState['A'].pumpOn = dataBaru.pump_active;
+            updatePumpUI('A');
         }
     }).subscribe();
 
@@ -318,13 +336,29 @@ async function fetchInitialSettings() {
     if (!supabase) return;
 
     try {
-        const { data, error } = await supabase
+        // Fetch mode/settings from device_settings
+        const { data: settings, error: settingsError } = await supabase
             .from('device_settings')
             .select('*')
             .eq('device_id', currentDeviceId)
             .maybeSingle();
 
-        if (data) updateUIBasedOnSettings(data);
+        // Fetch pump status from device_status
+        const { data: status, error: statusError } = await supabase
+            .from('device_status')
+            .select('pump_active')
+            .eq('device_id', currentDeviceId)
+            .maybeSingle();
+
+        if (settingsError) console.error('Error fetch device_settings:', settingsError);
+        if (statusError) console.error('Error fetch device_status:', statusError);
+
+        // Merge data for UI update
+        const merged = {
+            ...(settings || {}),
+            pump_active: status?.pump_active ?? false
+        };
+        updateUIBasedOnSettings(merged);
     } catch(err) {
         console.error("Error fetch initial settings", err);
     }
@@ -332,10 +366,10 @@ async function fetchInitialSettings() {
 
 function updateUIBasedOnSettings(settings) {
     try {
-        console.log('[SSOT] Updating UI for device:', settings.device_id, 'Mode:', settings.mode, 'Pump:', settings.pump_status);
+        console.log('[SSOT] Updating UI for device:', settings.device_id, 'Mode:', settings.mode, 'Pump:', settings.pump_active);
         const zone = 'A'; 
         systemState[zone].mode = settings.mode;
-        systemState[zone].pumpOn = settings.pump_status;
+        systemState[zone].pumpOn = settings.pump_active;
         
         const container = document.getElementById(`mode-switch-${zone}`);
         if (container) {
@@ -410,8 +444,8 @@ function setupPumpToggle(zone) {
 
         try {
             const { error } = await supabase
-                .from('device_settings')
-                .update({ pump_status: newPumpStatus })
+                .from('device_status')
+                .update({ pump_active: newPumpStatus })
                 .eq('device_id', currentDeviceId);
                 
             if (error) {
@@ -526,7 +560,7 @@ function setupModeSwitch(zone) {
                     updateUIBasedOnSettings({
                         device_id: currentDeviceId,
                         mode: previousMode,
-                        pump_status: systemState[zone].pumpOn
+                        pump_active: systemState[zone].pumpOn
                     });
                     return; // Don't proceed with database update
                 }
@@ -547,12 +581,10 @@ function setupModeSwitch(zone) {
             if (supabase) {
                 try {
                     // SAFE STATE: Reset pump to OFF when switching any mode
+                    // Update mode on device_settings
                     const { data, error } = await supabase
                         .from('device_settings')
-                        .update({ 
-                            mode: selectedMode,
-                            pump_status: false  // Always reset pump to OFF for safety
-                        })
+                        .update({ mode: selectedMode })
                         .eq('device_id', currentDeviceId)
                         .select(); // Return updated data to verify
                     
@@ -564,12 +596,18 @@ function setupModeSwitch(zone) {
                         console.log(`[Mode Switch] Returned data:`, data);
                         console.log(`[Mode Switch] Device ID used: ${currentDeviceId}`);
                         
-                        // Verify pump_status was actually updated
+                        // Also reset pump on device_status
+                        const { error: pumpError } = await supabase
+                            .from('device_status')
+                            .update({ pump_active: false })
+                            .eq('device_id', currentDeviceId);
+                        if (pumpError) {
+                            console.error('[Mode Switch] Failed to reset pump on device_status:', pumpError);
+                        }
+
+                        // Verify mode was updated
                         if (data && data.length > 0) {
-                            console.log(`[Mode Switch] DB pump_status: ${data[0].pump_status}, mode: ${data[0].mode}`);
-                            if (data[0].pump_status === true) {
-                                console.error('[Mode Switch] WARNING: pump_status is still TRUE! Update may have been blocked by RLS or trigger.');
-                            }
+                            console.log(`[Mode Switch] DB mode: ${data[0].mode}`);
                         } else {
                             console.error('[Mode Switch] WARNING: No data returned. Row may not exist for device_id:', currentDeviceId);
                         }
@@ -875,8 +913,8 @@ function startScheduleChecker(zone) {
                 // Should be ON but currently OFF
                 console.log(`[Satpam Waktu] TURNING PUMP ON - Schedule active at ${currentTime}`);
                 const { error: updateError } = await supabase
-                    .from('device_settings')
-                    .update({ pump_status: true })
+                    .from('device_status')
+                    .update({ pump_active: true })
                     .eq('device_id', currentDeviceId);
                 
                 if (updateError) {
@@ -890,8 +928,8 @@ function startScheduleChecker(zone) {
                 // Should be OFF but currently ON
                 console.log(`[Satpam Waktu] TURNING PUMP OFF - No active schedule at ${currentTime}`);
                 const { error: updateError } = await supabase
-                    .from('device_settings')
-                    .update({ pump_status: false })
+                    .from('device_status')
+                    .update({ pump_active: false })
                     .eq('device_id', currentDeviceId);
                 
                 if (updateError) {

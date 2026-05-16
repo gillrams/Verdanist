@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verdanist - Smart Farming App</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+        }
+        
+        /* Color Palette */
+        :root {
+            --primary-green: #4be277;
+            --light-blue: #e8f4f8;
+            --sky-blue: #87ceeb;
+            --soft-white: #f9fafb;
+            --earthy-brown: #8b7355;
+            --dark-charcoal: #1a1a1a;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--soft-white) 0%, #f0f9f7 100%);
+            overflow-x: hidden;
+        }
+        
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 28px;
+            box-shadow: 0 8px 32px rgba(75, 226, 119, 0.08), 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .glass-card:hover {
+            box-shadow: 0 12px 40px rgba(75, 226, 119, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+        
+        /* Pill Button */
+        .btn-pill {
+            border-radius: 50px;
+            padding: 14px 32px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(75, 226, 119, 0.3);
+        }
+        
+        .btn-pill:hover {
+            box-shadow: 0 8px 32px rgba(75, 226, 119, 0.4);
+            transform: scale(1.02);
+        }
+        
+        .btn-pill:active {
+            transform: scale(0.98);
+        }
+        
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Animation for floating elements */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Screen transitions */
+        .screen {
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+        
+        .screen.hidden {
+            display: none;
+            opacity: 0;
+        }
+        
+        /* Smooth gradient backgrounds */
+        .bg-gradient-organic {
+            background: linear-gradient(135deg, #f0fdf4 0%, #e0f2f1 50%, #e8f4f8 100%);
+        }
+    </style>
+</head>
+<body class="bg-gradient-organic">
+    <!-- ONBOARDING SCREEN -->
+    <div id="onboarding-screen" class="screen w-full min-h-screen flex flex-col items-center justify-center px-6 py-12">
+        <!-- Logo -->
+        <div class="mb-8 flex items-center gap-2">
+            <span class="material-symbols-outlined text-4xl" style="color: var(--primary-green); font-variation-settings: 'FILL' 1;">eco</span>
+            <span class="text-2xl font-black" style="color: var(--dark-charcoal);">Verdanist</span>
+        </div>
+        
+        <!-- Main Illustration Container -->
+        <div class="w-full max-w-sm h-80 mb-8 relative">
+            <img src="../assets/images/farmer-greenhouse-illustration.jpg" alt="Farmer with drone in greenhouse" class="w-full h-full object-cover rounded-[32px] shadow-xl">
+        </div>
+        
+        <!-- Content Section -->
+        <div class="w-full max-w-sm text-center mb-8">
+            <h1 class="text-4xl font-bold mb-4" style="color: var(--dark-charcoal); line-height: 1.2;">
+                Welcome To The Future Of <span style="color: var(--primary-green);">Verdanist</span>
+            </h1>
+            <p class="text-lg text-gray-600 leading-relaxed">
+                Manage misting, soil moisture, and greenhouse climate all in one beautiful app.
+            </p>
+        </div>
+        
+        <!-- CTA Button -->
+        <button onclick="goToDashboard()" class="btn-pill w-full max-w-sm" style="background: linear-gradient(135deg, var(--primary-green) 0%, #2ba86d 100%); color: white;">
+            Get Started
+        </button>
+        
+        <!-- Skip Link -->
+        <button onclick="goToDashboard()" class="mt-4 text-gray-500 hover:text-gray-700 transition">
+            Skip for now →
+        </button>
+    </div>
+
+    <!-- DASHBOARD SCREEN -->
+    <div id="dashboard-screen" class="screen hidden w-full min-h-screen pb-safe">
+        <!-- Header -->
+        <div class="bg-white/70 backdrop-blur-md sticky top-0 z-40 border-b border-gray-200/50">
+            <div class="px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-3xl" style="color: var(--primary-green); font-variation-settings: 'FILL' 1;">eco</span>
+                    <span class="text-lg font-black" style="color: var(--dark-charcoal);">Verdanist</span>
+                </div>
+                <button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-100 transition">
+                    <span class="material-symbols-outlined text-gray-600">settings</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="px-6 py-8">
+            <!-- Welcome Section -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-1" style="color: var(--dark-charcoal);">Good Morning, Farmer!</h2>
+                <p class="text-gray-500">Your greenhouse is running smoothly</p>
+            </div>
+
+            <!-- Status Cards Grid -->
+            <div class="space-y-4 mb-8">
+                <!-- Weather Card -->
+                <div class="glass-card p-6 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--light-blue) 0%, var(--sky-blue) 100%);">
+                            <span class="material-symbols-outlined text-2xl text-white" style="font-variation-settings: 'FILL' 1;">wb_sunny</span>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium">Weather</p>
+                            <p class="text-2xl font-bold" style="color: var(--dark-charcoal);">Sunny, 28°C</p>
+                        </div>
+                    </div>
+                    <span class="text-3xl">☀️</span>
+                </div>
+
+                <!-- Soil Moisture Card -->
+                <div class="glass-card p-6 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, #fef3c7 0%, #f59e0b 100%);">
+                            <span class="material-symbols-outlined text-2xl text-white" style="font-variation-settings: 'FILL' 1;">opacity</span>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium">Soil Moisture</p>
+                            <p class="text-2xl font-bold" style="color: var(--dark-charcoal);">65%</p>
+                        </div>
+                    </div>
+                    <span class="text-3xl">💧</span>
+                </div>
+
+                <!-- Humidity Card -->
+                <div class="glass-card p-6 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, #dbeafe 0%, var(--sky-blue) 100%);">
+                            <span class="material-symbols-outlined text-2xl text-white" style="font-variation-settings: 'FILL' 1;">cloud_queue</span>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 font-medium">Humidity</p>
+                            <p class="text-2xl font-bold" style="color: var(--dark-charcoal);">82%</p>
+                        </div>
+                    </div>
+                    <span class="text-3xl">☁️</span>
+                </div>
+            </div>
+
+            <!-- Zone Status Section -->
+            <div class="mb-8">
+                <h3 class="text-lg font-bold mb-4" style="color: var(--dark-charcoal);">Cultivation Zones</h3>
+                
+                <!-- Indoor Misting -->
+                <div class="glass-card p-6 mb-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);">
+                                <span class="material-symbols-outlined text-purple-600" style="font-variation-settings: 'FILL' 1;">cloud</span>
+                            </div>
+                            <div>
+                                <p class="font-bold" style="color: var(--dark-charcoal);">Indoor Misting</p>
+                                <p class="text-xs text-gray-500">Seedling propagation</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-green-600" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                    </div>
+                    <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-purple-400 to-blue-400 w-[85%] rounded-full"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">85% optimal conditions</p>
+                </div>
+
+                <!-- Outdoor Polybag -->
+                <div class="glass-card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, #dcfce7 0%, #86efac 100%);">
+                                <span class="material-symbols-outlined text-green-700" style="font-variation-settings: 'FILL' 1;">grass</span>
+                            </div>
+                            <div>
+                                <p class="font-bold" style="color: var(--dark-charcoal);">Outdoor Polybag</p>
+                                <p class="text-xs text-gray-500">Mature plants</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-green-600" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                    </div>
+                    <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-green-400 to-emerald-500 w-[72%] rounded-full"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">72% optimal conditions</p>
+                </div>
+            </div>
+
+            <!-- Quick Action Buttons -->
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <button class="glass-card p-4 flex flex-col items-center gap-2 hover:bg-white/95 transition">
+                    <span class="material-symbols-outlined text-3xl" style="color: var(--primary-green); font-variation-settings: 'FILL' 1;">tune</span>
+                    <p class="text-sm font-semibold text-center" style="color: var(--dark-charcoal);">Adjust Settings</p>
+                </button>
+                <button class="glass-card p-4 flex flex-col items-center gap-2 hover:bg-white/95 transition">
+                    <span class="material-symbols-outlined text-3xl" style="color: var(--primary-green); font-variation-settings: 'FILL' 1;">analytics</span>
+                    <p class="text-sm font-semibold text-center" style="color: var(--dark-charcoal);">View Reports</p>
+                </button>
+                <button class="glass-card p-4 flex flex-col items-center gap-2 hover:bg-white/95 transition">
+                    <span class="material-symbols-outlined text-3xl" style="color: var(--primary-green); font-variation-settings: 'FILL' 1;">notifications</span>
+                    <p class="text-sm font-semibold text-center" style="color: var(--dark-charcoal);">Alerts</p>
+                </button>
+                <button class="glass-card p-4 flex flex-col items-center gap-2 hover:bg-white/95 transition">
+                    <span class="material-symbols-outlined text-3xl" style="color: var(--primary-green); font-variation-settings: 'FILL' 1;">history</span>
+                    <p class="text-sm font-semibold text-center" style="color: var(--dark-charcoal);">Logs</p>
+                </button>
+            </div>
+
+            <!-- Back Button -->
+            <button onclick="goToOnboarding()" class="btn-pill w-full" style="background: var(--light-blue); color: var(--dark-charcoal); margin-bottom: 24px;">
+                ← Back to Welcome
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function goToDashboard() {
+            document.getElementById('onboarding-screen').classList.add('hidden');
+            document.getElementById('dashboard-screen').classList.remove('hidden');
+        }
+
+        function goToOnboarding() {
+            document.getElementById('dashboard-screen').classList.add('hidden');
+            document.getElementById('onboarding-screen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

@@ -52,10 +52,7 @@ export default function Welcome() {
         </div>
 
         <div className="flex-1 flex flex-col justify-center min-h-[400px]">
-          <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-6 w-fit mt-12">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            <span className="text-primary text-xs font-semibold">Smart Greenhouse IoT</span>
-          </div>
+
 
           <h1
             style={{ fontFamily: "'Fredoka', sans-serif", fontWeight: 600, lineHeight: 1.2 }}

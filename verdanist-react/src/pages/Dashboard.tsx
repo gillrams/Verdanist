@@ -156,11 +156,17 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col min-h-screen bg-background pb-20 lg:pb-6 lg:pt-6 w-full">
       
-      {/* Top Brand Bar */}
+      {/* Top Brand Bar - logo hanya tampil di mobile, desktop pakai sidebar */}
       <div className="px-6 pt-10 lg:pt-0 pb-4 flex items-center justify-between">
-        <div>
+        <div className="lg:hidden">
           <img src={logoLight} alt="Verdanist Logo" className="h-12 w-auto object-contain dark:hidden" />
           <img src={logoDark} alt="Verdanist Logo" className="h-12 w-auto object-contain hidden dark:block" />
+        </div>
+        {/* Di desktop, tampilkan judul kebun aktif sebagai ganti logo */}
+        <div className="hidden lg:flex items-center gap-2">
+          <span className="text-foreground font-bold" style={{ fontSize: 20 }}>
+            {currentFarm?.name || 'Dashboard'}
+          </span>
         </div>
         <span className="text-muted-foreground/80 font-medium tracking-wide" style={{ fontSize: 13 }}>
           {currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB

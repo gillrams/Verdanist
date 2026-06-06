@@ -6,7 +6,7 @@ import ikonLogoLight from '../../assets/Ikon_logo_light.png';
 import ikonLogoDark from '../../assets/Ikon_logo_dark.png';
 
 export default function Sidebar() {
-  const { logout, user } = useAuth();
+  const { logout, user, currentFarm } = useAuth();
   const { t, toggleLang, lang } = useLanguage();
 
   return (
@@ -16,7 +16,9 @@ export default function Sidebar() {
         <img src={ikonLogoDark} alt="Verdanist Logo" className="w-12 h-12 object-contain drop-shadow-md hidden dark:block" />
         <div>
           <h1 className="text-green-700 dark:text-green-400 font-extrabold text-xl tracking-tight">Verdanist</h1>
-          <p className="font-bold text-xs text-green-600/60 dark:text-white/50 uppercase tracking-widest mt-0.5">Persada Farm</p>
+          <p className="font-bold text-xs text-green-600/60 dark:text-white/50 uppercase tracking-widest mt-0.5">
+            {currentFarm?.name || user?.displayName || 'Smart Greenhouse'}
+          </p>
         </div>
       </div>
 

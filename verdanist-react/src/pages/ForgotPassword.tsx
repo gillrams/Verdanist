@@ -39,8 +39,8 @@ export default function ForgotPassword() {
   if (success) {
     return (
       <div className="flex flex-col min-h-screen bg-background px-6 items-center justify-center relative">
-        <div className="absolute top-6 right-6">
-          <ThemeToggle className="w-10 h-10 bg-card border border-border shadow-sm" />
+        <div className="absolute top-12 right-6 z-10">
+          <ThemeToggle className="w-10 h-10 bg-card border border-border shadow-sm rounded-full" />
         </div>
         
         <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mb-6 ring-8 ring-emerald-500/5">
@@ -67,26 +67,31 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background px-6">
-      <div className="pt-14 pb-6">
-        <div className="flex justify-between items-start mb-6">
+    <div className="flex flex-col min-h-screen bg-background px-6 relative">
+      {/* Logo absolut kiri atas */}
+      <div className="absolute top-12 left-6 z-10">
+        <ImageWithFallback
+          src={logoLight}
+          alt="Verdanist"
+          className="block dark:hidden h-12 object-contain object-left"
+        />
+        <ImageWithFallback
+          src={logoDark}
+          alt="Verdanist"
+          className="hidden dark:block h-12 object-contain object-left"
+        />
+      </div>
+
+      {/* ThemeToggle absolut kanan atas */}
+      <div className="absolute top-12 right-6 z-10">
+        <ThemeToggle className="w-10 h-10 bg-card border border-border shadow-sm rounded-full" />
+      </div>
+
+      <div className="pt-28 pb-6 shrink-0">
+        <div className="mb-6">
           <button onClick={() => navigate('/login')} className="p-2 -ml-2 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <ThemeToggle className="w-10 h-10 bg-card border border-border shadow-sm" />
-        </div>
-
-        <div className="mb-8">
-          <ImageWithFallback
-            src={logoLight}
-            alt="Verdanist"
-            className="block dark:hidden h-12 object-contain object-left"
-          />
-          <ImageWithFallback
-            src={logoDark}
-            alt="Verdanist"
-            className="hidden dark:block h-12 object-contain object-left"
-          />
         </div>
 
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wider mb-4">

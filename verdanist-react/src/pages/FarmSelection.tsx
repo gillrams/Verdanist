@@ -40,30 +40,23 @@ export default function FarmSelection() {
         if (farms.length === 0) setLoading(true);
         setError(null);
 
-        // 1. Try fetching from public_farms view first
-        const { data, error: queryError } = await supabase
-          .from('public_farms')
+        const { data, error: fetchError } = await supabase
+          .from('farms')
           .select('*');
 
-        if (queryError) {
-          // 2. Fallback to farms table directly if view is missing or inaccessible
-          const { data: fallbackData, error: fallbackError } = await supabase
-            .from('farms')
-            .select('*');
+        console.log('Farm fetch result:', { data, fetchError });
 
-          if (fallbackError) {
-            if (farms.length === 0) {
-              setError(fallbackError.message || 'Gagal memuat data kebun dari database.');
-            }
-          } else if (fallbackData) {
-            setFarms(fallbackData);
-            localStorage.setItem('cached_farms', JSON.stringify(fallbackData));
+        if (fetchError) {
+          console.error('Error fetching farms:', fetchError);
+          if (farms.length === 0) {
+            setError(fetchError.message || 'Gagal memuat data kebun dari database.');
           }
         } else if (data) {
           setFarms(data);
           localStorage.setItem('cached_farms', JSON.stringify(data));
         }
       } catch (err: any) {
+        console.error('Unexpected error fetching farms:', err);
         if (farms.length === 0) {
           setError(err.message || 'Terjadi kesalahan saat memuat kebun.');
         }

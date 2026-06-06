@@ -159,8 +159,8 @@ export default function Dashboard() {
       {/* Top Brand Bar */}
       <div className="px-6 pt-10 lg:pt-0 pb-4 flex items-center justify-between">
         <div>
-          <img src={logoLight} alt="Verdanist Logo" className="h-10 w-auto object-contain dark:hidden" />
-          <img src={logoDark} alt="Verdanist Logo" className="h-10 w-auto object-contain hidden dark:block" />
+          <img src={logoLight} alt="Verdanist Logo" className="h-12 w-auto object-contain dark:hidden" />
+          <img src={logoDark} alt="Verdanist Logo" className="h-12 w-auto object-contain hidden dark:block" />
         </div>
         <span className="text-muted-foreground/80 font-medium tracking-wide" style={{ fontSize: 13 }}>
           {currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB

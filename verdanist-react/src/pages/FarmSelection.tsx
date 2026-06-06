@@ -115,12 +115,12 @@ export default function FarmSelection() {
         <ImageWithFallback
           src={logoLight}
           alt="Verdanist"
-          className="block dark:hidden h-10 object-contain object-left"
+          className="block dark:hidden h-12 object-contain object-left"
         />
         <ImageWithFallback
           src={logoDark}
           alt="Verdanist"
-          className="hidden dark:block h-10 object-contain object-left"
+          className="hidden dark:block h-12 object-contain object-left"
         />
       </div>
 

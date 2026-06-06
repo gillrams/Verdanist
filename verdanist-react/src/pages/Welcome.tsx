@@ -38,12 +38,12 @@ export default function Welcome() {
           <ImageWithFallback
             src={logoLight}
             alt="Verdanist"
-            className="block dark:hidden h-10 object-contain object-left"
+            className="block dark:hidden h-12 object-contain object-left"
           />
           <ImageWithFallback
             src={logoDark}
             alt="Verdanist"
-            className="hidden dark:block h-10 object-contain object-left"
+            className="hidden dark:block h-12 object-contain object-left"
           />
         </div>
 
@@ -56,7 +56,7 @@ export default function Welcome() {
 
           <h1
             style={{ fontFamily: "'Fredoka', sans-serif", fontWeight: 600, lineHeight: 1.2 }}
-            className="text-foreground text-[42px] mb-4"
+            className="text-foreground text-[42px] mb-4 mt-12"
           >
             Sahabat Kebun<br />
             <span className="text-primary">Pintarmu</span>

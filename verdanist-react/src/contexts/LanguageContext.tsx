@@ -84,6 +84,7 @@ const translations = {
   'admin.pendingStatus': { id: 'Menunggu', en: 'Pending' },
   'admin.approveBtn': { id: 'Setujui', en: 'Approve' },
   'admin.deleteBtn': { id: 'Hapus', en: 'Delete' },
+  'admin.registeredBtn': { id: 'Terdaftar', en: 'Registered' },
   'admin.usersCount': { id: 'pengguna', en: 'users' },
   'admin.guest': { id: 'Tamu', en: 'Guest' },
   'admin.makeFarmer': { id: 'Jadikan Petani', en: 'Make Farmer' },

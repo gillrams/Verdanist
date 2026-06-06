@@ -177,10 +177,14 @@ export default function Admin() {
                           </span>
                       </div>
                       <div className="flex flex-col gap-2">
-                        {farm.status !== 'active' && (
-                          <button disabled={actionLoading === farm.id} onClick={() => approveFarm(farm.id)} className="bg-primary/10 text-primary px-3 py-1.5 rounded-xl" style={{ fontSize: 12, fontWeight: 600 }}>{t('admin.approveBtn')}</button>
+                        {farm.status !== 'active' ? (
+                          <>
+                            <button disabled={actionLoading === farm.id} onClick={() => approveFarm(farm.id)} className="bg-primary/10 text-primary px-3 py-1.5 rounded-xl" style={{ fontSize: 12, fontWeight: 600 }}>{t('admin.approveBtn')}</button>
+                            <button disabled={actionLoading === farm.id} onClick={() => deleteFarm(farm.id)} className="bg-destructive/10 text-destructive px-3 py-1.5 rounded-xl" style={{ fontSize: 12, fontWeight: 600 }}>{t('admin.deleteBtn')}</button>
+                          </>
+                        ) : (
+                          <button disabled className="bg-secondary text-muted-foreground/60 px-3 py-1.5 rounded-xl cursor-not-allowed border border-border/50" style={{ fontSize: 12, fontWeight: 600 }}>{t('admin.registeredBtn')}</button>
                         )}
-                        <button disabled={actionLoading === farm.id} onClick={() => deleteFarm(farm.id)} className="bg-destructive/10 text-destructive px-3 py-1.5 rounded-xl" style={{ fontSize: 12, fontWeight: 600 }}>{t('admin.deleteBtn')}</button>
                       </div>
                     </div>
                   ))}

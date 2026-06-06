@@ -38,23 +38,38 @@ export default function Admin() {
 
   const approveFarm = async (id: string) => {
     setActionLoading(id);
-    await supabase.from('farms').update({ status: 'active' }).eq('id', id);
-    setFarms(f => f.map(farm => farm.id === id ? { ...farm, status: 'active' } : farm));
+    const { error } = await supabase.from('farms').update({ status: 'active' }).eq('id', id);
+    if (error) {
+      console.error(error);
+      alert('Gagal menyetujui kebun: ' + error.message);
+    } else {
+      setFarms(f => f.map(farm => farm.id === id ? { ...farm, status: 'active' } : farm));
+    }
     setActionLoading(null);
   };
 
   const deleteFarm = async (id: string) => {
     if (!confirm(t('admin.confirmDelete'))) return;
     setActionLoading(id);
-    await supabase.from('farms').delete().eq('id', id);
-    setFarms(f => f.filter(farm => farm.id !== id));
+    const { error } = await supabase.from('farms').delete().eq('id', id);
+    if (error) {
+      console.error(error);
+      alert('Gagal menghapus kebun: ' + error.message);
+    } else {
+      setFarms(f => f.filter(farm => farm.id !== id));
+    }
     setActionLoading(null);
   };
 
   const updateRole = async (id: string, role: string) => {
     setActionLoading(id);
-    await supabase.from('profiles').update({ role }).eq('id', id);
-    setUsers(u => u.map(user => user.id === id ? { ...user, role } : user));
+    const { error } = await supabase.from('profiles').update({ role }).eq('id', id);
+    if (error) {
+      console.error(error);
+      alert('Gagal mengubah role: ' + error.message);
+    } else {
+      setUsers(u => u.map(user => user.id === id ? { ...user, role } : user));
+    }
     setActionLoading(null);
   };
 

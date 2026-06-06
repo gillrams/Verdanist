@@ -1,0 +1,16 @@
+flowchart TD
+    A["/ Welcome"] -->|Get Started| B["/farms Farm Selection"]
+    B -->|Pilih kebun| C["/farms/access Token"]
+    B -->|Daftar Kebun| D["/farms/apply Form"]
+    D -->|Sukses| B
+    C -->|Token valid| E["/login Login"]
+    A -->|Privacy / API| F["/about"]
+    E -->|Email / Google| G{Role?}
+    G -->|guest| H["/welcome-guest"]
+    G -->|farmer / admin| I["App Shell"]
+    H -->|WhatsApp Admin| H
+    I --> J["/dashboard Overview"]
+    I --> K["/analytics"]
+    I --> L["/logs History"]
+    I --> M["/settings"]
+    I -->|admin only| N["/admin"]

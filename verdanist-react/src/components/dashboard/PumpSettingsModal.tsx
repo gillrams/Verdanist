@@ -1,28 +1,93 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '../../lib/supabase';
 
 interface PumpSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   deviceId: string;
+  onShowAlert?: (
+    title: string,
+    message: string,
+    onConfirm: () => void,
+    isNotification?: boolean,
+    confirmText?: string,
+    cancelText?: string,
+    type?: 'warning' | 'success' | 'info'
+  ) => void;
 }
 
-export default function PumpSettingsModal({ isOpen, onClose, deviceId: _deviceId }: PumpSettingsModalProps) {
-  // Local state for settings (In real app, fetch from database)
+export default function PumpSettingsModal({ isOpen, onClose, deviceId, onShowAlert }: PumpSettingsModalProps) {
+  const [tempThresh, setTempThresh] = useState('32');
+  const [humThresh, setHumThresh] = useState('60');
+  const [soilThresh, setSoilThresh] = useState('50');
+  
   const [timeout, setTimeoutVal] = useState('1');
   const [flowRate, setFlowRate] = useState('100');
   const [ssid, setSsid] = useState('Verdanist_Grow');
   const [password, setPassword] = useState('********');
   
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const fetchSettings = async () => {
+        setFetching(true);
+        try {
+          const { data } = await supabase.from('device_settings').select('temp_threshold, hum_threshold').eq('device_id', deviceId).single();
+          if (data) {
+            if (data.temp_threshold != null) setTempThresh(data.temp_threshold.toString());
+            if (data.hum_threshold != null) setHumThresh(data.hum_threshold.toString());
+          }
+          const storedSoil = localStorage.getItem(`verdanist_soil_threshold_${deviceId}`);
+          if (storedSoil) setSoilThresh(storedSoil);
+        } catch (e) {
+          console.error(e);
+        } finally {
+          setFetching(false);
+        }
+      };
+      fetchSettings();
+    }
+  }, [isOpen, deviceId]);
 
   const handleSave = async () => {
     setLoading(true);
-    // Simulate API call or Supabase update
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setLoading(false);
-    onClose();
-    alert('Pengaturan berhasil disimpan!');
+    try {
+      const tempNum = parseFloat(tempThresh);
+      const humNum = parseFloat(humThresh);
+      const soilNum = parseFloat(soilThresh);
+
+      // Simpan ke Supabase
+      await supabase.from('device_settings').update({
+        temp_threshold: tempNum,
+        hum_threshold: humNum
+      }).eq('device_id', deviceId);
+
+      // Simpan Soil ke Local Storage
+      localStorage.setItem(`verdanist_soil_threshold_${deviceId}`, soilNum.toString());
+
+      onClose();
+      
+      if (onShowAlert) {
+        onShowAlert(
+          'Pengaturan Berhasil Disimpan! ⚙️',
+          `Sistem ${deviceId} telah diperbarui dengan batas berikut:\n\n• Batas Suhu Maksimal: **${tempNum}°C**\n• Kelembaban Udara Minimal: **${humNum}%**\n• Kelembaban Tanah Minimal: **${soilNum}%**\n\nSistem otomatis akan mengikuti nilai parameter yang baru.`,
+          () => {},
+          true,
+          'OK',
+          '',
+          'success'
+        );
+      } else {
+        alert('Pengaturan berhasil disimpan!');
+      }
+    } catch (e) {
+      alert('Gagal menyimpan pengaturan.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -42,7 +107,7 @@ export default function PumpSettingsModal({ isOpen, onClose, deviceId: _deviceId
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
                 <span className="material-symbols-rounded text-green-500">settings</span>
-                Pump Settings
+                Pengaturan Sistem
               </h3>
               <button 
                 onClick={onClose}
@@ -52,8 +117,50 @@ export default function PumpSettingsModal({ isOpen, onClose, deviceId: _deviceId
               </button>
             </div>
 
-            <div className="space-y-3 max-h-[250px] overflow-y-auto pr-2">
+            <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
               
+              {/* Section 0: Thresholds */}
+              <div className="bg-gray-50 dark:bg-white/5 rounded-2xl p-3 border border-gray-100 dark:border-white/5">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="material-symbols-rounded text-emerald-500 text-lg">tune</span>
+                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-gray-700 dark:text-white/70">Batas Otomatis (Threshold)</h4>
+                </div>
+                {fetching ? (
+                   <div className="py-2 flex justify-center"><div className="w-4 h-4 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" /></div>
+                ) : (
+                  <div className="space-y-2">
+                    <div>
+                      <label className="text-[10px] font-bold uppercase text-gray-400 dark:text-white/40 block mb-1">Batas Suhu Maks (°C)</label>
+                      <input 
+                        type="number" 
+                        step="0.1"
+                        value={tempThresh}
+                        onChange={(e) => setTempThresh(e.target.value)}
+                        className="w-full bg-white dark:bg-[#05150E] border border-gray-200 dark:border-white/10 rounded-xl px-3 py-1.5 text-sm font-bold text-gray-900 dark:text-white focus:outline-none focus:border-green-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold uppercase text-gray-400 dark:text-white/40 block mb-1">Kelembaban Udara Min (%)</label>
+                      <input 
+                        type="number" 
+                        value={humThresh}
+                        onChange={(e) => setHumThresh(e.target.value)}
+                        className="w-full bg-white dark:bg-[#05150E] border border-gray-200 dark:border-white/10 rounded-xl px-3 py-1.5 text-sm font-bold text-gray-900 dark:text-white focus:outline-none focus:border-green-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold uppercase text-gray-400 dark:text-white/40 block mb-1">Kelembaban Tanah Min (%)</label>
+                      <input 
+                        type="number" 
+                        value={soilThresh}
+                        onChange={(e) => setSoilThresh(e.target.value)}
+                        className="w-full bg-white dark:bg-[#05150E] border border-gray-200 dark:border-white/10 rounded-xl px-3 py-1.5 text-sm font-bold text-gray-900 dark:text-white focus:outline-none focus:border-green-500"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Section 1: Safety */}
               <div className="bg-gray-50 dark:bg-white/5 rounded-2xl p-3 border border-gray-100 dark:border-white/5">
                 <div className="flex items-center gap-2 mb-2">

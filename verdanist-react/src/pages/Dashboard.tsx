@@ -420,7 +420,7 @@ export default function Dashboard() {
       {/* Modals */}
       <AiAssistantModal isOpen={isAiModalOpen} onClose={() => setIsAiModalOpen(false)} deviceId={zone === 'indoor' ? 'ESP32_INDOOR' : 'ESP32_OUTDOOR'} onShowAlert={handleShowAlert} />
       <NotificationModal isOpen={isNotifModalOpen} onClose={() => setIsNotifModalOpen(false)} />
-      <PumpSettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} deviceId={modalDevice === 'indoor' ? 'ESP32_INDOOR' : 'ESP32_OUTDOOR'} />
+      <PumpSettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} deviceId={modalDevice === 'indoor' ? 'ESP32_INDOOR' : 'ESP32_OUTDOOR'} onShowAlert={handleShowAlert} />
       <TimerModal isOpen={isTimerModalOpen} onClose={() => setIsTimerModalOpen(false)} deviceId={modalDevice === 'indoor' ? 'ESP32_INDOOR' : 'ESP32_OUTDOOR'} currentMode="timer" setMode={() => { }} onShowAlert={handleShowAlert} />
       <AlertModal {...alertState} onClose={() => setAlertState(p => ({ ...p, isOpen: false }))} />
 

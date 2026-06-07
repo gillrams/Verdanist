@@ -71,10 +71,9 @@ export default function PumpSettingsModal({ isOpen, onClose, deviceId, onShowAle
       // Log perubahan ke riwayat agar muncul di Notifikasi dan Log
       await supabase.from('pump_logs').insert({
         zone: deviceId === 'ESP32_OUTDOOR' ? 'B' : 'A',
-        action: 'SISTEM DIUBAH',
+        action: 'PUMP ON', // Using valid enum for check constraint
         trigger: 'manual',
-        detail: `Parameter manual diubah. Suhu Maks: ${tempNum}°C, Kelembaban Min: ${humNum}%, Tanah: ${soilNum}%.`,
-        operator: 'Admin / Pengguna'
+        detail: `Parameter manual diubah. Suhu Maks: ${tempNum}°C, Kelembaban Min: ${humNum}%, Tanah: ${soilNum}%.`
       });
 
       onClose();

@@ -42,10 +42,20 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
     setLoading(false);
   };
 
-  const getIcon = (action: string) => {
-    if (action === 'PUMP ON') return <PlayCircle className="w-5 h-5 text-primary" />;
-    if (action === 'PUMP OFF') return <StopCircle className="w-5 h-5 text-muted-foreground" />;
+  const getIcon = (notif: Notification) => {
+    if (notif.detail?.includes('Konfigurasi AI')) return <span className="material-symbols-rounded text-emerald-500 w-5 h-5 flex items-center justify-center">psychology</span>;
+    if (notif.detail?.includes('Parameter manual')) return <span className="material-symbols-rounded text-blue-500 w-5 h-5 flex items-center justify-center">settings</span>;
+    if (notif.action === 'PUMP ON') return <PlayCircle className="w-5 h-5 text-primary" />;
+    if (notif.action === 'PUMP OFF') return <StopCircle className="w-5 h-5 text-muted-foreground" />;
     return <Info className="w-5 h-5 text-chart-2" />;
+  };
+
+  const getTitle = (notif: Notification) => {
+    if (notif.detail?.includes('Konfigurasi AI')) return 'AI Config Diterapkan';
+    if (notif.detail?.includes('Parameter manual')) return 'Sistem Diubah';
+    if (notif.action === 'PUMP ON') return 'Pompa Dinyalakan';
+    if (notif.action === 'PUMP OFF') return 'Pompa Dimatikan';
+    return notif.action;
   };
 
   const formatTime = (dateStr: string) => {
@@ -105,11 +115,11 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
                     <div key={notif.id} className="p-4 hover:bg-secondary/30 transition-colors cursor-default">
                       <div className="flex gap-3">
                         <div className="mt-0.5">
-                          {getIcon(notif.action)}
+                          {getIcon(notif)}
                         </div>
                         <div className="flex-1">
                           <p className="text-sm font-bold text-foreground leading-snug">
-                            {notif.action === 'PUMP ON' ? 'Pompa Dinyalakan' : notif.action === 'PUMP OFF' ? 'Pompa Dimatikan' : notif.action}
+                            {getTitle(notif)}
                           </p>
                           <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
                             {notif.detail || 'Perubahan status pada sistem.'}

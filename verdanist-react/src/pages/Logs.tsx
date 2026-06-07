@@ -105,16 +105,29 @@ export default function Logs() {
         if (isToday) dateLabel = t('logs.today');
         if (isYesterday) dateLabel = t('logs.yesterday');
 
-        const type: LogEntry['type'] = log.action === 'PUMP ON' ? 'pump_on' : 'pump_off';
+        // Detect AI config or manual setting changes by detail content
+        const isAiConfig = log.detail?.includes('Konfigurasi AI');
+        const isManualConfig = log.detail?.includes('Parameter manual');
+
+        let type: LogEntry['type'] = log.action === 'PUMP ON' ? 'pump_on' : 'pump_off';
+        let title = log.action === 'PUMP ON' ? t('logs.pumpOn') : t('logs.pumpOff');
+
+        if (isAiConfig) {
+          type = 'sensor_rh'; // reuse emerald icon
+          title = '🤖 AI Config Diterapkan';
+        } else if (isManualConfig) {
+          type = 'sensor_temp'; // reuse orange icon
+          title = '⚙️ Parameter Sistem Diubah';
+        }
 
         return {
           id: `pump-${log.id}`,
           type,
-          title: log.action === 'PUMP ON' ? t('logs.pumpOn') : t('logs.pumpOff'),
+          title,
           detail: log.detail || '-',
           zone: `${t('logs.zone')} ${log.zone}`,
-          operator: log.operator || t('logs.system'),
-          timestamp: d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }), // Keeping 24h format generally
+          operator: log.trigger === 'system' ? 'Agronomy AI' : (log.trigger === 'manual' ? 'Admin' : (log.operator || t('logs.system'))),
+          timestamp: d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
           date: dateLabel,
           rawDate: d
         };

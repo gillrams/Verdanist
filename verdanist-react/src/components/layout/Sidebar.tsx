@@ -15,7 +15,7 @@ export default function Sidebar() {
         <img src={ikonLogoLight} alt="Verdanist Logo" className="w-12 h-12 object-contain drop-shadow-md dark:hidden" />
         <img src={ikonLogoDark} alt="Verdanist Logo" className="w-12 h-12 object-contain drop-shadow-md hidden dark:block" />
         <div>
-          <h1 className="text-green-700 dark:text-green-400 font-extrabold text-xl tracking-tight">Verdanist</h1>
+          <h1 style={{ fontFamily: "'Fredoka', sans-serif", fontSize: 22, fontWeight: 600 }} className="text-green-700 dark:text-green-400 tracking-tight">Verdanist</h1>
           <p className="font-bold text-xs text-green-600/60 dark:text-white/50 uppercase tracking-widest mt-0.5">
             {currentFarm?.name || user?.displayName || 'Smart Greenhouse'}
           </p>

@@ -68,6 +68,15 @@ export default function PumpSettingsModal({ isOpen, onClose, deviceId, onShowAle
       // Simpan Soil ke Local Storage
       localStorage.setItem(`verdanist_soil_threshold_${deviceId}`, soilNum.toString());
 
+      // Log perubahan ke riwayat agar muncul di Notifikasi dan Log
+      await supabase.from('pump_logs').insert({
+        zone: deviceId === 'ESP32_OUTDOOR' ? 'B' : 'A',
+        action: 'SISTEM DIUBAH',
+        trigger: 'manual',
+        detail: `Parameter manual diubah. Suhu Maks: ${tempNum}°C, Kelembaban Min: ${humNum}%, Tanah: ${soilNum}%.`,
+        operator: 'Admin / Pengguna'
+      });
+
       onClose();
       
       if (onShowAlert) {

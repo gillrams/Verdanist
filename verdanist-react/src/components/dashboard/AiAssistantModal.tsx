@@ -449,6 +449,15 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
           localStorage.setItem(`verdanist_soil_offset_${deviceId}`, '0');
         }
 
+        // 3. Log the AI configuration change to pump_logs for notifications and history
+        await supabase.from('pump_logs').insert({
+          zone: deviceId === 'ESP32_OUTDOOR' ? 'B' : 'A',
+          action: 'AI CONFIG',
+          trigger: 'system',
+          detail: `Konfigurasi AI "${plant.name}" diterapkan. Suhu Maks: ${plant.temp.toFixed(1)}°C, Kelembaban Min: ${plant.humidity}%, Tanah: ${plant.soil}%, Pola: ${plant.pattern === 'continuous' ? 'Kontinu' : 'Pulsasi'}.`,
+          operator: 'Agronomy AI'
+        });
+
         // Close the modal
         onClose();
 

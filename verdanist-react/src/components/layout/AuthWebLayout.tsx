@@ -12,7 +12,7 @@ export default function AuthWebLayout({ children }: AuthWebLayoutProps) {
   return (
     <div className="min-h-[100dvh] bg-background flex">
       {/* Kolom Kiri: Main Content - Menjaga tampilan asli mobile layout */}
-      <div className="w-full md:w-1/2 lg:w-[480px] xl:w-[500px] flex flex-col shrink-0 relative border-r border-border/40 shadow-[var(--shadow-custom)] z-10 bg-background h-[100dvh] overflow-hidden">
+      <div className="w-full md:w-1/2 lg:w-[480px] xl:w-[500px] flex flex-col shrink-0 relative border-r border-border/40 shadow-[var(--shadow-custom)] z-50 bg-background h-[100dvh] overflow-hidden">
         {children}
       </div>
 

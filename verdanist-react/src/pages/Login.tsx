@@ -70,7 +70,7 @@ export default function Login({ initialTab = "login" }: { initialTab?: "login" |
     <AuthWebLayout>
       <div className="flex-1 flex flex-col h-full px-6 overflow-y-auto relative">
         {/* Logo absolut kiri atas */}
-        <div className="absolute top-12 left-6 z-10">
+        <div className="absolute top-6 left-6 md:top-12 md:left-6 z-10">
           <ImageWithFallback
             src={logoLight}
             alt="Verdanist"
@@ -84,11 +84,11 @@ export default function Login({ initialTab = "login" }: { initialTab?: "login" |
         </div>
 
         {/* ThemeToggle absolut kanan atas */}
-        <div className="absolute top-12 right-6 z-10">
+        <div className="absolute top-6 right-6 md:top-12 md:right-6 z-10">
           <ThemeToggle className="w-10 h-10 bg-card border border-border shadow-sm rounded-full" />
         </div>
 
-        <div className="pt-28 pb-6 shrink-0">
+        <div className="pt-20 md:pt-28 pb-6 shrink-0">
           <div className="mb-6">
             <button onClick={() => navigate('/')} className="p-2 -ml-2 text-muted-foreground hover:text-foreground">
               <ArrowLeft className="w-5 h-5" />

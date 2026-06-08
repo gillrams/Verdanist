@@ -34,7 +34,7 @@ export default function Welcome() {
   return (
     <AuthWebLayout>
       <div className="flex-1 flex flex-col h-full px-6 pb-6 pt-16 overflow-y-auto relative">
-        <div className="absolute top-12 left-6 z-10">
+        <div className="absolute top-6 left-6 md:top-12 md:left-6 z-10">
           <ImageWithFallback
             src={logoLight}
             alt="Verdanist"
@@ -47,7 +47,7 @@ export default function Welcome() {
           />
         </div>
 
-        <div className="absolute top-12 right-6 z-10">
+        <div className="absolute top-6 right-6 md:top-12 md:right-6 z-10">
           <ThemeToggle className="w-10 h-10 bg-card border border-border shadow-sm rounded-full" />
         </div>
 
@@ -56,7 +56,7 @@ export default function Welcome() {
 
           <h1
             style={{ fontFamily: "'Fredoka', sans-serif", fontWeight: 600, lineHeight: 1.2 }}
-            className="text-foreground text-[42px] mb-4 mt-12"
+            className="text-foreground text-[42px] mb-4 mt-6 md:mt-12"
           >
             Sahabat Kebun<br />
             <span className="text-primary">Pintarmu</span>

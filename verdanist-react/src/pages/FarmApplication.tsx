@@ -18,7 +18,7 @@ export default function FarmApplication() {
     if (!name || !email || !wa) return;
 
     const message = `Halo, saya ${name}.%0AEmail: ${email}%0ANo. WA: ${wa}%0A%0ASaya mau daftar kebun, berapa biayanya?`;
-    window.open(`https://wa.me/6285817619891?text=${message}`, '_blank');
+    window.open(`https://wa.me/+6285817619891?text=${message}`, '_blank');
     navigate('/farms');
   };
 

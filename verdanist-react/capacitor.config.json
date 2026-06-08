@@ -1,0 +1,6 @@
+{
+  "appId": "id.verdanist.app",
+  "appName": "Verdanist",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

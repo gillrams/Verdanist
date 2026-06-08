@@ -4,6 +4,11 @@ import { useAuth } from '../contexts/AuthContext';
 import { ArrowLeft, KeyRound, ScanLine } from "lucide-react";
 import QRScannerModal from '../components/ui/QRScannerModal';
 import { supabase } from '../lib/supabase';
+import AuthWebLayout from '../components/layout/AuthWebLayout';
+import { ThemeToggle } from '../components/ui/ThemeToggle';
+import { ImageWithFallback } from '../components/ui/ImageWithFallback';
+import logoLight from "../assets/Logo_Light_Samping.png";
+import logoDark from "../assets/Logo_Dark_samping.png";
 
 export default function FarmAccess() {
   const [token, setToken] = useState('');
@@ -73,10 +78,12 @@ export default function FarmAccess() {
 
   if (isInitializing || (!farm && !error)) {
     return (
-      <div className="flex flex-col min-h-screen bg-background items-center justify-center">
-        <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-        <p className="mt-4 text-sm text-muted-foreground font-medium">Menyiapkan akses...</p>
-      </div>
+      <AuthWebLayout>
+        <div className="flex flex-col h-full bg-background items-center justify-center">
+          <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+          <p className="mt-4 text-sm text-muted-foreground font-medium">Menyiapkan akses...</p>
+        </div>
+      </AuthWebLayout>
     );
   }
 
@@ -117,19 +124,37 @@ export default function FarmAccess() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background px-6">
-      <div className="pt-14 pb-6">
-        <button onClick={() => navigate('/farms')} className="p-2 -ml-2 mb-4 text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <p style={{ fontSize: 13, fontWeight: 600 }} className="text-ring mb-1">Langkah 2 dari 3</p>
-        <h1 style={{ fontFamily: "'Fredoka', sans-serif", fontSize: 28, fontWeight: 600 }} className="text-foreground mb-2">
-          Masukkan Token
-        </h1>
-        <p style={{ fontSize: 14 }} className="text-muted-foreground">
-          Token akses untuk bergabung ke <span className="text-foreground" style={{ fontWeight: 500 }}>{farm.name}</span>
-        </p>
-      </div>
+    <AuthWebLayout>
+      <div className="flex-1 flex flex-col h-full bg-background px-6 relative overflow-y-auto">
+        <div className="absolute top-12 left-6 z-10">
+          <ImageWithFallback
+            src={logoLight}
+            alt="Verdanist"
+            className="block dark:hidden h-12 object-contain object-left"
+          />
+          <ImageWithFallback
+            src={logoDark}
+            alt="Verdanist"
+            className="hidden dark:block h-12 object-contain object-left"
+          />
+        </div>
+
+        <div className="absolute top-12 right-6 z-10">
+          <ThemeToggle className="w-10 h-10 bg-card border border-border shadow-sm rounded-full" />
+        </div>
+
+        <div className="pt-28 pb-6">
+          <button onClick={() => navigate('/farms')} className="p-2 -ml-2 mb-4 text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <p style={{ fontSize: 13, fontWeight: 600 }} className="text-ring mb-1">Langkah 2 dari 3</p>
+          <h1 style={{ fontFamily: "'Fredoka', sans-serif", fontSize: 28, fontWeight: 600 }} className="text-foreground mb-2">
+            Masukkan Token
+          </h1>
+          <p style={{ fontSize: 14 }} className="text-muted-foreground">
+            Token akses untuk bergabung ke <span className="text-foreground" style={{ fontWeight: 500 }}>{farm.name}</span>
+          </p>
+        </div>
 
       <div className="flex-1 flex flex-col justify-center">
         <form onSubmit={(e) => handleSubmit(e)} className="bg-card border border-border rounded-3xl p-6 shadow-[var(--shadow-custom)]">
@@ -139,6 +164,7 @@ export default function FarmAccess() {
           <label className="block text-muted-foreground mb-2" style={{ fontSize: 13 }}>Token Akses Kebun</label>
           <div className="relative">
             <input
+              type="password"
               value={token}
               onChange={(e) => { setToken(e.target.value); setError(""); }}
               placeholder="Contoh: VRD-2024-ABCDEF"
@@ -189,6 +215,7 @@ export default function FarmAccess() {
         onClose={() => setIsScannerOpen(false)} 
         onScanSuccess={handleScanSuccess} 
       />
-    </div>
+      </div>
+    </AuthWebLayout>
   );
 }

@@ -384,6 +384,7 @@ export default function Dashboard() {
               ) : (
                 zone === 'indoor' ? (
                   <PumpController
+                    key="indoor"
                     device="indoor"
                     mode={indoorSensor.mode}
                     setMode={(m) => setIndoorSensor(p => ({ ...p, mode: m as any }))}
@@ -395,6 +396,7 @@ export default function Dashboard() {
                   />
                 ) : (
                   <PumpController
+                    key="outdoor"
                     device="outdoor"
                     mode={outdoorSensor.mode}
                     setMode={(m) => setOutdoorSensor(p => ({ ...p, mode: m as any }))}

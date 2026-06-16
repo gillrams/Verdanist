@@ -22,7 +22,7 @@ export default function PumpSettingsModal({ isOpen, onClose, deviceId, onShowAle
   const [humThresh, setHumThresh] = useState('60');
   const [soilThresh, setSoilThresh] = useState('50');
   
-  const [timeout, setTimeoutVal] = useState('1');
+  const [timeout, setTimeoutVal] = useState('30');
   const [flowRate, setFlowRate] = useState('100');
   const [ssid, setSsid] = useState('Verdanist_Grow');
   const [password, setPassword] = useState('********');
@@ -42,6 +42,19 @@ export default function PumpSettingsModal({ isOpen, onClose, deviceId, onShowAle
           }
           const storedSoil = localStorage.getItem(`verdanist_soil_threshold_${deviceId}`);
           if (storedSoil) setSoilThresh(storedSoil);
+          
+          const storedTimeout = localStorage.getItem(`verdanist_pump_timeout_${deviceId}`);
+          if (storedTimeout) setTimeoutVal(storedTimeout);
+          else setTimeoutVal('30');
+          
+          const storedFlowRate = localStorage.getItem(`verdanist_flow_rate_${deviceId}`);
+          if (storedFlowRate) setFlowRate(storedFlowRate);
+          
+          const storedSsid = localStorage.getItem(`verdanist_ssid_${deviceId}`);
+          if (storedSsid) setSsid(storedSsid);
+          
+          const storedPassword = localStorage.getItem(`verdanist_password_${deviceId}`);
+          if (storedPassword) setPassword(storedPassword);
         } catch (e) {
           console.error(e);
         } finally {
@@ -65,8 +78,14 @@ export default function PumpSettingsModal({ isOpen, onClose, deviceId, onShowAle
         hum_threshold: humNum
       }).eq('device_id', deviceId);
 
-      // Simpan Soil ke Local Storage
+      // Simpan ke Local Storage
       localStorage.setItem(`verdanist_soil_threshold_${deviceId}`, soilNum.toString());
+      localStorage.setItem(`verdanist_pump_timeout_${deviceId}`, timeout);
+      localStorage.setItem(`verdanist_flow_rate_${deviceId}`, flowRate);
+      localStorage.setItem(`verdanist_ssid_${deviceId}`, ssid);
+      localStorage.setItem(`verdanist_password_${deviceId}`, password);
+      
+      window.dispatchEvent(new CustomEvent('verdanist_settings_updated', { detail: { deviceId } }));
 
       // Log perubahan ke riwayat agar muncul di Notifikasi dan Log
       await supabase.from('pump_logs').insert({
@@ -177,16 +196,16 @@ export default function PumpSettingsModal({ isOpen, onClose, deviceId, onShowAle
                 </div>
                 
                 <div>
-                  <label className="text-[10px] font-bold uppercase text-gray-400 dark:text-white/40 block mb-1">Max Timeout (Menit)</label>
+                  <label className="text-[10px] font-bold uppercase text-gray-400 dark:text-white/40 block mb-1">Max Timeout (Detik)</label>
                   <input 
                     type="number" 
                     min="1"
-                    max="10"
+                    max="30"
                     value={timeout}
                     onChange={(e) => setTimeoutVal(e.target.value)}
                     className="w-full bg-white dark:bg-[#05150E] border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm font-bold text-gray-900 dark:text-white focus:outline-none focus:border-green-500"
                   />
-                  <p className="text-[9px] text-gray-400 dark:text-white/30 mt-1">*Pompa otomatis mati jika menyentuh batas ini.</p>
+                  <p className="text-[9px] text-gray-400 dark:text-white/30 mt-1">*Pompa otomatis mati jika menyentuh batas ini (Max 30 Detik).</p>
                 </div>
               </div>
 

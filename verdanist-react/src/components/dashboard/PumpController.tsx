@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { Settings, Timer as TimerIcon } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-const PUMP_DURATION = 60; // seconds
+// Removed global PUMP_DURATION
 
 interface PumpControllerProps {
   onOpenTimerModal?: () => void;
@@ -32,7 +32,11 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
   // ... existing logic is kept intact ...
   const [isPumpOn, setIsPumpOn] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [timeLeft, setTimeLeft] = useState(PUMP_DURATION);
+  const [pumpDuration, setPumpDuration] = useState(() => {
+    const saved = localStorage.getItem(`verdanist_pump_timeout_${device === 'outdoor' ? 'ESP32_OUTDOOR' : 'ESP32_INDOOR'}`);
+    return saved ? parseInt(saved, 10) : 30;
+  });
+  const [timeLeft, setTimeLeft] = useState(pumpDuration);
   const [pumpStartedAt, setPumpStartedAt] = useState<string | null>(null);
   const [tempThreshold, setTempThreshold] = useState(27);
   const [humThreshold, setHumThreshold] = useState(65);
@@ -59,13 +63,13 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
           setPumpStartedAt(updatePayload.last_sync);
         } else {
           setPumpStartedAt(null);
-          setTimeLeft(PUMP_DURATION);
+          setTimeLeft(pumpDuration);
         }
         await supabase.from('pump_logs').insert({
           zone: device === 'outdoor' ? 'B' : 'A',
           action: newState ? 'PUMP ON' : 'PUMP OFF',
           trigger: forcedState !== undefined ? 'system' : 'manual',
-          detail: forcedState !== undefined ? 'Auto-off after 1 minute safety limit' : `Manual toggle by user via Dashboard (${device})`
+          detail: forcedState !== undefined ? `Auto-off after safety limit (${pumpDuration}s)` : `Manual toggle by user via Dashboard (${device})`
         });
       }
     } catch (e) {
@@ -86,14 +90,14 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
         if (!isUpdatingRef.current) {
           setIsPumpOn(payload.new.pump_active);
           setPumpStartedAt(payload.new.pump_active ? (payload.new.last_sync || null) : null);
-          if (!payload.new.pump_active) setTimeLeft(PUMP_DURATION);
+          if (!payload.new.pump_active) setTimeLeft(pumpDuration);
         }
       })
       .on('broadcast', { event: 'pump_toggle' }, payload => {
         if (!isUpdatingRef.current) {
           setIsPumpOn(payload.payload.pump_active);
           setPumpStartedAt(payload.payload.pump_active ? payload.payload.last_sync : null);
-          if (!payload.payload.pump_active) setTimeLeft(PUMP_DURATION);
+          if (!payload.payload.pump_active) setTimeLeft(pumpDuration);
         }
       }).subscribe();
 
@@ -105,6 +109,21 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
 
     return () => { supabase.removeChannel(statusSub); supabase.removeChannel(settingsSub); };
   }, [deviceId]);
+
+  useEffect(() => {
+    const handleSettingsUpdated = (e: any) => {
+      if (e.detail.deviceId === deviceId) {
+        const saved = localStorage.getItem(`verdanist_pump_timeout_${deviceId}`);
+        if (saved) {
+          const newDur = parseInt(saved, 10);
+          setPumpDuration(newDur);
+          if (!isPumpOn) setTimeLeft(newDur);
+        }
+      }
+    };
+    window.addEventListener('verdanist_settings_updated', handleSettingsUpdated);
+    return () => window.removeEventListener('verdanist_settings_updated', handleSettingsUpdated);
+  }, [deviceId, isPumpOn]);
 
   const fetchInitialState = async () => {
     try {
@@ -128,12 +147,12 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
 
   useEffect(() => {
     if (!isPumpOn || !pumpStartedAt) {
-      setTimeLeft(PUMP_DURATION);
+      setTimeLeft(pumpDuration);
       return;
     }
     const calcRemaining = () => {
       const elapsed = (Date.now() - new Date(pumpStartedAt).getTime()) / 1000;
-      return Math.max(0, Math.ceil(PUMP_DURATION - elapsed));
+      return Math.max(0, Math.ceil(pumpDuration - elapsed));
     };
     setTimeLeft(calcRemaining());
     const timer = setInterval(() => {
@@ -283,7 +302,7 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
               <motion.div
                 className="h-full bg-destructive"
                 initial={{ width: '100%' }}
-                animate={{ width: `${(timeLeft / 60) * 100}%` }}
+                animate={{ width: `${(timeLeft / pumpDuration) * 100}%` }}
                 transition={{ ease: "linear", duration: 1 }}
               />
             </div>

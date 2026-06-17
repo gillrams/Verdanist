@@ -30,7 +30,10 @@ interface PumpControllerProps {
 export default function PumpController({ onOpenTimerModal, onOpenSettings, onShowAlert, device = 'indoor', mode, setMode, temp, humidity }: PumpControllerProps) {
   const { t } = useLanguage();
   // ... existing logic is kept intact ...
-  const [isPumpOn, setIsPumpOn] = useState(false);
+  const deviceId = device === 'outdoor' ? 'ESP32_OUTDOOR' : 'ESP32_INDOOR';
+  const [isPumpOn, setIsPumpOn] = useState(() => {
+    return sessionStorage.getItem(`verdanist_pump_on_${deviceId}`) === 'true';
+  });
   const [loading, setLoading] = useState(true);
   const [pumpDuration, setPumpDuration] = useState(() => {
     const saved = localStorage.getItem(`verdanist_pump_timeout_${device === 'outdoor' ? 'ESP32_OUTDOOR' : 'ESP32_INDOOR'}`);
@@ -43,19 +46,20 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
   });
   const [tempThreshold, setTempThreshold] = useState(27);
   const [humThreshold, setHumThreshold] = useState(65);
-  const deviceId = device === 'outdoor' ? 'ESP32_OUTDOOR' : 'ESP32_INDOOR';
   const isUpdatingRef = useRef(false);
 
   const handleTogglePump = useCallback(async (forcedState?: boolean) => {
     const newState = forcedState !== undefined ? forcedState : !isPumpOn;
     isUpdatingRef.current = true;
     setIsPumpOn(newState);
+    sessionStorage.setItem(`verdanist_pump_on_${deviceId}`, newState.toString());
     try {
       const updatePayload: any = { pump_active: newState };
       updatePayload.last_sync = new Date().toISOString();
       const { error } = await supabase.from('device_status').update(updatePayload).eq('device_id', deviceId);
       if (error) {
         setIsPumpOn(!newState);
+        sessionStorage.setItem(`verdanist_pump_on_${deviceId}`, (!newState).toString());
       } else {
         supabase.channel(`status_changes_${deviceId}`).send({
           type: 'broadcast',
@@ -80,6 +84,7 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
       }
     } catch (e) {
       setIsPumpOn(!newState);
+      sessionStorage.setItem(`verdanist_pump_on_${deviceId}`, (!newState).toString());
     } finally {
       isUpdatingRef.current = false;
     }
@@ -95,6 +100,7 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'device_status', filter: `device_id=eq.${deviceId}` }, payload => {
         if (!isUpdatingRef.current) {
           setIsPumpOn(payload.new.pump_active);
+          sessionStorage.setItem(`verdanist_pump_on_${deviceId}`, payload.new.pump_active.toString());
           if (!payload.new.pump_active) {
             localStorage.removeItem(`verdanist_pump_start_${deviceId}`);
             setPumpStartedAt(null);
@@ -109,6 +115,7 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
       .on('broadcast', { event: 'pump_toggle' }, payload => {
         if (!isUpdatingRef.current) {
           setIsPumpOn(payload.payload.pump_active);
+          sessionStorage.setItem(`verdanist_pump_on_${deviceId}`, payload.payload.pump_active.toString());
           if (!payload.payload.pump_active) {
             localStorage.removeItem(`verdanist_pump_start_${deviceId}`);
             setPumpStartedAt(null);
@@ -149,6 +156,7 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
       const { data: statusData } = await supabase.from('device_status').select('pump_active, last_sync').eq('device_id', deviceId).single();
       if (statusData) {
         setIsPumpOn(statusData.pump_active);
+        sessionStorage.setItem(`verdanist_pump_on_${deviceId}`, statusData.pump_active.toString());
         if (!statusData.pump_active) {
            localStorage.removeItem(`verdanist_pump_start_${deviceId}`);
            setPumpStartedAt(null);
@@ -176,7 +184,9 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
 
   useEffect(() => {
     if (!isPumpOn || !pumpStartedAt) {
-      setTimeLeft(pumpDuration);
+      if (!isPumpOn) {
+        setTimeLeft(pumpDuration);
+      }
       return;
     }
     const calcRemaining = () => {

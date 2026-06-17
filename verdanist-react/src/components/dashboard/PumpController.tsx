@@ -37,7 +37,10 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
     return saved ? parseInt(saved, 10) : 30;
   });
   const [timeLeft, setTimeLeft] = useState(pumpDuration);
-  const [pumpStartedAt, setPumpStartedAt] = useState<string | null>(null);
+  const [pumpStartedAt, setPumpStartedAt] = useState<number | null>(() => {
+    const saved = localStorage.getItem(`verdanist_pump_start_${device === 'outdoor' ? 'ESP32_OUTDOOR' : 'ESP32_INDOOR'}`);
+    return saved ? parseInt(saved, 10) : null;
+  });
   const [tempThreshold, setTempThreshold] = useState(27);
   const [humThreshold, setHumThreshold] = useState(65);
   const deviceId = device === 'outdoor' ? 'ESP32_OUTDOOR' : 'ESP32_INDOOR';
@@ -60,8 +63,11 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
           payload: { pump_active: newState, last_sync: updatePayload.last_sync }
         });
         if (newState) {
-          setPumpStartedAt(updatePayload.last_sync);
+          const now = Date.now();
+          localStorage.setItem(`verdanist_pump_start_${deviceId}`, now.toString());
+          setPumpStartedAt(now);
         } else {
+          localStorage.removeItem(`verdanist_pump_start_${deviceId}`);
           setPumpStartedAt(null);
           setTimeLeft(pumpDuration);
         }
@@ -89,15 +95,28 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'device_status', filter: `device_id=eq.${deviceId}` }, payload => {
         if (!isUpdatingRef.current) {
           setIsPumpOn(payload.new.pump_active);
-          setPumpStartedAt(payload.new.pump_active ? (payload.new.last_sync || null) : null);
-          if (!payload.new.pump_active) setTimeLeft(pumpDuration);
+          if (!payload.new.pump_active) {
+            localStorage.removeItem(`verdanist_pump_start_${deviceId}`);
+            setPumpStartedAt(null);
+            setTimeLeft(pumpDuration);
+          } else if (!pumpStartedAt) {
+            // Only set if we don't have a local start time
+            const serverTime = payload.new.last_sync ? new Date(payload.new.last_sync).getTime() : Date.now();
+            setPumpStartedAt(serverTime);
+          }
         }
       })
       .on('broadcast', { event: 'pump_toggle' }, payload => {
         if (!isUpdatingRef.current) {
           setIsPumpOn(payload.payload.pump_active);
-          setPumpStartedAt(payload.payload.pump_active ? payload.payload.last_sync : null);
-          if (!payload.payload.pump_active) setTimeLeft(pumpDuration);
+          if (!payload.payload.pump_active) {
+            localStorage.removeItem(`verdanist_pump_start_${deviceId}`);
+            setPumpStartedAt(null);
+            setTimeLeft(pumpDuration);
+          } else if (!pumpStartedAt) {
+            const serverTime = payload.payload.last_sync ? new Date(payload.payload.last_sync).getTime() : Date.now();
+            setPumpStartedAt(serverTime);
+          }
         }
       }).subscribe();
 
@@ -130,7 +149,17 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
       const { data: statusData } = await supabase.from('device_status').select('pump_active, last_sync').eq('device_id', deviceId).single();
       if (statusData) {
         setIsPumpOn(statusData.pump_active);
-        setPumpStartedAt(statusData.pump_active ? (statusData.last_sync || null) : null);
+        if (!statusData.pump_active) {
+           localStorage.removeItem(`verdanist_pump_start_${deviceId}`);
+           setPumpStartedAt(null);
+        } else {
+           const localStart = localStorage.getItem(`verdanist_pump_start_${deviceId}`);
+           if (localStart) {
+             setPumpStartedAt(parseInt(localStart, 10));
+           } else {
+             setPumpStartedAt(statusData.last_sync ? new Date(statusData.last_sync).getTime() : Date.now());
+           }
+        }
       }
     } catch (e) { } finally { setLoading(false); }
   };
@@ -151,7 +180,7 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
       return;
     }
     const calcRemaining = () => {
-      const elapsed = (Date.now() - new Date(pumpStartedAt).getTime()) / 1000;
+      const elapsed = (Date.now() - pumpStartedAt) / 1000;
       return Math.max(0, Math.ceil(pumpDuration - elapsed));
     };
     setTimeLeft(calcRemaining());

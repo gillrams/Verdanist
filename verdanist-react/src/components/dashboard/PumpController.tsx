@@ -534,7 +534,7 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
         </motion.button>
 
         {/* Timer Animation */}
-        {isPumpOn && (
+        {isPumpOn && isDeviceOnline && (
           <div className="mt-2">
             <div className="flex justify-between items-center mb-1 text-xs font-bold text-muted-foreground">
               <span className="flex items-center gap-1 text-destructive">

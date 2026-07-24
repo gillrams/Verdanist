@@ -92,8 +92,8 @@ export default function Analytics() {
       .select('type, value, recorded_at, device_id')
       .gte('recorded_at', since)
       .eq('device_id', 'ESP32_INDOOR') // Default indoor for now
-      .order('recorded_at', { ascending: true })
-      .limit(1000);
+      .order('recorded_at', { ascending: false }) // Fetch newest first
+      .limit(period === '30D' ? 15000 : period === '7D' ? 5000 : 1000);
 
     if (error || !rows || rows.length === 0) {
       setData(generateMockData(period));
@@ -101,17 +101,21 @@ export default function Analytics() {
       const grouped: Record<number, { time: string, suhuSum: number, suhuCount: number, rhSum: number, rhCount: number, pompa: number, timestamp: number }> = {};
 
       let roundFactor = 60 * 1000;
-      if (period === '1H') roundFactor = 5 * 60 * 1000;
-      else if (period === '6H') roundFactor = 30 * 60 * 1000;
-      else if (period === '1D') roundFactor = 2 * 60 * 60 * 1000;
-      else if (period === '7D') roundFactor = 24 * 60 * 60 * 1000;
-      else if (period === '30D') roundFactor = 24 * 60 * 60 * 1000;
+      let points = 12;
+      
+      if (period === '1H') { roundFactor = 5 * 60 * 1000; points = 12; }
+      else if (period === '6H') { roundFactor = 30 * 60 * 1000; points = 12; }
+      else if (period === '1D') { roundFactor = 2 * 60 * 60 * 1000; points = 12; }
+      else if (period === '7D') { roundFactor = 24 * 60 * 60 * 1000; points = 7; }
+      else if (period === '30D') { roundFactor = 24 * 60 * 60 * 1000; points = 30; }
 
-      rows.forEach(r => {
-        const d = new Date(r.recorded_at);
-        const roundedTime = Math.floor(d.getTime() / roundFactor) * roundFactor;
-        const rd = new Date(roundedTime);
-
+      // PRE-FILL BUCKETS so the chart always has a full axis
+      const nowTime = Date.now();
+      const currentRounded = Math.floor(nowTime / roundFactor) * roundFactor;
+      
+      for (let i = points - 1; i >= 0; i--) {
+        const bucketTime = currentRounded - (i * roundFactor);
+        const rd = new Date(bucketTime);
         const h = rd.getHours().toString().padStart(2, '0');
         const m = rd.getMinutes().toString().padStart(2, '0');
         const dd = rd.getDate().toString().padStart(2, '0');
@@ -122,15 +126,20 @@ export default function Analytics() {
         if (period === '30D') label = `${dd}/${mm}`;
         else if (period === '7D') label = `${dayName} ${dd}`;
         else label = `${h}:${m}`;
+        
+        grouped[bucketTime] = { time: label, suhuSum: 0, suhuCount: 0, rhSum: 0, rhCount: 0, pompa: 0, timestamp: bucketTime };
+      }
 
-        if (!grouped[roundedTime]) {
-          grouped[roundedTime] = { time: label, suhuSum: 0, suhuCount: 0, rhSum: 0, rhCount: 0, pompa: 0, timestamp: roundedTime };
+      rows.forEach(r => {
+        const d = new Date(r.recorded_at);
+        const bucketTime = Math.floor(d.getTime() / roundFactor) * roundFactor;
+
+        if (grouped[bucketTime]) {
+          const numericVal = Number(r.value);
+          if (r.type === 'temperature') { grouped[bucketTime].suhuSum += numericVal; grouped[bucketTime].suhuCount++; }
+          else if (r.type === 'humidity' || r.type === 'soil_moisture') { grouped[bucketTime].rhSum += numericVal; grouped[bucketTime].rhCount++; }
+          else if (r.type === 'pump') { grouped[bucketTime].pompa += numericVal; }
         }
-
-        const numericVal = Number(r.value);
-        if (r.type === 'temperature') { grouped[roundedTime].suhuSum += numericVal; grouped[roundedTime].suhuCount++; }
-        else if (r.type === 'humidity' || r.type === 'soil_moisture') { grouped[roundedTime].rhSum += numericVal; grouped[roundedTime].rhCount++; }
-        else if (r.type === 'pump') { grouped[roundedTime].pompa += numericVal; }
       });
 
       const formatted = Object.values(grouped).sort((a, b) => a.timestamp - b.timestamp).map(g => ({
@@ -140,9 +149,7 @@ export default function Analytics() {
         pompa: g.pompa
       }));
       
-      const hasEnoughData = formatted.filter(d => d.suhu !== null || d.rh !== null).length >= 2;
-      if (hasEnoughData) setData(formatted);
-      else setData(generateMockData(period));
+      setData(formatted);
     }
     setLoading(false);
   }, [period]);

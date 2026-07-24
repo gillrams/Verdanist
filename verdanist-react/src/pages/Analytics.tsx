@@ -8,20 +8,56 @@ import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { supabase } from '../lib/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 
-const HOURLY_MOCK = [
-  { time: "00:00", suhu: 23.4, rh: 80, pompa: 0 },
-  { time: "02:00", suhu: 22.1, rh: 83, pompa: 15 },
-  { time: "04:00", suhu: 21.8, rh: 85, pompa: 0 },
-  { time: "06:00", suhu: 24.2, rh: 79, pompa: 20 },
-  { time: "08:00", suhu: 27.6, rh: 72, pompa: 30 },
-  { time: "10:00", suhu: 29.8, rh: 64, pompa: 25 },
-  { time: "12:00", suhu: 33.1, rh: 58, pompa: 0 },
-  { time: "14:00", suhu: 34.2, rh: 55, pompa: 40 },
-  { time: "16:00", suhu: 31.5, rh: 62, pompa: 35 },
-  { time: "18:00", suhu: 28.3, rh: 68, pompa: 0 },
-  { time: "20:00", suhu: 25.9, rh: 73, pompa: 20 },
-  { time: "22:00", suhu: 24.1, rh: 77, pompa: 0 },
-];
+const generateMockData = (period: Period) => {
+  const points = period === '1H' ? 12 : period === '6H' ? 12 : period === '1D' ? 12 : period === '7D' ? 7 : 15;
+  const data = [];
+  const now = new Date();
+  
+  // Base values for smooth curves
+  let currentTemp = 24 + Math.random() * 5;
+  let currentRh = 65 + Math.random() * 15;
+
+  for (let i = points - 1; i >= 0; i--) {
+    const d = new Date(now.getTime());
+    if (period === '1H') d.setMinutes(d.getMinutes() - i * 5);
+    else if (period === '6H') d.setMinutes(d.getMinutes() - i * 30);
+    else if (period === '1D') d.setHours(d.getHours() - i * 2);
+    else if (period === '7D') d.setDate(d.getDate() - i);
+    else if (period === '30D') d.setDate(d.getDate() - i * 2);
+
+    const h = d.getHours().toString().padStart(2, '0');
+    const m = d.getMinutes().toString().padStart(2, '0');
+    const dd = d.getDate().toString().padStart(2, '0');
+    const mm = (d.getMonth() + 1).toString().padStart(2, '0');
+    const dayName = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'][d.getDay()];
+
+    let label: string;
+    if (period === '30D') label = `${dd}/${mm}`;
+    else if (period === '7D') label = `${dayName} ${dd}`;
+    else label = `${h}:${m}`;
+
+    // Add some random walk for realism
+    currentTemp += (Math.random() - 0.5) * 2;
+    currentRh += (Math.random() - 0.5) * 4;
+    
+    // Constrain
+    if (currentTemp < 20) currentTemp = 20;
+    if (currentTemp > 35) currentTemp = 35;
+    if (currentRh < 40) currentRh = 40;
+    if (currentRh > 90) currentRh = 90;
+
+    const basePompa = Math.random() > 0.8 ? Math.floor(Math.random() * 15) : 0;
+
+    data.push({
+      time: label,
+      suhu: parseFloat(currentTemp.toFixed(1)),
+      rh: Math.floor(currentRh),
+      pompa: basePompa,
+      timestamp: d.getTime()
+    });
+  }
+  return data;
+};
 
 type Period = "1H" | "6H" | "1D" | "7D" | "30D";
 type Metric = "suhu" | "rh" | "pompa";
@@ -34,9 +70,9 @@ const METRIC_CONFIG: Record<Metric, { color: string; labelKey: any }> = {
 
 export default function Analytics() {
   const { t, lang } = useLanguage();
-  const [period, setPeriod] = useState<Period>("1D");
+  const [period, setPeriod] = useState<Period>("1H");
   const [metric, setMetric] = useState<Metric>("suhu");
-  const [data, setData] = useState<any[]>(HOURLY_MOCK);
+  const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Derived stats
@@ -60,46 +96,53 @@ export default function Analytics() {
       .limit(1000);
 
     if (error || !rows || rows.length === 0) {
-      setData(HOURLY_MOCK); // fallback
+      setData(generateMockData(period));
     } else {
-      const grouped: Record<string, { time: string, suhu: number | null, rh: number | null, pompa: number }> = {};
+      const grouped: Record<number, { time: string, suhuSum: number, suhuCount: number, rhSum: number, rhCount: number, pompa: number, timestamp: number }> = {};
+
+      let roundFactor = 60 * 1000;
+      if (period === '1H') roundFactor = 5 * 60 * 1000;
+      else if (period === '6H') roundFactor = 30 * 60 * 1000;
+      else if (period === '1D') roundFactor = 2 * 60 * 60 * 1000;
+      else if (period === '7D') roundFactor = 24 * 60 * 60 * 1000;
+      else if (period === '30D') roundFactor = 2 * 24 * 60 * 60 * 1000;
 
       rows.forEach(r => {
         const d = new Date(r.recorded_at);
-        d.setSeconds(0);
-        d.setMilliseconds(0);
-        const timeKey = d.toISOString();
+        const roundedTime = Math.floor(d.getTime() / roundFactor) * roundFactor;
+        const rd = new Date(roundedTime);
 
-        const h = d.getHours().toString().padStart(2, '0');
-        const m = d.getMinutes().toString().padStart(2, '0');
-        const dd = d.getDate().toString().padStart(2, '0');
-        const mm = (d.getMonth() + 1).toString().padStart(2, '0');
-        const dayName = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'][d.getDay()];
+        const h = rd.getHours().toString().padStart(2, '0');
+        const m = rd.getMinutes().toString().padStart(2, '0');
+        const dd = rd.getDate().toString().padStart(2, '0');
+        const mm = (rd.getMonth() + 1).toString().padStart(2, '0');
+        const dayName = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'][rd.getDay()];
 
         let label: string;
-        if (period === '30D') {
-          label = `${dd}/${mm}`;
-        } else if (period === '7D') {
-          label = `${dayName} ${h}:${m}`;
-        } else {
-          label = `${h}:${m}`;
-        }
+        if (period === '30D') label = `${dd}/${mm}`;
+        else if (period === '7D') label = `${dayName} ${dd}`;
+        else label = `${h}:${m}`;
 
-        if (!grouped[timeKey]) {
-          grouped[timeKey] = { time: label, suhu: null, rh: null, pompa: 0 };
+        if (!grouped[roundedTime]) {
+          grouped[roundedTime] = { time: label, suhuSum: 0, suhuCount: 0, rhSum: 0, rhCount: 0, pompa: 0, timestamp: roundedTime };
         }
 
         const numericVal = Number(r.value);
-        if (r.type === 'temperature') grouped[timeKey].suhu = numericVal;
-        else if (r.type === 'humidity' || r.type === 'soil_moisture') grouped[timeKey].rh = numericVal;
-        else if (r.type === 'pump') grouped[timeKey].pompa = numericVal;
+        if (r.type === 'temperature') { grouped[roundedTime].suhuSum += numericVal; grouped[roundedTime].suhuCount++; }
+        else if (r.type === 'humidity' || r.type === 'soil_moisture') { grouped[roundedTime].rhSum += numericVal; grouped[roundedTime].rhCount++; }
+        else if (r.type === 'pump') { grouped[roundedTime].pompa += numericVal; }
       });
 
-      const formatted = Object.values(grouped).sort((a, b) => a.time.localeCompare(b.time));
-      // Hanya gunakan data real jika ada minimal 2 titik dengan suhu/kelembaban
+      const formatted = Object.values(grouped).sort((a, b) => a.timestamp - b.timestamp).map(g => ({
+        time: g.time,
+        suhu: g.suhuCount > 0 ? parseFloat((g.suhuSum / g.suhuCount).toFixed(1)) : null,
+        rh: g.rhCount > 0 ? Math.round(g.rhSum / g.rhCount) : null,
+        pompa: g.pompa
+      }));
+      
       const hasEnoughData = formatted.filter(d => d.suhu !== null || d.rh !== null).length >= 2;
       if (hasEnoughData) setData(formatted);
-      else setData(HOURLY_MOCK);
+      else setData(generateMockData(period));
     }
     setLoading(false);
   }, [period]);
@@ -212,7 +255,7 @@ export default function Analytics() {
                 />
                 <Area
                   key={`area-${metric}`}
-                  type="linear"
+                  type="monotone"
                   dataKey={metric}
                   stroke={METRIC_CONFIG[metric].color}
                   strokeWidth={2.5}
@@ -221,54 +264,6 @@ export default function Analytics() {
                   activeDot={{ r: 5, fill: METRIC_CONFIG[metric].color, stroke: "var(--color-card)", strokeWidth: 2 }}
                 />
               </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Line chart suhu vs rh — Dual Y-Axis */}
-        <div className="px-6">
-          <div className="bg-card border border-border rounded-3xl p-4 shadow-[var(--shadow-custom)]">
-            <p style={{ fontWeight: 600, fontSize: 14 }} className="text-foreground mb-4">{t('analytics.tempVsRH')}</p>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={data} margin={{ top: 10, right: 5, left: -10, bottom: 5 }}>
-                <CartesianGrid key="grid" strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                <XAxis key="x" dataKey={xKey} tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={15} />
-                {/* Sumbu Y Kiri — Suhu (°C) */}
-                <YAxis
-                  key="y-suhu"
-                  yAxisId="suhu"
-                  orientation="left"
-                  domain={[18, 45]}
-                  tick={{ fill: "var(--color-chart-3)", fontSize: 10 }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(v: number) => `${v}°`}
-                />
-                {/* Sumbu Y Kanan — Kelembaban (%) */}
-                <YAxis
-                  key="y-rh"
-                  yAxisId="rh"
-                  orientation="right"
-                  domain={[30, 100]}
-                  tick={{ fill: "var(--color-chart-2)", fontSize: 10 }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(v: number) => `${v}%`}
-                />
-                <Tooltip
-                  key="tip"
-                  contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 12, color: "var(--color-foreground)", fontSize: 12, boxShadow: "0 10px 25px rgba(0,0,0,0.1)" }}
-                  labelStyle={{ color: "var(--color-muted-foreground)", fontWeight: 'bold', marginBottom: 4 }}
-                  labelFormatter={(label) => lang === 'en' ? label : `Pukul ${label}`}
-                  formatter={(value: any, name: any) => {
-                    if (name === t('analytics.tempC')) return [`${value}°C`, name];
-                    return [`${value}%`, name];
-                  }}
-                />
-                <Legend key="legend" wrapperStyle={{ fontSize: 11, color: "var(--color-muted-foreground)", paddingTop: 10 }} />
-                <Line key="suhu-line" yAxisId="suhu" type="linear" dataKey="suhu" stroke="var(--color-chart-3)" strokeWidth={2} dot={false} name={t('analytics.tempC')} />
-                <Line key="rh-line" yAxisId="rh" type="linear" dataKey="rh" stroke="var(--color-chart-2)" strokeWidth={2} dot={false} name="RH %" />
-              </LineChart>
             </ResponsiveContainer>
           </div>
         </div>

@@ -193,9 +193,6 @@ export default function PumpSettingsModal({ isOpen, onClose, deviceId, onShowAle
                   <p className="text-[9px] text-gray-400 dark:text-white/30 mt-1">*Pompa otomatis mati jika menyentuh batas ini (Max 30 Detik).</p>
                 </div>
               </div>
-
-              </div>
-
             </div>
 
             {/* Action Buttons */}

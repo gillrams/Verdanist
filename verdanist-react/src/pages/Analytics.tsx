@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
-  LineChart, Line, AreaChart, Area,
-  XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
+  AreaChart, Area,
+  XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from "recharts";
 import { TrendingUp, TrendingDown, Thermometer, Droplets, Zap } from "lucide-react";
 import { ThemeToggle } from '../components/ui/ThemeToggle';

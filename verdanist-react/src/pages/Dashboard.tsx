@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -41,6 +41,7 @@ export default function Dashboard() {
   const [indoorSensor, setIndoorSensor] = useState<{ temp: number | null; hum: number | null; mode: 'manual' | 'auto' | 'timer'; lastSeen: string | null }>({ temp: null, hum: null, mode: 'auto', lastSeen: null });
   const [outdoorSensor, setOutdoorSensor] = useState<{ temp: number | null; hum: number | null; mode: 'manual' | 'auto' | 'timer'; lastSeen: string | null }>({ temp: null, hum: null, mode: 'auto', lastSeen: null });
   const [deviceOnline, setDeviceOnline] = useState({ indoor: true, outdoor: true });
+  const lastSeenRef = useRef<{ indoor: string | null; outdoor: string | null }>({ indoor: null, outdoor: null });
 
   const [indoorPump, setIndoorPump] = useState({ on: false, lastRun: t('dash.neverRun') });
   const [outdoorPump, setOutdoorPump] = useState({ on: false, lastRun: t('dash.neverRun') });
@@ -76,8 +77,14 @@ export default function Dashboard() {
       const { data: sData } = await supabase.from('device_settings').select('*').in('device_id', ['ESP32_INDOOR', 'ESP32_OUTDOOR']);
       if (sData) {
         sData.forEach(d => {
-          if (d.device_id === 'ESP32_INDOOR') setIndoorSensor(p => ({ ...p, temp: d.temperature ?? null, hum: d.humidity ?? null, mode: d.mode || p.mode, lastSeen: d.last_seen ?? null }));
-          if (d.device_id === 'ESP32_OUTDOOR') setOutdoorSensor(p => ({ ...p, temp: d.temperature ?? null, hum: d.humidity ?? null, mode: d.mode || p.mode, lastSeen: d.last_seen ?? null }));
+          if (d.device_id === 'ESP32_INDOOR') {
+            lastSeenRef.current.indoor = d.last_seen ?? null;
+            setIndoorSensor(p => ({ ...p, temp: d.temperature ?? null, hum: d.humidity ?? null, mode: d.mode || p.mode, lastSeen: d.last_seen ?? null }));
+          }
+          if (d.device_id === 'ESP32_OUTDOOR') {
+            lastSeenRef.current.outdoor = d.last_seen ?? null;
+            setOutdoorSensor(p => ({ ...p, temp: d.temperature ?? null, hum: d.humidity ?? null, mode: d.mode || p.mode, lastSeen: d.last_seen ?? null }));
+          }
         });
       }
       const { data: pData } = await supabase.from('device_status').select('*').in('device_id', ['ESP32_INDOOR', 'ESP32_OUTDOOR']);
@@ -95,36 +102,19 @@ export default function Dashboard() {
       const now = new Date();
       setCurrentTime(now);
       
+      // Read lastSeen from ref (always up-to-date, no nested setState issues)
+      const indoorLS = lastSeenRef.current.indoor;
+      const outdoorLS = lastSeenRef.current.outdoor;
+      const newIndoor = indoorLS ? (now.getTime() - new Date(indoorLS).getTime()) < 15000 : false;
+      const newOutdoor = outdoorLS ? (now.getTime() - new Date(outdoorLS).getTime()) < 15000 : false;
+
       setDeviceOnline(prev => {
-        let newIndoor = prev.indoor;
-        let newOutdoor = prev.outdoor;
-        
-        setIndoorSensor(indoor => {
-          if (indoor.lastSeen) {
-            const last = new Date(indoor.lastSeen);
-            newIndoor = (now.getTime() - last.getTime()) < 15000;
-          } else {
-            newIndoor = false;
-          }
-          return indoor;
-        });
-
-        setOutdoorSensor(outdoor => {
-          if (outdoor.lastSeen) {
-            const last = new Date(outdoor.lastSeen);
-            newOutdoor = (now.getTime() - last.getTime()) < 15000;
-          } else {
-            newOutdoor = false;
-          }
-          return outdoor;
-        });
-
         if (newIndoor !== prev.indoor || newOutdoor !== prev.outdoor) {
           return { indoor: newIndoor, outdoor: newOutdoor };
         }
         return prev;
       });
-    }, 1000);
+    }, 5000);
 
     const sub = supabase.channel('dashboard_updates')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'device_settings' }, payload => {
@@ -142,7 +132,11 @@ export default function Dashboard() {
             sendNotification(`rh_${payload.new.device_id}`, `💧 Kelembaban Rendah (${devName})`, { body: `Kelembaban turun ke ${newHum.toFixed(1)}% (Di bawah batas ${humThresh}%)` });
           }
           
-          return { ...prev, temp: newTemp, hum: newHum, mode: payload.new.mode ?? prev.mode, lastSeen: payload.new.last_seen ?? prev.lastSeen };
+          // Update ref so the timer picks it up immediately
+          const newLastSeen = payload.new.last_seen ?? prev.lastSeen;
+          if (payload.new.device_id === 'ESP32_INDOOR') lastSeenRef.current.indoor = newLastSeen;
+          if (payload.new.device_id === 'ESP32_OUTDOOR') lastSeenRef.current.outdoor = newLastSeen;
+          return { ...prev, temp: newTemp, hum: newHum, mode: payload.new.mode ?? prev.mode, lastSeen: newLastSeen };
         };
 
         if (payload.new.device_id === 'ESP32_INDOOR') {

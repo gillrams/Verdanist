@@ -9,7 +9,7 @@ import { supabase } from '../lib/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const generateMockData = (period: Period) => {
-  const points = period === '1H' ? 12 : period === '6H' ? 12 : period === '1D' ? 12 : period === '7D' ? 7 : 15;
+  const points = period === '1H' ? 12 : period === '6H' ? 12 : period === '1D' ? 12 : period === '7D' ? 7 : 30;
   const data = [];
   const now = new Date();
   
@@ -23,7 +23,7 @@ const generateMockData = (period: Period) => {
     else if (period === '6H') d.setMinutes(d.getMinutes() - i * 30);
     else if (period === '1D') d.setHours(d.getHours() - i * 2);
     else if (period === '7D') d.setDate(d.getDate() - i);
-    else if (period === '30D') d.setDate(d.getDate() - i * 2);
+    else if (period === '30D') d.setDate(d.getDate() - i);
 
     const h = d.getHours().toString().padStart(2, '0');
     const m = d.getMinutes().toString().padStart(2, '0');
@@ -105,7 +105,7 @@ export default function Analytics() {
       else if (period === '6H') roundFactor = 30 * 60 * 1000;
       else if (period === '1D') roundFactor = 2 * 60 * 60 * 1000;
       else if (period === '7D') roundFactor = 24 * 60 * 60 * 1000;
-      else if (period === '30D') roundFactor = 2 * 24 * 60 * 60 * 1000;
+      else if (period === '30D') roundFactor = 24 * 60 * 60 * 1000;
 
       rows.forEach(r => {
         const d = new Date(r.recorded_at);

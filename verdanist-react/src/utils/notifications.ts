@@ -1,5 +1,7 @@
 // src/utils/notifications.ts
 import { supabase } from '../lib/supabase';
+import { Capacitor } from '@capacitor/core';
+import { PushNotifications } from '@capacitor/push-notifications';
 
 export interface NotificationPrefs {
   notifTemp: boolean;
@@ -43,44 +45,90 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 export async function registerServiceWorkerAndSubscribe(userId: string): Promise<boolean> {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    alert('Browser Anda tidak mendukung web push notifications.');
-    return false;
-  }
+  if (Capacitor.isNativePlatform()) {
+    // ---- NATIVE ANDROID PUSH NOTIFICATIONS (CAPACITOR) ----
+    try {
+      let permStatus = await PushNotifications.checkPermissions();
 
-  try {
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') return false;
+      if (permStatus.receive === 'prompt') {
+        permStatus = await PushNotifications.requestPermissions();
+      }
 
-    const registration = await navigator.serviceWorker.register('/sw.js');
-    await navigator.serviceWorker.ready;
+      if (permStatus.receive !== 'granted') {
+        return false;
+      }
 
-    let subscription = await registration.pushManager.getSubscription();
-    if (!subscription) {
-      subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      await PushNotifications.register();
+
+      // We wait for the registration event to get the token
+      return new Promise<boolean>((resolve) => {
+        PushNotifications.addListener('registration', async (token) => {
+          console.log('[Native Push] Push registration success, token:', token.value);
+          const { error } = await supabase.from('push_subscriptions').upsert({
+            user_id: userId,
+            endpoint: token.value, // for FCM, endpoint is the token
+            p256dh: 'android_fcm',
+            auth: 'android_fcm'
+          }, { onConflict: 'endpoint' });
+
+          if (error) {
+            console.error('[Native Push] Error saving token to DB:', error);
+            resolve(false);
+          } else {
+            resolve(true);
+          }
+        });
+
+        PushNotifications.addListener('registrationError', (error: any) => {
+          console.error('[Native Push] Error on registration:', JSON.stringify(error));
+          resolve(false);
+        });
       });
+    } catch (error) {
+      console.error('[Native Push] Setup failed:', error);
+      return false;
     }
-
-    // Save to Supabase
-    const subJson = JSON.parse(JSON.stringify(subscription));
-    const { error } = await supabase.from('push_subscriptions').upsert({
-      user_id: userId,
-      endpoint: subJson.endpoint,
-      p256dh: subJson.keys.p256dh,
-      auth: subJson.keys.auth
-    }, { onConflict: 'endpoint' });
-
-    if (error) {
-      console.error('Error saving subscription to DB:', error);
+  } else {
+    // ---- WEB PUSH NOTIFICATIONS (SERVICE WORKER) ----
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      alert('Browser Anda tidak mendukung web push notifications.');
       return false;
     }
 
-    return true;
-  } catch (error) {
-    console.error('Service Worker registration failed:', error);
-    return false;
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') return false;
+
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      await navigator.serviceWorker.ready;
+
+      let subscription = await registration.pushManager.getSubscription();
+      if (!subscription) {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+        });
+      }
+
+      // Save to Supabase
+      const subJson = JSON.parse(JSON.stringify(subscription));
+      const { error } = await supabase.from('push_subscriptions').upsert({
+        user_id: userId,
+        endpoint: subJson.endpoint,
+        p256dh: subJson.keys.p256dh,
+        auth: subJson.keys.auth
+      }, { onConflict: 'endpoint' });
+
+      if (error) {
+        console.error('Error saving subscription to DB:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Service Worker registration failed:', error);
+      return false;
+    }
   }
 }
 

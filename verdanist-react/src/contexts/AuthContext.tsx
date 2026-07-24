@@ -96,11 +96,75 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     role: role as 'admin' | 'farmer' | 'guest',
   });
 
+  // Handle OAuth deep link callback when app opens via id.verdanist.app://login-callback
+  const handleDeepLink = async (url: string) => {
+    if (!url) return;
+    console.log('[AuthContext] Deep link received:', url);
+
+    // Extract hash fragment containing OAuth tokens
+    const hashIndex = url.indexOf('#');
+    if (hashIndex !== -1) {
+      const hash = url.substring(hashIndex + 1);
+      const params = new URLSearchParams(hash);
+      const accessToken = params.get('access_token');
+      const refreshToken = params.get('refresh_token');
+
+      if (accessToken && refreshToken) {
+        console.log('[AuthContext] Setting session from deep link tokens');
+        const { data, error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+        if (error) {
+          console.error('[AuthContext] Error setting session from deep link:', error);
+        } else if (data?.user) {
+          console.log('[AuthContext] Session established from deep link for:', data.user.email);
+          try {
+            const { Browser } = await import('@capacitor/browser');
+            await Browser.close(); // Close the custom tab if it's open
+          } catch (e) {
+            console.warn('[AuthContext] Could not close browser', e);
+          }
+        }
+      }
+    }
+  };
+
   useEffect(() => {
     let cancelled = false;
 
     const restoreSession = async () => {
       try {
+        // Check for deep link URL (OAuth callback from native app)
+        const currentUrl = window.location.href;
+        if (currentUrl.startsWith('id.verdanist.app://') || currentUrl.includes('login-callback')) {
+          console.log('[AuthContext] App opened via deep link');
+          await handleDeepLink(currentUrl);
+        }
+
+        // Also check Capacitor App plugin for launch URL (when app was in background)
+        try {
+          const { App: CapApp } = await import('@capacitor/app');
+          const launchUrl = await CapApp.getLaunchUrl();
+          if (launchUrl?.url) {
+            console.log('[AuthContext] Capacitor launch URL:', launchUrl.url);
+            await handleDeepLink(launchUrl.url);
+          }
+
+          // Listen for future deep link activations while app is running
+          CapApp.addListener('appStateChange', async ({ isActive }) => {
+            if (isActive) {
+              const resumedUrl = await CapApp.getLaunchUrl();
+              if (resumedUrl?.url) {
+                console.log('[AuthContext] App resumed with URL:', resumedUrl.url);
+                await handleDeepLink(resumedUrl.url);
+              }
+            }
+          });
+        } catch (e) {
+          // Not running on Capacitor or plugin not available
+        }
+
         // 1. Read session directly from localStorage (bypasses Supabase JS client)
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
@@ -165,16 +229,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  // Detect if running inside Capacitor native app
+  const isNative = (): boolean => {
+    return !!(window as any).Capacitor && (window as any).Capacitor.isNativePlatform();
+  };
+
+  const getRedirectUrl = (path: string = '/dashboard'): string => {
+    if (isNative()) {
+      return 'id.verdanist.app://login-callback';
+    }
+    return `${window.location.origin}${path}`;
+  };
+
   const login = async (provider: 'google' | 'email', email?: string, password?: string, isRegister?: boolean, name?: string) => {
     if (provider === 'google') {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`
+      if (isNative()) {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: getRedirectUrl('/dashboard'),
+            skipBrowserRedirect: true,
+          }
+        });
+        if (error) throw error;
+        if (data?.url) {
+          const { Browser } = await import('@capacitor/browser');
+          await Browser.open({ url: data.url });
         }
-      });
-      if (error) throw error;
-    } 
+      } else {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: getRedirectUrl('/dashboard')
+          }
+        });
+        if (error) throw error;
+      }
+    }
     
     if (provider === 'email' && email && password) {
       if (isRegister) {
@@ -210,7 +301,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: getRedirectUrl('/reset-password'),
     });
     if (error) throw error;
   };

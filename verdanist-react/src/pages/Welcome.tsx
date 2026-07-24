@@ -8,6 +8,7 @@ import logoLight from "../assets/Logo_Light_Samping.png";
 import logoDark from "../assets/Logo_Dark_samping.png";
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import AuthWebLayout from '../components/layout/AuthWebLayout';
+import { Capacitor } from '@capacitor/core';
 
 export default function Welcome() {
   const navigate = useNavigate();
@@ -99,23 +100,26 @@ export default function Welcome() {
             Lihat Demo
           </button>
 
-          {/* Tombol download APK — hanya tampil di mobile, di desktop sudah ada di panel kanan */}
-          <div className="md:hidden pt-2">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="flex-1 h-px bg-border" />
-              <span className="text-muted-foreground/60 text-xs">Punya Android?</span>
-              <div className="flex-1 h-px bg-border" />
+          {/* Tombol download APK — hanya tampil di mobile, di desktop sudah ada di panel kanan, dan sembunyikan jika sudah di aplikasi native */}
+          {!Capacitor.isNativePlatform() && (
+            <div className="md:hidden pt-2">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex-1 h-px bg-border" />
+                <span className="text-muted-foreground/60 text-xs">Punya Android?</span>
+                <div className="flex-1 h-px bg-border" />
+              </div>
+              <a
+              href="/verdanist.apk"
+              download="verdanist.apk"
+                className="w-full border border-primary/40 text-primary bg-primary/5 hover:bg-primary/10 active:scale-[0.98] transition-all rounded-2xl py-3.5 flex items-center justify-center gap-2.5"
+                style={{ fontWeight: 600, fontSize: 15 }}
+              >
+                <Download className="w-5 h-5" />
+                Download Aplikasi Android
+              </a>
+              <p className="text-center text-xs text-muted-foreground/50 mt-2">Gratis · APK langsung · Android 8.0+</p>
             </div>
-            <a
-              href="#download-apk"
-              className="w-full border border-primary/40 text-primary bg-primary/5 hover:bg-primary/10 active:scale-[0.98] transition-all rounded-2xl py-3.5 flex items-center justify-center gap-2.5"
-              style={{ fontWeight: 600, fontSize: 15 }}
-            >
-              <Download className="w-5 h-5" />
-              Download Aplikasi Android
-            </a>
-            <p className="text-center text-xs text-muted-foreground/50 mt-2">Gratis · APK langsung · Android 8.0+</p>
-          </div>
+          )}
         </div>
       </div>
     </AuthWebLayout>

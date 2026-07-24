@@ -1,5 +1,18 @@
 {
+  "headers": [
+    {
+      "source": "/verdanist.apk",
+      "headers": [
+        { "key": "Content-Type", "value": "application/vnd.android.package-archive" },
+        { "key": "Content-Disposition", "value": "attachment; filename=\"verdanist.apk\"" }
+      ]
+    }
+  ],
   "rewrites": [
+    {
+      "source": "/verdanist.apk",
+      "destination": "/verdanist.apk"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"

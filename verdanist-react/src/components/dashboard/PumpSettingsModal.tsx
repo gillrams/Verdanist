@@ -23,9 +23,6 @@ export default function PumpSettingsModal({ isOpen, onClose, deviceId, onShowAle
   const [soilThresh, setSoilThresh] = useState('50');
   
   const [timeout, setTimeoutVal] = useState('30');
-  const [flowRate, setFlowRate] = useState('100');
-  const [ssid, setSsid] = useState('Verdanist_Grow');
-  const [password, setPassword] = useState('********');
   
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
@@ -46,15 +43,6 @@ export default function PumpSettingsModal({ isOpen, onClose, deviceId, onShowAle
           const storedTimeout = localStorage.getItem(`verdanist_pump_timeout_${deviceId}`);
           if (storedTimeout) setTimeoutVal(storedTimeout);
           else setTimeoutVal('30');
-          
-          const storedFlowRate = localStorage.getItem(`verdanist_flow_rate_${deviceId}`);
-          if (storedFlowRate) setFlowRate(storedFlowRate);
-          
-          const storedSsid = localStorage.getItem(`verdanist_ssid_${deviceId}`);
-          if (storedSsid) setSsid(storedSsid);
-          
-          const storedPassword = localStorage.getItem(`verdanist_password_${deviceId}`);
-          if (storedPassword) setPassword(storedPassword);
         } catch (e) {
           console.error(e);
         } finally {
@@ -81,9 +69,6 @@ export default function PumpSettingsModal({ isOpen, onClose, deviceId, onShowAle
       // Simpan ke Local Storage
       localStorage.setItem(`verdanist_soil_threshold_${deviceId}`, soilNum.toString());
       localStorage.setItem(`verdanist_pump_timeout_${deviceId}`, timeout);
-      localStorage.setItem(`verdanist_flow_rate_${deviceId}`, flowRate);
-      localStorage.setItem(`verdanist_ssid_${deviceId}`, ssid);
-      localStorage.setItem(`verdanist_password_${deviceId}`, password);
       
       window.dispatchEvent(new CustomEvent('verdanist_settings_updated', { detail: { deviceId } }));
 
@@ -209,51 +194,6 @@ export default function PumpSettingsModal({ isOpen, onClose, deviceId, onShowAle
                 </div>
               </div>
 
-              {/* Section 2: Calibration */}
-              <div className="bg-gray-50 dark:bg-white/5 rounded-2xl p-3 border border-gray-100 dark:border-white/5">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="material-symbols-rounded text-blue-500 text-lg">colorize</span>
-                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-gray-700 dark:text-white/70">Kalibrasi Debit</h4>
-                </div>
-                
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-gray-400 dark:text-white/40 block mb-1">Debit Air (ml / detik)</label>
-                  <input 
-                    type="number" 
-                    value={flowRate}
-                    onChange={(e) => setFlowRate(e.target.value)}
-                    className="w-full bg-white dark:bg-[#05150E] border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm font-bold text-gray-900 dark:text-white focus:outline-none focus:border-green-500"
-                  />
-                </div>
-              </div>
-
-              {/* Section 3: WiFi */}
-              <div className="bg-gray-50 dark:bg-white/5 rounded-2xl p-3 border border-gray-100 dark:border-white/5">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="material-symbols-rounded text-amber-500 text-lg">wifi</span>
-                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-gray-700 dark:text-white/70">Konfigurasi WiFi Alat</h4>
-                </div>
-                
-                <div className="space-y-2">
-                  <div>
-                    <label className="text-[10px] font-bold uppercase text-gray-400 dark:text-white/40 block mb-1">SSID (Nama WiFi)</label>
-                    <input 
-                      type="text" 
-                      value={ssid}
-                      onChange={(e) => setSsid(e.target.value)}
-                      className="w-full bg-white dark:bg-[#05150E] border border-gray-200 dark:border-white/10 rounded-xl px-3 py-1.5 text-sm font-bold text-gray-900 dark:text-white focus:outline-none focus:border-green-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-bold uppercase text-gray-400 dark:text-white/40 block mb-1">Password</label>
-                    <input 
-                      type="password" 
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-white dark:bg-[#05150E] border border-gray-200 dark:border-white/10 rounded-xl px-3 py-1.5 text-sm font-bold text-gray-900 dark:text-white focus:outline-none focus:border-green-500"
-                    />
-                  </div>
-                </div>
               </div>
 
             </div>

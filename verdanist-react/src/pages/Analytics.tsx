@@ -148,8 +148,9 @@ export default function Analytics() {
         rh: g.rhCount > 0 ? Math.round(g.rhSum / g.rhCount) : null,
         pompa: g.pompa
       }));
-      
-      setData(formatted);
+      const hasEnoughData = formatted.filter(d => d.suhu !== null || d.rh !== null).length >= 2;
+      if (hasEnoughData) setData(formatted);
+      else setData(generateMockData(period));
     }
     setLoading(false);
   }, [period]);
@@ -264,6 +265,7 @@ export default function Analytics() {
                   key={`area-${metric}`}
                   type="monotone"
                   dataKey={metric}
+                  connectNulls={true}
                   stroke={METRIC_CONFIG[metric].color}
                   strokeWidth={2.5}
                   fill="url(#metricGrad)"

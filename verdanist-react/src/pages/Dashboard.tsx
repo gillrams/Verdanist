@@ -38,8 +38,9 @@ export default function Dashboard() {
   const [zone, setZone] = useState<"indoor" | "outdoor">("indoor");
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  const [indoorSensor, setIndoorSensor] = useState({ temp: 28.0, hum: 75, mode: 'auto' as 'manual' | 'auto' | 'timer' });
-  const [outdoorSensor, setOutdoorSensor] = useState({ temp: 31.0, hum: 60, mode: 'auto' as 'manual' | 'auto' | 'timer' });
+  const [indoorSensor, setIndoorSensor] = useState<{ temp: number | null; hum: number | null; mode: 'manual' | 'auto' | 'timer'; lastSeen: string | null }>({ temp: null, hum: null, mode: 'auto', lastSeen: null });
+  const [outdoorSensor, setOutdoorSensor] = useState<{ temp: number | null; hum: number | null; mode: 'manual' | 'auto' | 'timer'; lastSeen: string | null }>({ temp: null, hum: null, mode: 'auto', lastSeen: null });
+  const [deviceOnline, setDeviceOnline] = useState({ indoor: true, outdoor: true });
 
   const [indoorPump, setIndoorPump] = useState({ on: false, lastRun: t('dash.neverRun') });
   const [outdoorPump, setOutdoorPump] = useState({ on: false, lastRun: t('dash.neverRun') });
@@ -48,6 +49,7 @@ export default function Dashboard() {
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [isNotifModalOpen, setIsNotifModalOpen] = useState(false);
   const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
+  const [timerModalTab, setTimerModalTab] = useState<'schedule' | 'interval'>('schedule');
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [modalDevice, setModalDevice] = useState<'indoor' | 'outdoor'>('indoor');
 
@@ -74,8 +76,8 @@ export default function Dashboard() {
       const { data: sData } = await supabase.from('device_settings').select('*').in('device_id', ['ESP32_INDOOR', 'ESP32_OUTDOOR']);
       if (sData) {
         sData.forEach(d => {
-          if (d.device_id === 'ESP32_INDOOR') setIndoorSensor(p => ({ ...p, temp: d.temperature || p.temp, hum: d.humidity || p.hum, mode: d.mode || p.mode }));
-          if (d.device_id === 'ESP32_OUTDOOR') setOutdoorSensor(p => ({ ...p, temp: d.temperature || p.temp, hum: d.humidity || p.hum, mode: d.mode || p.mode }));
+          if (d.device_id === 'ESP32_INDOOR') setIndoorSensor(p => ({ ...p, temp: d.temperature ?? null, hum: d.humidity ?? null, mode: d.mode || p.mode, lastSeen: d.last_seen ?? null }));
+          if (d.device_id === 'ESP32_OUTDOOR') setOutdoorSensor(p => ({ ...p, temp: d.temperature ?? null, hum: d.humidity ?? null, mode: d.mode || p.mode, lastSeen: d.last_seen ?? null }));
         });
       }
       const { data: pData } = await supabase.from('device_status').select('*').in('device_id', ['ESP32_INDOOR', 'ESP32_OUTDOOR']);
@@ -89,7 +91,40 @@ export default function Dashboard() {
     };
     fetchInitial();
 
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    const timer = setInterval(() => {
+      const now = new Date();
+      setCurrentTime(now);
+      
+      setDeviceOnline(prev => {
+        let newIndoor = prev.indoor;
+        let newOutdoor = prev.outdoor;
+        
+        setIndoorSensor(indoor => {
+          if (indoor.lastSeen) {
+            const last = new Date(indoor.lastSeen);
+            newIndoor = (now.getTime() - last.getTime()) < 15000;
+          } else {
+            newIndoor = false;
+          }
+          return indoor;
+        });
+
+        setOutdoorSensor(outdoor => {
+          if (outdoor.lastSeen) {
+            const last = new Date(outdoor.lastSeen);
+            newOutdoor = (now.getTime() - last.getTime()) < 15000;
+          } else {
+            newOutdoor = false;
+          }
+          return outdoor;
+        });
+
+        if (newIndoor !== prev.indoor || newOutdoor !== prev.outdoor) {
+          return { indoor: newIndoor, outdoor: newOutdoor };
+        }
+        return prev;
+      });
+    }, 1000);
 
     const sub = supabase.channel('dashboard_updates')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'device_settings' }, payload => {
@@ -107,7 +142,7 @@ export default function Dashboard() {
             sendNotification(`rh_${payload.new.device_id}`, `💧 Kelembaban Rendah (${devName})`, { body: `Kelembaban turun ke ${newHum.toFixed(1)}% (Di bawah batas ${humThresh}%)` });
           }
           
-          return { ...prev, temp: newTemp, hum: newHum, mode: payload.new.mode ?? prev.mode };
+          return { ...prev, temp: newTemp, hum: newHum, mode: payload.new.mode ?? prev.mode, lastSeen: payload.new.last_seen ?? prev.lastSeen };
         };
 
         if (payload.new.device_id === 'ESP32_INDOOR') {
@@ -149,6 +184,11 @@ export default function Dashboard() {
   const sensorData = zone === "indoor"
     ? { suhu: indoorSensor.temp, rh: indoorSensor.hum, tanah: 45, cahaya: 8200, co2: 412 }
     : { suhu: outdoorSensor.temp, rh: outdoorSensor.hum, tanah: 38, cahaya: 62000, co2: 415 };
+
+  // Count sensors that have actual data from DHT11
+  const connectedSensorsCount = [deviceOnline.indoor, deviceOnline.outdoor].filter(Boolean).length;
+  // Is current zone sensor connected?
+  const currentSensorConnected = zone === 'indoor' ? deviceOnline.indoor : deviceOnline.outdoor;
 
   const hour = new Date().getHours();
   const greeting = hour < 11 ? t('dash.greeting.morning') : hour < 15 ? t('dash.greeting.afternoon') : hour < 18 ? t('dash.greeting.evening') : t('dash.greeting.night');
@@ -192,6 +232,27 @@ export default function Dashboard() {
                     </span>
                   </div>
                 )}
+                {/* Sensor Connection Badge */}
+                <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md w-fit border transition-all ${
+                  connectedSensorsCount === 2
+                    ? 'bg-green-500/10 border-green-500/20'
+                    : connectedSensorsCount === 1
+                      ? 'bg-yellow-500/10 border-yellow-500/20'
+                      : 'bg-muted/60 border-border'
+                }`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${
+                    connectedSensorsCount === 2 ? 'bg-green-500 animate-pulse'
+                    : connectedSensorsCount === 1 ? 'bg-yellow-500 animate-pulse'
+                    : 'bg-muted-foreground/40'
+                  }`} />
+                  <span className={`${
+                    connectedSensorsCount === 2 ? 'text-green-600 dark:text-green-400'
+                    : connectedSensorsCount === 1 ? 'text-yellow-600 dark:text-yellow-400'
+                    : 'text-muted-foreground'
+                  }`} style={{ fontSize: 11, fontWeight: 600 }}>
+                    {connectedSensorsCount}/2 Sensor
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -218,16 +279,33 @@ export default function Dashboard() {
       <div className="px-6 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
         
         {/* Hero sensor card */}
-        <div className="lg:col-span-7 order-1 w-full">
-            <div className={`border border-border rounded-3xl overflow-hidden shadow-[var(--shadow-custom)] transition-colors duration-500 ${sensorData.suhu > 30 ? 'bg-gradient-to-br from-orange-500/10 to-red-500/5' :
-                sensorData.suhu < 24 ? 'bg-gradient-to-br from-blue-500/10 to-cyan-500/5' :
-                  'bg-card'
-              }`}>
+        <div className="lg:col-span-7 order-1 w-full flex flex-col gap-3">
+            {!currentSensorConnected && (
+              <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-4 flex items-center gap-3">
+                <div className="w-10 h-10 bg-destructive/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="material-symbols-rounded text-destructive text-xl">wifi_off</span>
+                </div>
+                <div>
+                  <h4 className="text-destructive font-bold text-sm">Perangkat Offline</h4>
+                  <p className="text-destructive/80 text-xs mt-0.5">Tidak ada koneksi dari ESP32 {zone === 'indoor' ? 'Indoor' : 'Outdoor'}. Terakhir aktif: {zone === 'indoor' ? (indoorSensor.lastSeen ? new Date(indoorSensor.lastSeen).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'Belum pernah') : (outdoorSensor.lastSeen ? new Date(outdoorSensor.lastSeen).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'Belum pernah')}</p>
+                </div>
+              </div>
+            )}
+            <div className={`border border-border rounded-3xl overflow-hidden shadow-[var(--shadow-custom)] transition-colors duration-500 ${
+              !currentSensorConnected ? 'bg-card grayscale-[30%]' :
+              sensorData.suhu !== null && sensorData.suhu > 30 ? 'bg-gradient-to-br from-orange-500/10 to-red-500/5' :
+              sensorData.suhu !== null && sensorData.suhu < 24 ? 'bg-gradient-to-br from-blue-500/10 to-cyan-500/5' :
+              'bg-card'
+            }`}>
               <div className="flex items-center justify-between px-5 pt-4 pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-ring animate-pulse" />
-                  <span className="text-ring" style={{ fontSize: 12, fontWeight: 600 }}>LIVE</span>
-                  <span className="text-muted-foreground" style={{ fontSize: 12 }}>· {t('dash.realtime')}</span>
+                  <div className={`w-2 h-2 rounded-full ${currentSensorConnected ? 'bg-ring animate-pulse' : 'bg-destructive'}`} />
+                  <span className={currentSensorConnected ? 'text-ring' : 'text-destructive'} style={{ fontSize: 12, fontWeight: 600 }}>
+                    {currentSensorConnected ? 'LIVE' : 'OFFLINE'}
+                  </span>
+                  <span className="text-muted-foreground" style={{ fontSize: 12 }}>
+                    · {currentSensorConnected ? t('dash.realtime') : 'No Sensor Data'}
+                  </span>
                 </div>
                 <div className="bg-muted rounded-xl p-0.5 flex">
                   {(["indoor", "outdoor"] as const).map((z) => (
@@ -248,33 +326,50 @@ export default function Dashboard() {
               <div className="flex items-end gap-6 px-5 pb-5">
                 <div>
                   <div className="flex items-start gap-1">
-                    <span style={{ fontFamily: "'Fredoka', sans-serif", fontSize: 64, fontWeight: 600, lineHeight: 1 }} className="text-foreground">
-                      {sensorData.suhu.toFixed(1)}
+                    <span
+                      style={{ fontFamily: "'Fredoka', sans-serif", fontSize: 64, fontWeight: 600, lineHeight: 1 }}
+                      className={sensorData.suhu !== null ? 'text-foreground' : 'text-muted-foreground/25'}
+                    >
+                      {sensorData.suhu !== null ? sensorData.suhu.toFixed(1) : '--'}
                     </span>
-                    <span className="text-muted-foreground mt-4" style={{ fontSize: 22, fontWeight: 500 }}>°C</span>
+                    <span
+                      className={`mt-4 ${sensorData.suhu !== null ? 'text-muted-foreground' : 'text-muted-foreground/20'}`}
+                      style={{ fontSize: 22, fontWeight: 500 }}
+                    >°C</span>
                   </div>
                   <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                    <Thermometer className="w-3.5 h-3.5 text-ring" />
+                    <Thermometer className={`w-3.5 h-3.5 ${sensorData.suhu !== null ? 'text-ring' : 'text-muted-foreground/30'}`} />
                     <span style={{ fontSize: 12 }} className="text-muted-foreground">{t('dash.airTemp')}</span>
-                    <TrendingUp className="w-3 h-3 text-ring" />
-                    {sensorData.suhu > 28 && (
+                    {sensorData.suhu !== null && <TrendingUp className="w-3 h-3 text-ring" />}
+                    {sensorData.suhu !== null && sensorData.suhu > 28 && currentSensorConnected && (
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-100 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400">
                         {t('dash.hot')}
+                      </span>
+                    )}
+                    {!currentSensorConnected && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-destructive/10 text-destructive">
+                        Offline
                       </span>
                     )}
                   </div>
                 </div>
                 <div className="pb-1">
                   <div className="flex items-start gap-1">
-                    <span style={{ fontFamily: "'Fredoka', sans-serif", fontSize: 48, fontWeight: 600, lineHeight: 1 }} className="text-muted-foreground">
-                      {sensorData.rh.toFixed(1)}
+                    <span
+                      style={{ fontFamily: "'Fredoka', sans-serif", fontSize: 48, fontWeight: 600, lineHeight: 1 }}
+                      className={sensorData.rh !== null ? 'text-muted-foreground' : 'text-muted-foreground/25'}
+                    >
+                      {sensorData.rh !== null ? sensorData.rh.toFixed(1) : '--'}
                     </span>
-                    <span className="text-muted-foreground/60 mt-3" style={{ fontSize: 18, fontWeight: 500 }}>%</span>
+                    <span
+                      className={`mt-3 ${sensorData.rh !== null ? 'text-muted-foreground/60' : 'text-muted-foreground/20'}`}
+                      style={{ fontSize: 18, fontWeight: 500 }}
+                    >%</span>
                   </div>
                   <div className="flex items-center gap-1.5 mt-1">
-                    <Droplets className="w-3.5 h-3.5 text-chart-2" />
+                    <Droplets className={`w-3.5 h-3.5 ${sensorData.rh !== null ? 'text-chart-2' : 'text-muted-foreground/30'}`} />
                     <span style={{ fontSize: 12 }} className="text-muted-foreground">{t('dash.humidity')}</span>
-                    <TrendingDown className="w-3 h-3 text-chart-2 ml-1" />
+                    {sensorData.rh !== null && <TrendingDown className="w-3 h-3 text-chart-2 ml-1" />}
                   </div>
                 </div>
               </div>
@@ -300,7 +395,7 @@ export default function Dashboard() {
                 )}
               </div>
             </div>
-          </div>
+        </div>
 
           {/* Charts separated */}
           <div className="lg:col-span-7 order-3 grid grid-cols-1 gap-3 lg:gap-4">
@@ -386,24 +481,26 @@ export default function Dashboard() {
                   <PumpController
                     key="indoor"
                     device="indoor"
+                    isDeviceOnline={deviceOnline.indoor}
                     mode={indoorSensor.mode}
                     setMode={(m) => setIndoorSensor(p => ({ ...p, mode: m as any }))}
-                    temp={indoorSensor.temp}
-                    humidity={indoorSensor.hum}
+                    temp={indoorSensor.temp ?? undefined}
+                    humidity={indoorSensor.hum ?? undefined}
                     onOpenSettings={() => { setModalDevice('indoor'); setIsSettingsModalOpen(true); }}
-                    onOpenTimerModal={() => { setModalDevice('indoor'); setIsTimerModalOpen(true); }}
+                    onOpenTimerModal={(tab = 'schedule') => { setModalDevice('indoor'); setTimerModalTab(tab); setIsTimerModalOpen(true); }}
                     onShowAlert={handleShowAlert}
                   />
                 ) : (
                   <PumpController
                     key="outdoor"
                     device="outdoor"
+                    isDeviceOnline={deviceOnline.outdoor}
                     mode={outdoorSensor.mode}
                     setMode={(m) => setOutdoorSensor(p => ({ ...p, mode: m as any }))}
-                    temp={outdoorSensor.temp}
-                    humidity={outdoorSensor.hum}
+                    temp={outdoorSensor.temp ?? undefined}
+                    humidity={outdoorSensor.hum ?? undefined}
                     onOpenSettings={() => { setModalDevice('outdoor'); setIsSettingsModalOpen(true); }}
-                    onOpenTimerModal={() => { setModalDevice('outdoor'); setIsTimerModalOpen(true); }}
+                    onOpenTimerModal={(tab = 'schedule') => { setModalDevice('outdoor'); setTimerModalTab(tab); setIsTimerModalOpen(true); }}
                     onShowAlert={handleShowAlert}
                   />
                 )
@@ -423,7 +520,7 @@ export default function Dashboard() {
       <AiAssistantModal isOpen={isAiModalOpen} onClose={() => setIsAiModalOpen(false)} deviceId={zone === 'indoor' ? 'ESP32_INDOOR' : 'ESP32_OUTDOOR'} onShowAlert={handleShowAlert} />
       <NotificationModal isOpen={isNotifModalOpen} onClose={() => setIsNotifModalOpen(false)} />
       <PumpSettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} deviceId={modalDevice === 'indoor' ? 'ESP32_INDOOR' : 'ESP32_OUTDOOR'} onShowAlert={handleShowAlert} />
-      <TimerModal isOpen={isTimerModalOpen} onClose={() => setIsTimerModalOpen(false)} deviceId={modalDevice === 'indoor' ? 'ESP32_INDOOR' : 'ESP32_OUTDOOR'} currentMode="timer" setMode={() => { }} onShowAlert={handleShowAlert} />
+      <TimerModal isOpen={isTimerModalOpen} onClose={() => setIsTimerModalOpen(false)} deviceId={modalDevice === 'indoor' ? 'ESP32_INDOOR' : 'ESP32_OUTDOOR'} currentMode="timer" setMode={() => { }} onShowAlert={handleShowAlert} initialTab={timerModalTab} />
       <AlertModal {...alertState} onClose={() => setAlertState(p => ({ ...p, isOpen: false }))} />
 
     </div>

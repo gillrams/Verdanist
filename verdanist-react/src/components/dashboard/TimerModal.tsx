@@ -17,6 +17,7 @@ interface TimerModalProps {
     cancelText?: string,
     type?: 'warning' | 'success' | 'info'
   ) => void;
+  initialTab?: 'schedule' | 'interval';
 }
 
 interface Schedule {
@@ -29,7 +30,7 @@ interface Schedule {
 
 const DAYS_OF_WEEK = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
 
-export default function TimerModal({ isOpen, onClose, deviceId, currentMode, setMode, onShowAlert }: TimerModalProps) {
+export default function TimerModal({ isOpen, onClose, deviceId, currentMode, setMode, onShowAlert, initialTab = 'schedule' }: TimerModalProps) {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(false);
   
@@ -37,14 +38,24 @@ export default function TimerModal({ isOpen, onClose, deviceId, currentMode, set
   const zone = deviceId === 'ESP32_OUTDOOR' ? 'B' : 'A';
 
   // Form State
+  // Tab State
+  const [activeTab, setActiveTab] = useState<'schedule' | 'interval'>(initialTab);
+
+  // Interval State
+  const [intervalVal, setIntervalVal] = useState('30');
+  const [intervalUnit, setIntervalUnit] = useState<'minutes' | 'hours'>('minutes');
+  const [intervalDur, setIntervalDur] = useState('30');
+
   const [morningTime, setMorningTime] = useState('08:00');
   const [afternoonTime, setAfternoonTime] = useState('16:00');
-  const [duration, setDuration] = useState('5');
+  const [duration, setDuration] = useState('30');
   const [selectedDays, setSelectedDays] = useState<string[]>(['Senin']);
 
   useEffect(() => {
     if (isOpen) {
+      setActiveTab(initialTab);
       fetchSchedules();
+      fetchIntervalSettings();
       
       // Set default waktu dan hari ke default
       setMorningTime('08:00');
@@ -56,6 +67,38 @@ export default function TimerModal({ isOpen, onClose, deviceId, currentMode, set
       setSelectedDays([currentDay]);
     }
   }, [isOpen]);
+
+  const fetchIntervalSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('device_settings')
+        .select('timer_type, interval_minutes, interval_duration')
+        .eq('device_id', deviceId)
+        .single();
+      
+      if (!error && data) {
+        if (data.timer_type) {
+           // We keep the logic to fetch interval_minutes etc., but we don't force setActiveTab here
+           // if we want to respect the user's explicit tab choice from the picker.
+           // However, if initialTab wasn't passed, we could use data.timer_type.
+           // For now, initialTab (from the picker) overrides database preference on open.
+        }
+        
+        if (data.interval_minutes) {
+          if (data.interval_minutes >= 60 && data.interval_minutes % 60 === 0) {
+            setIntervalVal((data.interval_minutes / 60).toString());
+            setIntervalUnit('hours');
+          } else {
+            setIntervalVal(data.interval_minutes.toString());
+            setIntervalUnit('minutes');
+          }
+        }
+        if (data.interval_duration) {
+          setIntervalDur(data.interval_duration.toString());
+        }
+      }
+    } catch (e) { }
+  };
 
   const fetchSchedules = async () => {
     setLoading(true);
@@ -199,7 +242,7 @@ export default function TimerModal({ isOpen, onClose, deviceId, currentMode, set
 
   const handleClose = async () => {
     // If we are currently in timer mode, verify if schedules are still valid
-    if (currentMode === 'timer') {
+    if (currentMode === 'timer' && activeTab === 'schedule') {
       const { isValid } = validateSchedules(schedules);
       if (!isValid) {
         // Revert to 'auto' mode
@@ -228,34 +271,50 @@ export default function TimerModal({ isOpen, onClose, deviceId, currentMode, set
   };
 
   const handleSaveAndApply = async () => {
-    const { isValid, invalidDays, dayCounts } = validateSchedules(schedules);
-
-    if (!isValid) {
-      const errorMsg = `Untuk mengaktifkan mode Timer, setiap hari (Senin s/d Minggu) wajib memiliki minimal 2 jadwal aktif.\n\nHari-hari berikut belum memenuhi syarat:\n${invalidDays.map(d => `• ${d} (${dayCounts[d]} jadwal aktif)`).join('\n')}\n\nSilakan tambahkan jadwal penyiraman untuk hari-hari tersebut.`;
-      
-      onShowAlert?.(
-        "Jadwal Kurang / Belum Sesuai",
-        errorMsg,
-        () => {},
-        true, // isNotification
-        "Mengerti", // confirmText
-        "", // cancelText
-        "warning" // type
-      );
-      return;
-    }
-    
     setLoading(true);
-    const { error } = await supabase
+    
+    // Simpan pengaturan interval & timer type
+    let finalIntervalMins = parseInt(intervalVal) || 30;
+    if (intervalUnit === 'hours') finalIntervalMins *= 60;
+    
+    // Save to settings
+    const { error: settingsError } = await supabase
       .from('device_settings')
-      .update({ mode: 'timer' })
+      .update({ 
+        mode: 'timer',
+        timer_type: activeTab,
+        interval_minutes: finalIntervalMins,
+        interval_duration: parseInt(intervalDur) || 2
+      })
       .eq('device_id', deviceId);
+
+    if (activeTab === 'schedule') {
+      const { isValid, invalidDays, dayCounts } = validateSchedules(schedules);
+
+      if (!isValid) {
+        const errorMsg = `Untuk mengaktifkan mode Timer, setiap hari (Senin s/d Minggu) wajib memiliki minimal 2 jadwal aktif.\n\nHari-hari berikut belum memenuhi syarat:\n${invalidDays.map(d => `• ${d} (${dayCounts[d]} jadwal aktif)`).join('\n')}\n\nSilakan tambahkan jadwal penyiraman untuk hari-hari tersebut.`;
+        
+        onShowAlert?.(
+          "Jadwal Kurang / Belum Sesuai",
+          errorMsg,
+          () => {},
+          true, // isNotification
+          "Mengerti", // confirmText
+          "", // cancelText
+          "warning" // type
+        );
+        setLoading(false);
+        return;
+      }
+    }
       
-    if (!error) {
+    if (!settingsError) {
       setMode('timer');
       onShowAlert?.(
         "Mode Timer Berhasil Diaktifkan",
-        "Penyimpanan jadwal berhasil disimpan. Pompa akan menyala otomatis sesuai dengan jadwal aktif yang telah Anda buat.",
+        activeTab === 'interval' 
+          ? `Pompa akan menyala setiap ${intervalVal} ${intervalUnit === 'hours' ? 'jam' : 'menit'} selama ${intervalDur} detik.`
+          : "Penyimpanan jadwal berhasil disimpan. Pompa akan menyala otomatis sesuai dengan jadwal aktif yang telah Anda buat.",
         () => {},
         true, // isNotification
         "Selesai", // confirmText
@@ -369,9 +428,27 @@ export default function TimerModal({ isOpen, onClose, deviceId, currentMode, set
               </button>
             </div>
 
-            {/* Form Tambah */}
-            <div className="bg-muted/50 rounded-2xl p-4 mb-6 border border-border/50">
-              <h4 className="text-xs font-extrabold uppercase tracking-widest text-muted-foreground mb-3">Tambah Jadwal</h4>
+            {/* Tab Switcher */}
+            <div className="bg-secondary/50 rounded-2xl p-1.5 flex shadow-inner border border-border/50 mb-6">
+              <button
+                onClick={() => setActiveTab('schedule')}
+                className={`flex-1 py-2.5 px-4 rounded-xl text-[13px] font-bold transition-all ${activeTab === 'schedule' ? 'bg-card text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+              >
+                Waktu Tertentu
+              </button>
+              <button
+                onClick={() => setActiveTab('interval')}
+                className={`flex-1 py-2.5 px-4 rounded-xl text-[13px] font-bold transition-all ${activeTab === 'interval' ? 'bg-card text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+              >
+                Interval Berulang
+              </button>
+            </div>
+
+            {activeTab === 'schedule' ? (
+              <>
+                {/* Form Tambah */}
+                <div className="bg-muted/50 rounded-2xl p-4 mb-6 border border-border/50">
+                  <h4 className="text-xs font-extrabold uppercase tracking-widest text-muted-foreground mb-3">Tambah Jadwal</h4>
               
               <div className="grid grid-cols-2 gap-3 mb-3">
                 <div>
@@ -396,11 +473,11 @@ export default function TimerModal({ isOpen, onClose, deviceId, currentMode, set
                 </div>
               </div>
               <div className="mb-3">
-                <label className="text-xs font-extrabold uppercase text-muted-foreground block mb-1">Durasi (Menit)</label>
+                <label className="text-xs font-extrabold uppercase text-muted-foreground block mb-1">Durasi (Detik)</label>
                 <input 
                   type="number" 
-                  min="0"
-                  max="5"
+                  min="1"
+                  max="300"
                   value={duration}
                   onChange={(e) => {
                     const val = e.target.value;
@@ -409,7 +486,7 @@ export default function TimerModal({ isOpen, onClose, deviceId, currentMode, set
                       return;
                     }
                     const num = parseInt(val);
-                    if (num >= 0 && num <= 5) {
+                    if (num >= 0 && num <= 300) {
                       setDuration(val);
                     }
                   }}
@@ -460,7 +537,7 @@ export default function TimerModal({ isOpen, onClose, deviceId, currentMode, set
                   <div>
                     <div className="flex items-baseline gap-1">
                       <span className="text-lg font-extrabold text-foreground">{schedule.start_time.substring(0, 5)}</span>
-                      <span className="text-xs font-bold text-muted-foreground">({schedule.duration} min)</span>
+                      <span className="text-xs font-bold text-muted-foreground">({schedule.duration} dtk)</span>
                     </div>
                     <div className="mt-1.5 flex flex-wrap gap-1">
                       {renderDaysBadge(schedule.days)}
@@ -483,6 +560,46 @@ export default function TimerModal({ isOpen, onClose, deviceId, currentMode, set
                 </div>
               ))}
             </div>
+            </>
+            ) : (
+              <div className="bg-muted/50 rounded-2xl p-4 mb-6 border border-border/50">
+                <h4 className="text-xs font-extrabold uppercase tracking-widest text-muted-foreground mb-4">Pengaturan Interval</h4>
+                
+                <div className="mb-4">
+                  <label className="text-xs font-extrabold uppercase text-muted-foreground block mb-2">Ulangi Setiap</label>
+                  <div className="flex gap-2">
+                    <input 
+                      type="number" 
+                      min="1"
+                      value={intervalVal}
+                      onChange={(e) => setIntervalVal(e.target.value)}
+                      className="w-1/2 bg-background border border-border rounded-xl px-3 py-2 text-sm font-bold text-foreground focus:outline-none focus:border-green-500"
+                    />
+                    <select
+                      value={intervalUnit}
+                      onChange={(e) => setIntervalUnit(e.target.value as 'minutes' | 'hours')}
+                      className="w-1/2 bg-background border border-border rounded-xl px-3 py-2 text-sm font-bold text-foreground focus:outline-none focus:border-green-500"
+                    >
+                      <option value="minutes">Menit</option>
+                      <option value="hours">Jam</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="mb-2">
+                  <label className="text-xs font-extrabold uppercase text-muted-foreground block mb-2">Durasi Menyala (Detik)</label>
+                  <input 
+                    type="number" 
+                    min="1"
+                    max="300"
+                    value={intervalDur}
+                    onChange={(e) => setIntervalDur(e.target.value)}
+                    className="w-full bg-background border border-border rounded-xl px-3 py-2 text-sm font-bold text-foreground focus:outline-none focus:border-green-500"
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-2 font-medium">Pompa akan menyala otomatis setiap {intervalVal} {intervalUnit === 'hours' ? 'jam' : 'menit'} selama {intervalDur} detik.</p>
+                </div>
+              </div>
+            )}
 
             {/* Tombol Simpan & Aktifkan */}
             <div className="mt-6">

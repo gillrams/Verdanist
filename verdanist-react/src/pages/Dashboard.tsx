@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -39,17 +39,10 @@ const formatLastSeen = (dateString: string | null) => {
   }
 };
 
-const INDOOR_CHART_DATA = [
-  { time: "00", suhu: 24, humidity: 78, soil: 0 }, { time: "03", suhu: 22, humidity: 82, soil: 0 }, { time: "06", suhu: 23, humidity: 80, soil: 0 },
-  { time: "09", suhu: 27, humidity: 72, soil: 0 }, { time: "12", suhu: 31, humidity: 65, soil: 0 }, { time: "15", suhu: 33, humidity: 60, soil: 0 },
-  { time: "18", suhu: 29, humidity: 68, soil: 0 }, { time: "21", suhu: 26, humidity: 74, soil: 0 }, { time: "Kini", suhu: 28.5, humidity: 75, soil: 0 },
-];
+const MAX_CHART_POINTS = 30;
+const CHART_INTERVAL_MS = 60_000; // Record a chart point every 1 minute
 
-const OUTDOOR_CHART_DATA = [
-  { time: "00", suhu: 22, humidity: 0, soil: 52 }, { time: "03", suhu: 20, humidity: 0, soil: 55 }, { time: "06", suhu: 21, humidity: 0, soil: 50 },
-  { time: "09", suhu: 28, humidity: 0, soil: 45 }, { time: "12", suhu: 33, humidity: 0, soil: 38 }, { time: "15", suhu: 35, humidity: 0, soil: 34 },
-  { time: "18", suhu: 30, humidity: 0, soil: 40 }, { time: "21", suhu: 25, humidity: 0, soil: 46 }, { time: "Kini", suhu: 31, humidity: 0, soil: 42 },
-];
+type ChartPoint = { time: string; suhu: number | null; humidity: number | null };
 
 
 export default function Dashboard() {
@@ -58,6 +51,10 @@ export default function Dashboard() {
   const { t, lang } = useLanguage();
   const [zone, setZone] = useState<"indoor" | "outdoor">("indoor");
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Live chart data (sliding window, max 30 points)
+  const [indoorChartData, setIndoorChartData] = useState<ChartPoint[]>([]);
+  const [outdoorChartData, setOutdoorChartData] = useState<ChartPoint[]>([]);
 
   const [indoorSensor, setIndoorSensor] = useState<{ temp: number | null; hum: number | null; mode: 'manual' | 'auto' | 'timer'; lastSeen: string | null }>({ temp: null, hum: null, mode: 'auto', lastSeen: null });
   const [outdoorSensor, setOutdoorSensor] = useState<{ temp: number | null; hum: number | null; mode: 'manual' | 'auto' | 'timer'; lastSeen: string | null }>({ temp: null, hum: null, mode: 'auto', lastSeen: null });
@@ -122,6 +119,18 @@ export default function Dashboard() {
           if (d.device_id === 'ESP32_INDOOR') setIndoorPump(p => ({ ...p, on: d.pump_active || false }));
           if (d.device_id === 'ESP32_OUTDOOR') setOutdoorPump(p => ({ ...p, on: d.pump_active || false }));
         });
+      }
+      // Seed chart with initial data point
+      const initTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      if (sData) {
+        const indoorRow = sData.find((d: any) => d.device_id === 'ESP32_INDOOR');
+        const outdoorRow = sData.find((d: any) => d.device_id === 'ESP32_OUTDOOR');
+        if (indoorRow) {
+          setIndoorChartData([{ time: initTime, suhu: indoorRow.temperature ?? null, humidity: indoorRow.humidity ?? null }]);
+        }
+        if (outdoorRow) {
+          setOutdoorChartData([{ time: initTime, suhu: outdoorRow.temperature ?? null, humidity: outdoorRow.humidity ?? null }]);
+        }
       }
       setLoading(false);
     };
@@ -202,6 +211,36 @@ export default function Dashboard() {
       supabase.removeChannel(sub);
       clearInterval(timer);
     };
+  }, []);
+
+  // Record chart data every 1 minute from latest sensor readings
+  const indoorSensorRef = useRef(indoorSensor);
+  const outdoorSensorRef = useRef(outdoorSensor);
+  useEffect(() => { indoorSensorRef.current = indoorSensor; }, [indoorSensor]);
+  useEffect(() => { outdoorSensorRef.current = outdoorSensor; }, [outdoorSensor]);
+
+  useEffect(() => {
+    const chartTimer = setInterval(() => {
+      const timeLabel = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      
+      const iSensor = indoorSensorRef.current;
+      if (iSensor.temp !== null || iSensor.hum !== null) {
+        setIndoorChartData(prev => {
+          const next = [...prev, { time: timeLabel, suhu: iSensor.temp, humidity: iSensor.hum }];
+          return next.length > MAX_CHART_POINTS ? next.slice(-MAX_CHART_POINTS) : next;
+        });
+      }
+
+      const oSensor = outdoorSensorRef.current;
+      if (oSensor.temp !== null || oSensor.hum !== null) {
+        setOutdoorChartData(prev => {
+          const next = [...prev, { time: timeLabel, suhu: oSensor.temp, humidity: oSensor.hum }];
+          return next.length > MAX_CHART_POINTS ? next.slice(-MAX_CHART_POINTS) : next;
+        });
+      }
+    }, CHART_INTERVAL_MS);
+
+    return () => clearInterval(chartTimer);
   }, []);
 
   const sensorData = zone === "indoor"
@@ -420,7 +459,7 @@ export default function Dashboard() {
             </div>
         </div>
 
-          {/* Charts separated */}
+          {/* Charts separated — live data, updates every 1 min, max 30 points */}
           <div className="lg:col-span-7 order-3 grid grid-cols-1 gap-3 lg:gap-4">
             {/* Suhu Chart */}
             <div className="bg-card border border-border rounded-3xl p-4 shadow-[var(--shadow-custom)]">
@@ -428,58 +467,74 @@ export default function Dashboard() {
                 <span style={{ fontWeight: 600, fontSize: 14 }} className="text-foreground">
                   {t('dash.tempChart')}
                 </span>
+                <span className="text-muted-foreground flex items-center gap-1.5" style={{ fontSize: 11 }}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-ring animate-pulse inline-block" />
+                  Live · 1 min
+                </span>
               </div>
-              <ResponsiveContainer width="100%" height={120}>
-                <AreaChart data={zone === 'indoor' ? INDOOR_CHART_DATA : OUTDOOR_CHART_DATA} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="suhuGradMobile" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="time" tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} domain={['dataMin - 2', 'dataMax + 2']} />
-                  <Tooltip
-                    contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 12, color: "var(--color-foreground)", fontSize: 12 }}
-                    labelStyle={{ color: "var(--color-muted-foreground)" }}
-                  />
-                  <Area type="monotone" dataKey="suhu" name={t('dash.tempC')} stroke="var(--primary)" strokeWidth={2} fill="url(#suhuGradMobile)" dot={false} />
-                </AreaChart>
-              </ResponsiveContainer>
+              {(zone === 'indoor' ? indoorChartData : outdoorChartData).length > 1 ? (
+                <ResponsiveContainer width="100%" height={120}>
+                  <AreaChart data={zone === 'indoor' ? indoorChartData : outdoorChartData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="suhuGradMobile" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="time" tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} domain={['dataMin - 2', 'dataMax + 2']} />
+                    <Tooltip
+                      contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 12, color: "var(--color-foreground)", fontSize: 12 }}
+                      labelStyle={{ color: "var(--color-muted-foreground)" }}
+                    />
+                    <Area type="monotone" dataKey="suhu" name={t('dash.tempC')} stroke="var(--primary)" strokeWidth={2} fill="url(#suhuGradMobile)" dot={false} animationDuration={500} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-[120px] text-muted-foreground">
+                  <span className="material-symbols-rounded text-2xl mb-1">show_chart</span>
+                  <span style={{ fontSize: 12 }}>Mengumpulkan data grafik...</span>
+                  <span style={{ fontSize: 10 }} className="text-muted-foreground/60 mt-0.5">Titik baru setiap 1 menit</span>
+                </div>
+              )}
             </div>
 
-            {/* Kelembaban / Tanah Chart */}
+            {/* Kelembaban Chart */}
             <div className="bg-card border border-border rounded-3xl p-4 shadow-[var(--shadow-custom)]">
               <div className="flex items-center justify-between mb-3">
                 <span style={{ fontWeight: 600, fontSize: 14 }} className="text-foreground">
-                  {zone === 'indoor' ? t('dash.humChart') : t('dash.soilChart')}
+                  {t('dash.humChart')}
+                </span>
+                <span className="text-muted-foreground flex items-center gap-1.5" style={{ fontSize: 11 }}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-chart-2 animate-pulse inline-block" />
+                  Live · 1 min
                 </span>
               </div>
-              <ResponsiveContainer width="100%" height={120}>
-                <AreaChart data={zone === 'indoor' ? INDOOR_CHART_DATA : OUTDOOR_CHART_DATA} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="humGradMobile" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="soilGradMobile" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="time" tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} domain={[30, 100]} />
-                  <Tooltip
-                    contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 12, color: "var(--color-foreground)", fontSize: 12 }}
-                    labelStyle={{ color: "var(--color-muted-foreground)" }}
-                  />
-                  {zone === 'indoor' ? (
-                    <Area type="monotone" dataKey="humidity" name={t('dash.humPercent')} stroke="#3b82f6" strokeWidth={2} fill="url(#humGradMobile)" dot={false} />
-                  ) : (
-                    <Area type="monotone" dataKey="soil" name={t('dash.soilPercent')} stroke="#f97316" strokeWidth={2} fill="url(#soilGradMobile)" dot={false} />
-                  )}
-                </AreaChart>
-              </ResponsiveContainer>
+              {(zone === 'indoor' ? indoorChartData : outdoorChartData).length > 1 ? (
+                <ResponsiveContainer width="100%" height={120}>
+                  <AreaChart data={zone === 'indoor' ? indoorChartData : outdoorChartData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="humGradMobile" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="time" tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} domain={[30, 100]} />
+                    <Tooltip
+                      contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 12, color: "var(--color-foreground)", fontSize: 12 }}
+                      labelStyle={{ color: "var(--color-muted-foreground)" }}
+                    />
+                    <Area type="monotone" dataKey="humidity" name={t('dash.humPercent')} stroke="#3b82f6" strokeWidth={2} fill="url(#humGradMobile)" dot={false} animationDuration={500} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-[120px] text-muted-foreground">
+                  <span className="material-symbols-rounded text-2xl mb-1">show_chart</span>
+                  <span style={{ fontSize: 12 }}>Mengumpulkan data grafik...</span>
+                  <span style={{ fontSize: 10 }} className="text-muted-foreground/60 mt-0.5">Titik baru setiap 1 menit</span>
+                </div>
+              )}
             </div>
           </div>
 

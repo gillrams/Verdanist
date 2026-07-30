@@ -244,8 +244,8 @@ export default function Dashboard() {
   }, []);
 
   const sensorData = zone === "indoor"
-    ? { suhu: indoorSensor.temp, rh: indoorSensor.hum, tanah: 45, cahaya: 8200, co2: 412 }
-    : { suhu: outdoorSensor.temp, rh: outdoorSensor.hum, tanah: 38, cahaya: 62000, co2: 415 };
+    ? { suhu: currentSensorConnected ? indoorSensor.temp : null, rh: currentSensorConnected ? indoorSensor.hum : null, tanah: 45, cahaya: 8200, co2: 412 }
+    : { suhu: currentSensorConnected ? outdoorSensor.temp : null, rh: currentSensorConnected ? outdoorSensor.hum : null, tanah: 38, cahaya: 62000, co2: 415 };
 
   // Count sensors that have actual data from DHT11
   const connectedSensorsCount = [deviceOnline.indoor, deviceOnline.outdoor].filter(Boolean).length;

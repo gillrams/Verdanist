@@ -17,6 +17,27 @@ import NotificationModal from '../components/dashboard/NotificationModal';
 import ActivityLog from '../components/dashboard/ActivityLog';
 import { getNotifPrefs, sendNotification } from '../utils/notifications';
 
+const formatLastSeen = (dateString: string | null) => {
+  if (!dateString) return 'Belum pernah';
+  const date = new Date(dateString);
+  const now = new Date();
+  
+  const isToday = date.getDate() === now.getDate() && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+  
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const isYesterday = date.getDate() === yesterday.getDate() && date.getMonth() === yesterday.getMonth() && date.getFullYear() === yesterday.getFullYear();
+
+  const timeString = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+  
+  if (isToday) {
+    return `Hari ini, ${timeString}`;
+  } else if (isYesterday) {
+    return `Kemarin, ${timeString}`;
+  } else {
+    return `${date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}, ${timeString}`;
+  }
+};
 
 const INDOOR_CHART_DATA = [
   { time: "00", suhu: 24, humidity: 78, soil: 0 }, { time: "03", suhu: 22, humidity: 82, soil: 0 }, { time: "06", suhu: 23, humidity: 80, soil: 0 },
@@ -281,7 +302,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <h4 className="text-destructive font-bold text-sm">Perangkat Offline</h4>
-                  <p className="text-destructive/80 text-xs mt-0.5">Tidak ada koneksi dari ESP32 {zone === 'indoor' ? 'Indoor' : 'Outdoor'}. Terakhir aktif: {zone === 'indoor' ? (indoorSensor.lastSeen ? new Date(indoorSensor.lastSeen).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'Belum pernah') : (outdoorSensor.lastSeen ? new Date(outdoorSensor.lastSeen).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'Belum pernah')}</p>
+                  <p className="text-destructive/80 text-xs mt-0.5">Tidak ada koneksi dari ESP32 {zone === 'indoor' ? 'Indoor' : 'Outdoor'}. Terakhir aktif: {zone === 'indoor' ? formatLastSeen(indoorSensor.lastSeen) : formatLastSeen(outdoorSensor.lastSeen)}</p>
                 </div>
               </div>
             )}

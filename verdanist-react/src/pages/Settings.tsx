@@ -4,7 +4,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../lib/supabase';
 import {
   Building2, Bell, ChevronRight,
-  Sun, Wifi, LogOut, Key, Camera, Pencil, Globe
+  Sun, Wifi, LogOut, Key, Camera, Pencil, Globe, X
 } from "lucide-react";
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { useNavigate } from 'react-router-dom';
@@ -102,6 +102,7 @@ export default function Settings() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const handleUpdateName = async () => {
     const newName = window.prompt(t('settings.enterNewName'), user?.displayName || "");
@@ -196,8 +197,11 @@ export default function Settings() {
               </div>
             )}
             <div className="flex items-center gap-4">
-              <div className="relative cursor-pointer group" onClick={() => fileInputRef.current?.click()}>
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/30 to-primary/80 flex items-center justify-center overflow-hidden border-2 border-transparent group-hover:border-primary/50 transition-all">
+              <div className="relative group">
+                <div 
+                  className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/30 to-primary/80 flex items-center justify-center overflow-hidden border-2 border-transparent group-hover:border-primary/50 transition-all cursor-pointer"
+                  onClick={() => user?.avatarUrl ? setPreviewImage(user.avatarUrl) : fileInputRef.current?.click()}
+                >
                   {user?.avatarUrl ? (
                     <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
@@ -206,8 +210,11 @@ export default function Settings() {
                     </span>
                   )}
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-card border border-border rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Camera className="w-3 h-3 text-ring" />
+                <div 
+                  className="absolute -bottom-1 -right-1 w-7 h-7 bg-card border border-border rounded-full flex items-center justify-center cursor-pointer hover:bg-secondary group-hover:scale-110 transition-transform shadow-sm"
+                  onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                >
+                  <Camera className="w-3.5 h-3.5 text-ring" />
                 </div>
                 <input 
                   type="file" 
@@ -309,6 +316,24 @@ export default function Settings() {
         </div>
         <p style={{ fontSize: 11 }} className="text-center text-muted-foreground/40 mb-6">Verdanist v2.4.1 · Build 2026.05</p>
       </div>
+
+      {/* Photo Preview Modal */}
+      {previewImage && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center animate-in fade-in duration-200"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div className="absolute top-6 right-6 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center cursor-pointer transition-colors">
+            <X className="w-5 h-5 text-white" />
+          </div>
+          <img 
+            src={previewImage} 
+            alt="Preview" 
+            className="max-w-[90vw] max-h-[80vh] object-contain rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()} 
+          />
+        </div>
+      )}
     </>
   );
 }

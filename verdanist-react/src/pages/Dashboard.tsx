@@ -243,14 +243,14 @@ export default function Dashboard() {
     return () => clearInterval(chartTimer);
   }, []);
 
-  const sensorData = zone === "indoor"
-    ? { suhu: currentSensorConnected ? indoorSensor.temp : null, rh: currentSensorConnected ? indoorSensor.hum : null, tanah: 45, cahaya: 8200, co2: 412 }
-    : { suhu: currentSensorConnected ? outdoorSensor.temp : null, rh: currentSensorConnected ? outdoorSensor.hum : null, tanah: 38, cahaya: 62000, co2: 415 };
-
   // Count sensors that have actual data from DHT11
   const connectedSensorsCount = [deviceOnline.indoor, deviceOnline.outdoor].filter(Boolean).length;
   // Is current zone sensor connected?
   const currentSensorConnected = zone === 'indoor' ? deviceOnline.indoor : deviceOnline.outdoor;
+
+  const sensorData = zone === "indoor"
+    ? { suhu: currentSensorConnected ? indoorSensor.temp : null, rh: currentSensorConnected ? indoorSensor.hum : null, tanah: 45, cahaya: 8200, co2: 412 }
+    : { suhu: currentSensorConnected ? outdoorSensor.temp : null, rh: currentSensorConnected ? outdoorSensor.hum : null, tanah: 38, cahaya: 62000, co2: 415 };
 
   const hour = new Date().getHours();
   const greeting = hour < 11 ? t('dash.greeting.morning') : hour < 15 ? t('dash.greeting.afternoon') : hour < 18 ? t('dash.greeting.evening') : t('dash.greeting.night');

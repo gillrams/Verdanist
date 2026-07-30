@@ -587,13 +587,11 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         // If the image fails to load (e.g. Unsplash blocked or 404),
-                        // fallback to a clean, reliable, and relevant SVG placeholder.
-                        if (!target.src.includes('loremflickr')) {
-                          // Try fetching a real photo from Flickr as fallback instead of plain text
-                          const keyword = encodeURIComponent(activeRecommend.name.split(' ')[0].toLowerCase());
-                          target.src = `https://loremflickr.com/800/400/plant,${keyword}/all`;
-                        } else if (!target.src.includes('placehold.co')) {
-                          // If even loremflickr fails, use placehold.co text as last resort
+                        // Try a specific, beautiful high-quality generic plant photo from Unsplash if the specific one fails
+                        if (!target.src.includes('1518531933037')) {
+                          target.src = 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=800&auto=format&fit=crop';
+                        } else {
+                          // Absolute fallback if Unsplash itself is blocked
                           target.src = `https://placehold.co/800x400/061d12/10b981?text=${encodeURIComponent((activeRecommend.name || 'Visual').substring(0, 15))}&font=Montserrat`;
                         }
                       }}

@@ -103,6 +103,10 @@ export default function Settings() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [showTokenModal, setShowTokenModal] = useState(false);
+
+  const savedTokens = JSON.parse(localStorage.getItem('verdanist_saved_tokens') || '{}');
+  const activeToken = currentFarm?.id ? savedTokens[currentFarm.id] : null;
 
   const handleUpdateName = async () => {
     const newName = window.prompt(t('settings.enterNewName'), user?.displayName || "");
@@ -250,14 +254,12 @@ export default function Settings() {
           <div className="bg-card border border-border shadow-sm rounded-2xl overflow-hidden divide-y divide-border">
             <SettingsRow label={currentFarm?.name || "Kebun Utama"} sub={`${currentFarm?.location || 'Bogor'} · ${t('common.active')}`} suffix={<span className="text-ring" style={{ fontSize: 12, fontWeight: 600 }}>{t('settings.connected')}</span>} />
             <SettingsRow label={t('settings.changeFarm')} sub={t('settings.changeFarmSub')} onClick={() => { clearFarmAccess(); navigate('/farms'); }} />
-            <SettingsRow label={t('settings.accessToken')} sub={(() => {
-              const saved = JSON.parse(localStorage.getItem('verdanist_saved_tokens') || '{}');
-              const token = currentFarm?.id ? saved[currentFarm.id] : null;
-              if (token && token.length > 6) {
-                return token.substring(0, token.length - 6) + '●●●●●●';
-              }
-              return token || '—';
-            })()} icon={<Key className="w-4 h-4 text-ring" />} />
+            <SettingsRow 
+              label={t('settings.accessToken')} 
+              sub={activeToken ? (activeToken.length > 6 ? activeToken.substring(0, activeToken.length - 6) + '●●●●●●' : activeToken) : '—'} 
+              icon={<Key className="w-4 h-4 text-ring" />} 
+              onClick={() => { if (activeToken) setShowTokenModal(true); }}
+            />
           </div>
         </div>
 
@@ -332,6 +334,44 @@ export default function Settings() {
             className="max-w-[90vw] max-h-[80vh] object-contain rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()} 
           />
+        </div>
+      )}
+
+      {/* Token QR Modal */}
+      {showTokenModal && activeToken && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center p-6 animate-in fade-in duration-200"
+          onClick={() => setShowTokenModal(false)}
+        >
+          <div 
+            className="bg-card w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-border flex flex-col items-center text-center animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-4">
+              <Key className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-foreground mb-1">Access Token</h3>
+            <p className="text-sm text-muted-foreground mb-6">Scan QR code ini atau salin token untuk menghubungkan perangkat kebun.</p>
+            
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-border/50 mb-6 w-48 h-48 flex items-center justify-center">
+              <img 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${activeToken}`}
+                alt="QR Code Token"
+                className="w-full h-full"
+              />
+            </div>
+            
+            <div className="bg-secondary/50 w-full rounded-xl p-3 mb-6 border border-border/50 relative group">
+              <p className="text-[13px] font-mono font-medium text-foreground break-all selection:bg-primary/20">{activeToken}</p>
+            </div>
+            
+            <button
+              onClick={() => setShowTokenModal(false)}
+              className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-bold hover:opacity-90 transition-opacity"
+            >
+              Tutup
+            </button>
+          </div>
         </div>
       )}
     </>

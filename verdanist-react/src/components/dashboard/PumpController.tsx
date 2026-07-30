@@ -310,6 +310,10 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
       setMode(targetMode);
       await supabase.from('device_settings').update({ mode: targetMode }).eq('device_id', deviceId);
       
+      if (targetMode === 'manual' && isPumpOn) {
+        handleTogglePumpRef.current(false);
+      }
+      
       if (targetMode === 'timer') {
         setShowTimerPicker(true);
       }

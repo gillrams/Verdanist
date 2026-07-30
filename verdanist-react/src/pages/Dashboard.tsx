@@ -216,15 +216,17 @@ export default function Dashboard() {
   // Record chart data every 1 minute from latest sensor readings
   const indoorSensorRef = useRef(indoorSensor);
   const outdoorSensorRef = useRef(outdoorSensor);
+  const deviceOnlineRef = useRef(deviceOnline);
   useEffect(() => { indoorSensorRef.current = indoorSensor; }, [indoorSensor]);
   useEffect(() => { outdoorSensorRef.current = outdoorSensor; }, [outdoorSensor]);
+  useEffect(() => { deviceOnlineRef.current = deviceOnline; }, [deviceOnline]);
 
   useEffect(() => {
     const chartTimer = setInterval(() => {
       const timeLabel = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
       
       const iSensor = indoorSensorRef.current;
-      if (iSensor.temp !== null || iSensor.hum !== null) {
+      if (deviceOnlineRef.current.indoor && (iSensor.temp !== null || iSensor.hum !== null)) {
         setIndoorChartData(prev => {
           const next = [...prev, { time: timeLabel, suhu: iSensor.temp, humidity: iSensor.hum }];
           return next.length > MAX_CHART_POINTS ? next.slice(-MAX_CHART_POINTS) : next;
@@ -232,7 +234,7 @@ export default function Dashboard() {
       }
 
       const oSensor = outdoorSensorRef.current;
-      if (oSensor.temp !== null || oSensor.hum !== null) {
+      if (deviceOnlineRef.current.outdoor && (oSensor.temp !== null || oSensor.hum !== null)) {
         setOutdoorChartData(prev => {
           const next = [...prev, { time: timeLabel, suhu: oSensor.temp, humidity: oSensor.hum }];
           return next.length > MAX_CHART_POINTS ? next.slice(-MAX_CHART_POINTS) : next;
@@ -472,7 +474,7 @@ export default function Dashboard() {
                   Live · 1 min
                 </span>
               </div>
-              {(zone === 'indoor' ? indoorChartData : outdoorChartData).length > 1 ? (
+              {currentSensorConnected && (zone === 'indoor' ? indoorChartData : outdoorChartData).length > 1 ? (
                 <ResponsiveContainer width="100%" height={120}>
                   <AreaChart data={zone === 'indoor' ? indoorChartData : outdoorChartData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
                     <defs>
@@ -510,7 +512,7 @@ export default function Dashboard() {
                   Live · 1 min
                 </span>
               </div>
-              {(zone === 'indoor' ? indoorChartData : outdoorChartData).length > 1 ? (
+              {currentSensorConnected && (zone === 'indoor' ? indoorChartData : outdoorChartData).length > 1 ? (
                 <ResponsiveContainer width="100%" height={120}>
                   <AreaChart data={zone === 'indoor' ? indoorChartData : outdoorChartData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
                     <defs>
@@ -562,8 +564,8 @@ export default function Dashboard() {
                     isDeviceOnline={deviceOnline.indoor}
                     mode={indoorSensor.mode}
                     setMode={(m) => setIndoorSensor(p => ({ ...p, mode: m as any }))}
-                    temp={indoorSensor.temp ?? undefined}
-                    humidity={indoorSensor.hum ?? undefined}
+                    temp={deviceOnline.indoor ? (indoorSensor.temp ?? undefined) : undefined}
+                    humidity={deviceOnline.indoor ? (indoorSensor.hum ?? undefined) : undefined}
                     onOpenSettings={() => { setModalDevice('indoor'); setIsSettingsModalOpen(true); }}
                     onOpenTimerModal={(tab = 'schedule') => { setModalDevice('indoor'); setTimerModalTab(tab); setIsTimerModalOpen(true); }}
                     onShowAlert={handleShowAlert}
@@ -575,8 +577,8 @@ export default function Dashboard() {
                     isDeviceOnline={deviceOnline.outdoor}
                     mode={outdoorSensor.mode}
                     setMode={(m) => setOutdoorSensor(p => ({ ...p, mode: m as any }))}
-                    temp={outdoorSensor.temp ?? undefined}
-                    humidity={outdoorSensor.hum ?? undefined}
+                    temp={deviceOnline.outdoor ? (outdoorSensor.temp ?? undefined) : undefined}
+                    humidity={deviceOnline.outdoor ? (outdoorSensor.hum ?? undefined) : undefined}
                     onOpenSettings={() => { setModalDevice('outdoor'); setIsSettingsModalOpen(true); }}
                     onOpenTimerModal={(tab = 'schedule') => { setModalDevice('outdoor'); setTimerModalTab(tab); setIsTimerModalOpen(true); }}
                     onShowAlert={handleShowAlert}

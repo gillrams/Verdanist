@@ -17,95 +17,7 @@ interface AiAssistantModalProps {
   ) => void;
 }
 
-interface PlantRecommendation {
-  name: string;
-  emoji: string;
-  temp: number;
-  humidity: number;
-  soil: number;
-  pattern: 'continuous' | 'pulsed';
-  desc: string;
-  tips: string;
-  isPlant: boolean;
-  isQuestion?: boolean;
-  answer?: string;
-  imageUrl?: string;
-}
-
-const PLANT_PRESETS: PlantRecommendation[] = [
-  {
-    name: 'Pakcoy / Caisim',
-    emoji: '🥬',
-    temp: 32.0,
-    humidity: 65,
-    soil: 60,
-    pattern: 'continuous',
-    desc: 'Sayuran berdaun hijau cepat tumbuh. Membutuhkan air berlebih, tanah yang konsisten basah, dan suhu sejuk untuk mencegah bolting (berbunga prematur).',
-    tips: 'Jaga kelembaban tanah minimal 60% dan pastikan ventilasi/kipas aktif di atas 32°C.',
-    isPlant: true,
-    imageUrl: '/plants/pakcoy.png'
-  },
-  {
-    name: 'Melon Hortikultura',
-    emoji: '🍈',
-    temp: 34.0,
-    humidity: 55,
-    soil: 50,
-    pattern: 'pulsed',
-    desc: 'Tanaman buah merambat premium. Memerlukan kelembaban sedang, suhu hangat terkontrol, dan pengairan berkala (pulsasi) untuk mencegah pembusukan akar.',
-    tips: 'Gunakan misting berpola pulsasi untuk menjaga udara sejuk tanpa membasahi buah secara berlebihan.',
-    isPlant: true,
-    imageUrl: '/plants/melon.png'
-  },
-  {
-    name: 'Monstera / Aroid',
-    emoji: '🪴',
-    temp: 30.0,
-    humidity: 70,
-    soil: 45,
-    pattern: 'continuous',
-    desc: 'Tanaman hias tropis berdaun indah. Menyukai kelembaban udara yang ekstra tinggi (tiru hutan hujan tropis) namun tanah tidak boleh terlalu becek.',
-    tips: 'Fokuskan misting udara untuk menjaga kelembaban udara di atas 70% agar daun mengkilap.',
-    isPlant: true,
-    imageUrl: '/plants/monstera.png'
-  },
-  {
-    name: 'Sukulen / Kaktus',
-    emoji: '🌵',
-    temp: 38.0,
-    humidity: 40,
-    soil: 25,
-    pattern: 'pulsed',
-    desc: 'Tanaman gurun penyimpan air. Meminimalisir penyiraman, toleran terhadap suhu ekstrem panas, dan menyukai tanah yang sangat porous/kering.',
-    tips: 'Set penyiraman ke minimal (25% tanah) dan biarkan suhu hangat hingga 38°C sebelum kipas menyala.',
-    isPlant: true,
-    imageUrl: '/plants/pakcoy.png'
-  },
-  {
-    name: 'Stroberi Dataran Tinggi',
-    emoji: '🍓',
-    temp: 28.0,
-    humidity: 60,
-    soil: 55,
-    pattern: 'pulsed',
-    desc: 'Tanaman buah sub-tropis sensitif panas. Membutuhkan lingkungan yang sangat sejuk (<28°C), tanah lembab sedang, dan nutrisi stabil.',
-    tips: 'Batas suhu disetel rendah di 28°C agar pompa misting mendinginkan greenhouse lebih awal di siang hari.',
-    isPlant: true,
-    imageUrl: '/plants/tomat.png'
-  },
-  {
-    name: 'Tomat Cherry',
-    emoji: '🍅',
-    temp: 30.0,
-    humidity: 65,
-    soil: 50,
-    pattern: 'continuous',
-    desc: 'Tanaman buah sayur penyuka matahari. Memerlukan air teratur untuk mencegah keretakan buah (blossom end rot) dan suhu optimal hangat.',
-    tips: 'Penyiraman rutin dengan kelembaban tanah 50% menjaga kalsium terserap merata ke buah.',
-    isPlant: true,
-    imageUrl: '/plants/tomat.png'
-  }
-];
+import { PLANT_PRESETS, type PlantRecommendation } from '../../data/plantsData';
 
 const MarkdownText = ({ text }: { text: string }) => {
   const lines = text.split('\n');
@@ -194,6 +106,9 @@ export default function AiAssistantModal({ isOpen, onClose, deviceId, onShowAler
   const [selectedPlant, setSelectedPlant] = useState<PlantRecommendation | null>(null);
   const [customRecommend, setCustomRecommend] = useState<PlantRecommendation | null>(null);
   const [applyLoading, setApplyLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'Semua' | 'Sayuran' | 'Buah' | 'Tanaman Hias' | 'Palawija & Herbal'>('Semua');
+
+  const filteredPresets = PLANT_PRESETS.filter(p => activeTab === 'Semua' || p.category === activeTab);
 
   const handleSearch = async (e: FormEvent) => {
     e.preventDefault();
@@ -283,6 +198,7 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
           pattern: parsed.pattern === 'pulsed' ? 'pulsed' : 'continuous',
           desc: typeof parsed.desc === 'string' ? parsed.desc : `Rekomendasi otomatis untuk tanaman ${searchQuery}.`,
           tips: typeof parsed.tips === 'string' ? parsed.tips : 'Pelihara tanaman dengan pemantauan suhu berkala.',
+          category: 'Semua',
           isPlant: isPlant,
           isQuestion: parsed.isQuestion === true,
           answer: typeof parsed.answer === 'string' ? parsed.answer : undefined,
@@ -311,6 +227,7 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
           pattern: 'pulsed',
           desc: 'Rekomendasi parameter darurat untuk mengurangi stres lingkungan pada tanaman Anda.',
           tips: 'Segera turunkan suhu ruang dan kelembaban untuk mencegah penyebaran patogen jamur.',
+          category: 'Semua',
           isPlant: true,
           isQuestion: true,
           answer: `Berdasarkan gejala yang Anda sebutkan, kemungkinan tanaman Anda mengalami infeksi atau stres lingkungan.
@@ -339,6 +256,7 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
           pattern: 'continuous',
           desc: 'Permintaan visual tanaman berhasil diproses. Memuat gambar dari server...',
           tips: 'Visualisasi membantu mengidentifikasi varietas dengan lebih tepat.',
+          category: 'Semua',
           isPlant: true,
           imageUrl: getReliableImageUrl(visualSubject)
         };
@@ -352,6 +270,7 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
           pattern: 'continuous',
           desc: 'Tanaman hortikultura penyuka iklim hangat. Memerlukan penyiraman sedang yang konsisten. Kelebihan air dapat menyebabkan layu fusarium.',
           tips: 'Penyiraman stabil di kelembaban tanah 48%. Hindari genangan air di akar saat malam hari.',
+          category: 'Sayuran',
           isPlant: true
         };
       } else if (query.includes('bayam') || query.includes('kangkung') || query.includes('sawi')) {
@@ -364,6 +283,7 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
           pattern: 'continuous',
           desc: 'Tanaman sayur semusim berdaun lunak. Sangat rakus air dan membutuhkan kelembaban lingkungan yang sangat tinggi agar tumbuh renyah.',
           tips: 'Disarankan menyiram secara kontinu untuk menjaga kesegaran sel daun tanaman sayur.',
+          category: 'Sayuran',
           isPlant: true
         };
       } else if (query.includes('anggrek') || query.includes('orchid')) {
@@ -376,6 +296,7 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
           pattern: 'pulsed',
           desc: 'Tanaman hias bernilai tinggi. Membutuhkan kelembaban udara ekstra lembab, namun akar peka terhadap kebusukan jika media tanam terlalu becek.',
           tips: 'Fokuskan misting kabut di siang hari (target hum 75%) dan minimalkan siraman langsung di akar (35%).',
+          category: 'Tanaman Hias',
           isPlant: true
         };
       } else if (query.includes('mawar') || query.includes('melati') || query.includes('bunga')) {
@@ -388,6 +309,7 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
           pattern: 'pulsed',
           desc: 'Tanaman berbunga estetik. Membutuhkan keseimbangan air di tanah dan sirkulasi udara baik untuk mencegah jamur daun/black spot.',
           tips: 'Gunakan misting berkala (pulsasi) agar kelembaban tidak menumpuk terlalu lama di kelopak bunga.',
+          category: 'Tanaman Hias',
           isPlant: true
         };
       } else {
@@ -410,6 +332,7 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
           pattern: patternGen,
           desc: `Hasil analisis agronomi AI untuk varietas tanaman "${searchQuery}". Model memprediksi profil mikroklimat ideal berdasarkan famili botani terdekat.`,
           tips: `Atur ambang suhu maksimal di ${tempGen}°C dan siram otomatis ketika kelembaban tanah turun di bawah ${soilGen}%.`,
+          category: 'Semua',
           isPlant: true
         };
       }
@@ -507,18 +430,16 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
             className="relative bg-gradient-to-b from-white/95 to-white/90 dark:from-[#082317]/95 dark:to-[#04150E]/95 backdrop-blur-3xl rounded-[2.5rem] w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-[0_40px_80px_rgba(0,0,0,0.5)] border border-border p-6 sm:p-8 z-10 space-y-6 scrollbar-none"
           >
 
-            {/* Top Glow bar */}
-            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500" />
-            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[70%] h-32 bg-emerald-500/20 rounded-full blur-[80px] pointer-events-none" />
+            <div className="absolute top-0 left-0 w-full h-1 bg-emerald-700/20" />
 
             {/* Header */}
             <div className="flex items-start justify-between">
               <div>
-                <span className="bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-500 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-md shadow-emerald-500/10 flex items-center gap-1.5 w-max">
-                  <span className="material-symbols-rounded text-[11px] animate-pulse">psychology</span>
-                  AGRONOMY COGNITIVE AI
+                <span className="bg-emerald-700/10 text-emerald-700 dark:text-emerald-400 border border-emerald-700/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 w-max">
+                  <span className="material-symbols-rounded text-[11px]">psychology</span>
+                  AGRONOMI AI
                 </span>
-                <h3 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-emerald-100 dark:to-white bg-clip-text text-transparent mt-3 tracking-tight flex items-center gap-2">
+                <h3 className="text-xl sm:text-2xl font-bold text-foreground mt-3 tracking-tight flex items-center gap-2">
                   Optimalisasi Mikroklimat AI
                 </h3>
                 <p className="text-xs text-muted-foreground font-semibold mt-1 max-w-xl leading-relaxed">
@@ -548,7 +469,7 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
               <button
                 type="submit"
                 disabled={loading}
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 hover:opacity-95 active:scale-[0.98] text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 flex items-center gap-1.5 cursor-pointer transition-all disabled:opacity-50"
+                className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 cursor-pointer transition-all disabled:opacity-50"
               >
                 {loading ? (
                   <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -561,57 +482,65 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
               </button>
             </form>
 
-            {/* Bento Quick-Select grid */}
+            {/* Bento Quick-Select grid with Tabs */}
             {!loading && !activeRecommend && (
               <div className="space-y-4">
-                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                  <span className="material-symbols-rounded text-sm text-emerald-500">grid_view</span>
-                  Preset Cepat Varietas Populer
-                </h4>
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-border">
+                  {['Semua', 'Sayuran', 'Buah', 'Tanaman Hias', 'Palawija & Herbal'].map(tab => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab as any)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors border ${
+                        activeTab === tab
+                          ? 'bg-emerald-700 text-white border-emerald-700'
+                          : 'bg-card text-muted-foreground border-border hover:bg-muted'
+                      }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                  {PLANT_PRESETS.map((plant) => (
+                  {filteredPresets.map((plant) => (
                     <button
                       key={plant.name}
                       onClick={() => {
                         setSelectedPlant(plant);
                         setCustomRecommend(null);
                       }}
-                      className="relative overflow-hidden bg-card hover:bg-emerald-500/10 border border-border hover:border-emerald-500/30 dark:hover:border-emerald-500/30 p-3 rounded-[1.25rem] text-left transition-all duration-300 hover:scale-[1.01] hover:shadow-[0_10px_20px_rgba(16,185,129,0.05)] cursor-pointer flex flex-col justify-between gap-2.5 group w-full min-h-[145px]"
+                      className="relative overflow-hidden bg-card hover:bg-muted border border-border hover:border-emerald-700/30 p-3 rounded-2xl text-left transition-all duration-300 cursor-pointer flex flex-col justify-between gap-2.5 group w-full min-h-[145px]"
                     >
-                      {/* Hover Ambient Glow */}
-                      <div className="absolute -right-4 -bottom-4 w-12 h-12 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all duration-300" />
-
                       {/* Top Row: Emoji & Category Badge */}
                       <div className="flex items-center justify-between w-full z-10 shrink-0">
-                        <span className="text-xl bg-muted w-8 h-8 rounded-lg flex items-center justify-center filter drop-shadow-sm group-hover:scale-110 transition-transform duration-300 shrink-0">
+                        <span className="text-xl bg-background border border-border w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
                           {plant.emoji}
                         </span>
-                        <span className="inline-block text-[8px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-500/20 px-2 py-1 rounded leading-none shrink-0">
-                          {plant.name.includes('Pakcoy') ? 'Sayuran' : plant.name.includes('Melon') ? 'Buah' : plant.name.includes('Monstera') ? 'Hias' : plant.name.includes('Sukulen') ? 'Gurun' : plant.name.includes('Stroberi') ? 'Berries' : 'Sayuran'}
+                        <span className="inline-block text-[8px] font-bold uppercase tracking-widest text-muted-foreground bg-secondary px-2 py-1 rounded leading-none shrink-0">
+                          {plant.category}
                         </span>
                       </div>
 
                       {/* Middle: Plant Name */}
                       <div className="z-10 min-w-0 flex-1 flex items-center">
-                        <p className="text-[10px] sm:text-[11px] font-extrabold text-foreground leading-tight group-hover:text-emerald-500 transition-colors">
+                        <p className="text-[10px] sm:text-[11px] font-bold text-foreground leading-tight group-hover:text-emerald-700 transition-colors">
                           {plant.name}
                         </p>
                       </div>
 
                       {/* Bottom: Bento-style Parameter Grid */}
-                      <div className="grid grid-cols-3 gap-0.5 bg-muted p-1.5 rounded-xl border border-border/50 w-full shrink-0 z-10">
+                      <div className="grid grid-cols-3 gap-0.5 bg-background p-1.5 rounded-xl border border-border w-full shrink-0 z-10">
                         <div className="flex flex-col items-center justify-center text-center">
                           <span className="material-symbols-rounded text-[10px] text-red-500 leading-none">thermostat</span>
-                          <span className="text-[8px] font-black mt-1 text-foreground/80 leading-none shrink-0">{plant.temp}°</span>
+                          <span className="text-[8px] font-bold mt-1 text-foreground/80 leading-none shrink-0">{plant.temp}°</span>
                         </div>
-                        <div className="flex flex-col items-center justify-center text-center border-x border-border/50">
+                        <div className="flex flex-col items-center justify-center text-center border-x border-border">
                           <span className="material-symbols-rounded text-[10px] text-blue-500 leading-none">humidity_low</span>
-                          <span className="text-[8px] font-black mt-1 text-foreground/80 leading-none shrink-0">{plant.humidity}%</span>
+                          <span className="text-[8px] font-bold mt-1 text-foreground/80 leading-none shrink-0">{plant.humidity}%</span>
                         </div>
                         <div className="flex flex-col items-center justify-center text-center">
-                          <span className="material-symbols-rounded text-[10px] text-emerald-500 leading-none">potted_plant</span>
-                          <span className="text-[8px] font-black mt-1 text-foreground/80 leading-none shrink-0">{plant.soil}%</span>
+                          <span className="material-symbols-rounded text-[10px] text-emerald-600 leading-none">potted_plant</span>
+                          <span className="text-[8px] font-bold mt-1 text-foreground/80 leading-none shrink-0">{plant.soil}%</span>
                         </div>
                       </div>
                     </button>
@@ -712,14 +641,26 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
                 )}
 
                 {/* Agronomy Explanation */}
-                <div className="space-y-2 relative z-10">
-                  <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">
-                    <span className="material-symbols-rounded text-sm">assignment</span>
+                <div className="space-y-2 relative z-10 border border-border bg-card/50 rounded-2xl p-4">
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1">
+                    <span className="material-symbols-rounded text-sm text-emerald-700">assignment</span>
                     Deskripsi Agronomis
                   </span>
-                  <p className="text-xs text-gray-600 dark:text-white/70 font-semibold leading-relaxed">
+                  <p className="text-xs text-foreground/80 font-medium leading-relaxed">
                     {activeRecommend.desc}
                   </p>
+                  
+                  {activeRecommend.journalReference && (
+                    <div className="mt-3 pt-3 border-t border-border/50">
+                      <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1 mb-1">
+                        <span className="material-symbols-rounded text-[11px] text-blue-600">school</span>
+                        Referensi Jurnal IPB
+                      </span>
+                      <p className="text-[10px] text-muted-foreground italic font-medium leading-relaxed">
+                        {activeRecommend.journalReference}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Target Parameters Bento Box - Only show for valid plants */}
@@ -793,13 +734,13 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
                       type="button"
                       disabled={applyLoading}
                       onClick={() => handleApplyConfig(activeRecommend)}
-                      className="w-full py-4.5 bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 hover:opacity-95 active:scale-[0.99] text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-[0_10px_35px_rgba(16,185,129,0.35)] flex items-center justify-center gap-2 cursor-pointer border border-green-400/30"
+                      className="w-full py-4 bg-emerald-700 hover:bg-emerald-800 active:scale-[0.99] text-white rounded-2xl text-xs font-bold uppercase tracking-widest transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
                     >
                       {applyLoading ? (
                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       ) : (
                         <>
-                          <span className="material-symbols-rounded text-base animate-pulse">magic_button</span>
+                          <span className="material-symbols-rounded text-base">magic_button</span>
                           Terapkan Parameter AI ke {deviceId}
                         </>
                       )}

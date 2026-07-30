@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -492,9 +492,9 @@ export default function Dashboard() {
                 </ResponsiveContainer>
               ) : (
                 <div className="flex flex-col items-center justify-center h-[120px] text-muted-foreground">
-                  <span className="material-symbols-rounded text-2xl mb-1">show_chart</span>
-                  <span style={{ fontSize: 12 }}>Mengumpulkan data grafik...</span>
-                  <span style={{ fontSize: 10 }} className="text-muted-foreground/60 mt-0.5">Titik baru setiap 1 menit</span>
+                  <span className="material-symbols-rounded text-2xl mb-1">{currentSensorConnected ? 'show_chart' : 'sensors_off'}</span>
+                  <span style={{ fontSize: 12 }}>{currentSensorConnected ? 'Mengumpulkan data grafik...' : 'Tidak ada data sensor'}</span>
+                  <span style={{ fontSize: 10 }} className="text-muted-foreground/60 mt-0.5">{currentSensorConnected ? 'Titik baru setiap 1 menit' : 'Perangkat sedang offline'}</span>
                 </div>
               )}
             </div>
@@ -530,9 +530,9 @@ export default function Dashboard() {
                 </ResponsiveContainer>
               ) : (
                 <div className="flex flex-col items-center justify-center h-[120px] text-muted-foreground">
-                  <span className="material-symbols-rounded text-2xl mb-1">show_chart</span>
-                  <span style={{ fontSize: 12 }}>Mengumpulkan data grafik...</span>
-                  <span style={{ fontSize: 10 }} className="text-muted-foreground/60 mt-0.5">Titik baru setiap 1 menit</span>
+                  <span className="material-symbols-rounded text-2xl mb-1">{currentSensorConnected ? 'show_chart' : 'sensors_off'}</span>
+                  <span style={{ fontSize: 12 }}>{currentSensorConnected ? 'Mengumpulkan data grafik...' : 'Tidak ada data sensor'}</span>
+                  <span style={{ fontSize: 10 }} className="text-muted-foreground/60 mt-0.5">{currentSensorConnected ? 'Titik baru setiap 1 menit' : 'Perangkat sedang offline'}</span>
                 </div>
               )}
             </div>

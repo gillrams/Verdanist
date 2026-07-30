@@ -61,7 +61,7 @@ export default function Dashboard() {
 
   const [indoorSensor, setIndoorSensor] = useState<{ temp: number | null; hum: number | null; mode: 'manual' | 'auto' | 'timer'; lastSeen: string | null }>({ temp: null, hum: null, mode: 'auto', lastSeen: null });
   const [outdoorSensor, setOutdoorSensor] = useState<{ temp: number | null; hum: number | null; mode: 'manual' | 'auto' | 'timer'; lastSeen: string | null }>({ temp: null, hum: null, mode: 'auto', lastSeen: null });
-  const [deviceOnline, setDeviceOnline] = useState({ indoor: true, outdoor: true });
+  const [deviceOnline, setDeviceOnline] = useState({ indoor: false, outdoor: false });
   const lastSeenRef = useRef<{ indoor: string | null; outdoor: string | null }>({ indoor: null, outdoor: null });
 
   const [indoorPump, setIndoorPump] = useState({ on: false, lastRun: t('dash.neverRun') });
@@ -97,16 +97,24 @@ export default function Dashboard() {
     const fetchInitial = async () => {
       const { data: sData } = await supabase.from('device_settings').select('*').in('device_id', ['ESP32_INDOOR', 'ESP32_OUTDOOR']);
       if (sData) {
+        const now = Date.now();
+        let initIndoorOnline = false;
+        let initOutdoorOnline = false;
+        
         sData.forEach(d => {
           if (d.device_id === 'ESP32_INDOOR') {
             lastSeenRef.current.indoor = d.last_seen ?? null;
             setIndoorSensor(p => ({ ...p, temp: d.temperature ?? null, hum: d.humidity ?? null, mode: d.mode || p.mode, lastSeen: d.last_seen ?? null }));
+            if (d.last_seen) initIndoorOnline = (now - new Date(d.last_seen).getTime()) < 15000;
           }
           if (d.device_id === 'ESP32_OUTDOOR') {
             lastSeenRef.current.outdoor = d.last_seen ?? null;
             setOutdoorSensor(p => ({ ...p, temp: d.temperature ?? null, hum: d.humidity ?? null, mode: d.mode || p.mode, lastSeen: d.last_seen ?? null }));
+            if (d.last_seen) initOutdoorOnline = (now - new Date(d.last_seen).getTime()) < 15000;
           }
         });
+        
+        setDeviceOnline({ indoor: initIndoorOnline, outdoor: initOutdoorOnline });
       }
       const { data: pData } = await supabase.from('device_status').select('*').in('device_id', ['ESP32_INDOOR', 'ESP32_OUTDOOR']);
       if (pData) {

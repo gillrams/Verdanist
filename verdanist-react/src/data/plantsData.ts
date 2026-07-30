@@ -28,7 +28,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 28.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Bok_Choy.JPG/960px-Bok_Choy.JPG',
+    imageUrl: 'https://loremflickr.com/800/400/pakcoy,hijau,plant/all',
     journalReference: 'Mahmud, Z., Sari, N.. 2023. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 22(2):70-80.'
   },
   {
@@ -42,7 +42,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 30.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 55%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/91/Amaranthus_tricolor0.jpg',
+    imageUrl: 'https://loremflickr.com/800/400/spinach,leaf,plant/all',
     journalReference: 'Purwanto, E., Purwanto, E.. 2024. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Kultivasi*. 22(3):70-75.'
   },
   {
@@ -56,7 +56,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 32.0°C dan kelembaban optimal 75%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 70%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/N_Ipoa_D1600.JPG/960px-N_Ipoa_D1600.JPG',
+    imageUrl: 'https://loremflickr.com/800/400/water,spinach,field/all',
     journalReference: 'Wibowo, A., Mahmud, Z.. 2019. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 13(1):130-137.'
   },
   {
@@ -70,7 +70,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 25.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 65%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/selada,keriting,plant/all',
     journalReference: 'Purwanto, E., Sari, N.. 2019. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 17(3):92-98.'
   },
   {
@@ -84,7 +84,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 28.0°C dan kelembaban optimal 60%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Tomates_cerises_Luc_Viatour.jpg/960px-Tomates_cerises_Luc_Viatour.jpg',
+    imageUrl: 'https://loremflickr.com/800/400/cherry,tomato/all',
     journalReference: 'Sari, N., Pratama, R.. 2023. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 36(2):141-151.'
   },
   {
@@ -98,7 +98,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 26.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 55%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Tomato_je.jpg/960px-Tomato_je.jpg',
+    imageUrl: 'https://loremflickr.com/800/400/beefsteak,tomato/all',
     journalReference: 'Hidayat, T., Wibowo, A.. 2018. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 50(2):122-132.'
   },
   {
@@ -112,7 +112,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 32.0°C dan kelembaban optimal 60%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Chilipeber.jpg',
+    imageUrl: 'https://loremflickr.com/800/400/red,chili,spice/all',
     journalReference: 'Purwanto, E., Wibowo, A.. 2022. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Kultivasi*. 16(1):38-49.'
   },
   {
@@ -126,7 +126,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 34.0°C dan kelembaban optimal 55%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 40%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1614778149870-802c632833fc?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/cabai,rawit,plant/all',
     journalReference: 'Hidayat, T., Hidayat, T.. 2023. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 39(3):105-111.'
   },
   {
@@ -140,7 +140,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 27.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1563514972688-66289b708d75?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/red,bell,pepper/all',
     journalReference: 'Sari, N., Hidayat, T.. 2020. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Kultivasi*. 17(4):136-146.'
   },
   {
@@ -154,7 +154,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 27.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1610630713705-24dbd601053b?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/yellow,bell,pepper/all',
     journalReference: 'Sari, N., Wibowo, A.. 2022. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Kultivasi*. 26(3):99-110.'
   },
   {
@@ -168,7 +168,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 30.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 55%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1615485903964-b63603d75c88?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/purple,eggplant,vegetable/all',
     journalReference: 'Sari, N., Mahmud, Z.. 2022. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 33(3):75-84.'
   },
   {
@@ -182,7 +182,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 22.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/broccoli,vegetable/all',
     journalReference: 'Pratama, R., Sari, N.. 2018. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 34(3):41-52.'
   },
   {
@@ -196,7 +196,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 24.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 55%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1510627498534-cf7e9002facc?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/cauliflower,vegetable/all',
     journalReference: 'Mahmud, Z., Wibowo, A.. 2019. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Kultivasi*. 41(4):161-171.'
   },
   {
@@ -210,7 +210,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 22.0°C dan kelembaban optimal 60%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/orange,carrot,vegetable/all',
     journalReference: 'Sari, N., Sari, N.. 2022. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 47(3):106-118.'
   },
   {
@@ -224,7 +224,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 30.0°C dan kelembaban optimal 55%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 40%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/red,onion,shallot/all',
     journalReference: 'Wibowo, A., Mahmud, Z.. 2024. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 45(2):112-119.'
   },
   {
@@ -238,7 +238,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 26.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1596482672455-87c2fb8b0b55?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/scallion,green,onion/all',
     journalReference: 'Hidayat, T., Mahmud, Z.. 2022. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Kultivasi*. 25(4):74-79.'
   },
   {
@@ -252,7 +252,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 24.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/red,strawberry,fruit/all',
     journalReference: 'Pratama, R., Susila, A.D.. 2022. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 23(2):19-30.'
   },
   {
@@ -266,7 +266,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 32.0°C dan kelembaban optimal 55%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1533423770451-b84fb7926b01?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/cantaloupe,melon,fruit/all',
     journalReference: 'Mahmud, Z., Hidayat, T.. 2018. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 30(1):109-119.'
   },
   {
@@ -280,7 +280,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 34.0°C dan kelembaban optimal 50%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1589984662646-e7b2e4962f18?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/watermelon,fruit/all',
     journalReference: 'Purwanto, E., Susila, A.D.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Buletin Penelitian Hortikultura*. 34(2):157-162.'
   },
   {
@@ -294,7 +294,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 33.0°C dan kelembaban optimal 50%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 40%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1535940342323-9366dfd5dfb7?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/purple,grape,fruit/all',
     journalReference: 'Wibowo, A., Wibowo, A.. 2023. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 25(2):60-67.'
   },
   {
@@ -308,7 +308,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 30.0°C dan kelembaban optimal 60%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1555513948-c573715df2ce?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/pomelo,citrus,fruit/all',
     journalReference: 'Sari, N., Hidayat, T.. 2023. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 49(3):71-77.'
   },
   {
@@ -322,7 +322,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 31.0°C dan kelembaban optimal 75%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1481349518771-20055b2a7b24?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/yellow,banana,fruit/all',
     journalReference: 'Sari, N., Wibowo, A.. 2019. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Buletin Penelitian Hortikultura*. 22(2):123-129.'
   },
   {
@@ -336,7 +336,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 28.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 40%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/monstera,deliciosa,leaf/all',
     journalReference: 'Susila, A.D., Pratama, R.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Lanskap Indonesia*. 10(3):79-90.'
   },
   {
@@ -350,7 +350,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 29.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1629857999863-718da029a1bb?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/aglaonema,plant,leaf/all',
     journalReference: 'Hidayat, T., Susila, A.D.. 2022. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 14(4):182-187.'
   },
   {
@@ -364,7 +364,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 26.0°C dan kelembaban optimal 75%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 35%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1563241527-3004b7be0ffd?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/phalaenopsis,orchid,flower/all',
     journalReference: 'Susila, A.D., Sari, N.. 2018. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 27(3):54-59.'
   },
   {
@@ -378,7 +378,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 35.0°C dan kelembaban optimal 35%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 20%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1509313210333-6a56e6dce882?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/mini,cactus,succulent/all',
     journalReference: 'Sari, N., Hidayat, T.. 2022. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 44(1):170-177.'
   },
   {
@@ -392,7 +392,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 30.0°C dan kelembaban optimal 40%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 25%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1598887142487-3c854d58d844?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/snake,plant,sansevieria/all',
     journalReference: 'Wibowo, A., Sari, N.. 2018. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Lanskap Indonesia*. 11(2):85-93.'
   },
   {
@@ -406,7 +406,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman palawija & herbal ini membutuhkan lingkungan tumbuh dengan suhu sekitar 32.0°C dan kelembaban optimal 60%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 55%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1587326466986-e7845f44e8bc?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/sweet,corn,maize/all',
     journalReference: 'Hidayat, T., Pratama, R.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 44(3):41-51.'
   },
   {
@@ -420,7 +420,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman palawija & herbal ini membutuhkan lingkungan tumbuh dengan suhu sekitar 30.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1599557608933-286a635848bb?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/soybean,plant/all',
     journalReference: 'Purwanto, E., Hidayat, T.. 2023. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 43(1):100-110.'
   },
   {
@@ -434,7 +434,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman palawija & herbal ini membutuhkan lingkungan tumbuh dengan suhu sekitar 29.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1615486511484-92e172cb4f55?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/red,ginger,root/all',
     journalReference: 'Mahmud, Z., Wibowo, A.. 2019. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 33(1):38-47.'
   },
   {
@@ -448,7 +448,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman palawija & herbal ini membutuhkan lingkungan tumbuh dengan suhu sekitar 26.0°C dan kelembaban optimal 75%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 65%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1628042971510-c172449a0cba?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/peppermint,mint,leaf/all',
     journalReference: 'Hidayat, T., Wibowo, A.. 2018. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Lanskap Indonesia*. 48(1):166-174.'
   },
   {
@@ -462,7 +462,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 24.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/selada,keriting,plant/all',
     journalReference: 'Sari, N., Purwanto, E.. 2018. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 20(1):44-51.'
   },
   {
@@ -476,7 +476,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 22.0°C dan kelembaban optimal 75%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 65%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1556801712-76c8eb07bbc9?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/iceberg,lettuce/all',
     journalReference: 'Susila, A.D., Pratama, R.. 2018. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 15(4):49-56.'
   },
   {
@@ -490,7 +490,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 30.0°C dan kelembaban optimal 80%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 80%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/N_Ipoa_D1600.JPG/960px-N_Ipoa_D1600.JPG',
+    imageUrl: 'https://loremflickr.com/800/400/water,spinach,field/all',
     journalReference: 'Kusuma, D., Pratama, R.. 2019. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 37(4):92-101.'
   },
   {
@@ -504,7 +504,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 27.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Bok_Choy.JPG/960px-Bok_Choy.JPG',
+    imageUrl: 'https://loremflickr.com/800/400/pakcoy,hijau,plant/all',
     journalReference: 'Pratama, R., Susila, A.D.. 2023. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 41(4):133-140.'
   },
   {
@@ -518,7 +518,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 32.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 55%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/91/Amaranthus_tricolor0.jpg',
+    imageUrl: 'https://loremflickr.com/800/400/spinach,leaf,plant/all',
     journalReference: 'Susila, A.D., Hidayat, T.. 2018. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 15(3):151-163.'
   },
   {
@@ -532,7 +532,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 22.0°C dan kelembaban optimal 50%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1615477815243-7f1c1fce9db5?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/garlic,bulb/all',
     journalReference: 'Purwanto, E., Kusuma, D.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Kultivasi*. 22(1):89-101.'
   },
   {
@@ -546,7 +546,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 24.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 65%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1596482672455-87c2fb8b0b55?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/scallion,green,onion/all',
     journalReference: 'Purwanto, E., Wibowo, A.. 2024. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 44(4):58-67.'
   },
   {
@@ -560,7 +560,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 30.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Petroselinum_crispum_003.JPG/960px-Petroselinum_crispum_003.JPG',
+    imageUrl: 'https://loremflickr.com/800/400/lemon,basil,leaf/all',
     journalReference: 'Kusuma, D., Kusuma, D.. 2022. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 43(1):88-96.'
   },
   {
@@ -574,7 +574,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 20.0°C dan kelembaban optimal 75%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1550828520-4cb496926fc9?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/green,cabbage,vegetable/all',
     journalReference: 'Mahmud, Z., Sari, N.. 2022. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 41(2):103-114.'
   },
   {
@@ -588,7 +588,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 32.0°C dan kelembaban optimal 60%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1593392305597-2b7eef4d402b?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/bitter,melon,gourd/all',
     journalReference: 'Mahmud, Z., Mahmud, Z.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Kultivasi*. 19(2):108-114.'
   },
   {
@@ -602,7 +602,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 26.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 55%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Psophoc_tetrag_090306-7164_kng.JPG/960px-Psophoc_tetrag_090306-7164_kng.JPG',
+    imageUrl: 'https://loremflickr.com/800/400/green,bean,vegetable/all',
     journalReference: 'Hidayat, T., Hidayat, T.. 2020. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 47(4):37-46.'
   },
   {
@@ -616,7 +616,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 32.0°C dan kelembaban optimal 60%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1615486511262-c7c4c37976e5?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/yardlong,bean,vegetable/all',
     journalReference: 'Hidayat, T., Purwanto, E.. 2023. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 15(2):45-51.'
   },
   {
@@ -630,7 +630,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 26.0°C dan kelembaban optimal 60%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 55%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1590165482129-1b8b27698780?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/zucchini,courgette,vegetable/all',
     journalReference: 'Mahmud, Z., Sari, N.. 2024. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Kultivasi*. 17(4):43-53.'
   },
   {
@@ -644,7 +644,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 30.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 65%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/green,cucumber,vegetable/all',
     journalReference: 'Pratama, R., Purwanto, E.. 2023. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 45(2):27-37.'
   },
   {
@@ -658,7 +658,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 32.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/green,cucumber,vegetable/all',
     journalReference: 'Susila, A.D., Purwanto, E.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 48(1):137-147.'
   },
   {
@@ -672,7 +672,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 28.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1593392305597-2b7eef4d402b?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/bitter,melon,gourd/all',
     journalReference: 'Mahmud, Z., Kusuma, D.. 2024. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 36(2):68-79.'
   },
   {
@@ -686,7 +686,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 32.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 55%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Psophoc_tetrag_090306-7164_kng.JPG/960px-Psophoc_tetrag_090306-7164_kng.JPG',
+    imageUrl: 'https://loremflickr.com/800/400/green,bean,vegetable/all',
     journalReference: 'Wibowo, A., Susila, A.D.. 2020. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 42(4):155-163.'
   },
   {
@@ -700,7 +700,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 22.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1524179091875-9c1b7f0cb490?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/curly,kale,leaf/all',
     journalReference: 'Mahmud, Z., Wibowo, A.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 33(3):166-171.'
   },
   {
@@ -714,7 +714,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 23.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1524179091875-9c1b7f0cb490?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/curly,kale,leaf/all',
     journalReference: 'Mahmud, Z., Susila, A.D.. 2024. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 21(2):188-196.'
   },
   {
@@ -728,7 +728,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 28.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1596482672455-87c2fb8b0b55?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/scallion,green,onion/all',
     journalReference: 'Susila, A.D., Kusuma, D.. 2020. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 42(1):94-102.'
   },
   {
@@ -742,7 +742,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 22.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Petroselinum_crispum_003.JPG/960px-Petroselinum_crispum_003.JPG',
+    imageUrl: 'https://loremflickr.com/800/400/lemon,basil,leaf/all',
     journalReference: 'Kusuma, D., Kusuma, D.. 2023. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Kultivasi*. 30(4):188-198.'
   },
   {
@@ -756,7 +756,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 23.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/selada,keriting,plant/all',
     journalReference: 'Pratama, R., Mahmud, Z.. 2020. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Kultivasi*. 30(3):172-183.'
   },
   {
@@ -770,7 +770,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 25.0°C dan kelembaban optimal 50%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1620574387735-3624d75b2dbc?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/yellow,onion,bulb/all',
     journalReference: 'Kusuma, D., Wibowo, A.. 2019. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 24(4):91-97.'
   },
   {
@@ -784,7 +784,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 22.0°C dan kelembaban optimal 60%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 65%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/orange,carrot,vegetable/all',
     journalReference: 'Sari, N., Sari, N.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 49(3):164-172.'
   },
   {
@@ -798,7 +798,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman sayuran ini membutuhkan lingkungan tumbuh dengan suhu sekitar 24.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/orange,carrot,vegetable/all',
     journalReference: 'Purwanto, E., Purwanto, E.. 2020. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 15(2):120-130.'
   },
   {
@@ -812,7 +812,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 30.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 55%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1558980394-4c7c9299fe96?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/mandarin,orange,fruit/all',
     journalReference: 'Hidayat, T., Mahmud, Z.. 2020. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 19(4):90-97.'
   },
   {
@@ -826,7 +826,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 32.0°C dan kelembaban optimal 60%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1590502593747-422e11893116?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/key,lime,citrus/all',
     journalReference: 'Hidayat, T., Purwanto, E.. 2022. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 19(4):77-87.'
   },
   {
@@ -840,7 +840,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 28.0°C dan kelembaban optimal 55%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1590502593747-422e11893116?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/key,lime,citrus/all',
     journalReference: 'Purwanto, E., Susila, A.D.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Buletin Penelitian Hortikultura*. 44(3):111-118.'
   },
   {
@@ -854,7 +854,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 33.0°C dan kelembaban optimal 60%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/mango,fruit,sweet/all',
     journalReference: 'Purwanto, E., Sari, N.. 2023. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 48(2):94-101.'
   },
   {
@@ -868,7 +868,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 34.0°C dan kelembaban optimal 55%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/mango,fruit,sweet/all',
     journalReference: 'Pratama, R., Sari, N.. 2022. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 17(1):71-80.'
   },
   {
@@ -882,7 +882,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 30.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 55%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1517282009859-f000ec3b26af?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/papaya,fruit,tree/all',
     journalReference: 'Sari, N., Kusuma, D.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Buletin Penelitian Hortikultura*. 44(1):94-106.'
   },
   {
@@ -896,7 +896,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 33.0°C dan kelembaban optimal 60%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/pineapple,fruit,sweet/all',
     journalReference: 'Purwanto, E., Purwanto, E.. 2019. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 26(4):96-106.'
   },
   {
@@ -910,7 +910,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 34.0°C dan kelembaban optimal 50%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1589984662646-e7b2e4962f18?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/watermelon,fruit/all',
     journalReference: 'Kusuma, D., Wibowo, A.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 31(2):33-40.'
   },
   {
@@ -924,7 +924,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 32.0°C dan kelembaban optimal 55%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1533423770451-b84fb7926b01?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/cantaloupe,melon,fruit/all',
     journalReference: 'Hidayat, T., Purwanto, E.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Buletin Penelitian Hortikultura*. 36(4):59-69.'
   },
   {
@@ -938,7 +938,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 30.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1517282009859-f000ec3b26af?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/papaya,fruit,tree/all',
     journalReference: 'Purwanto, E., Susila, A.D.. 2022. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Buletin Penelitian Hortikultura*. 27(3):30-41.'
   },
   {
@@ -952,7 +952,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 32.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1517282009859-f000ec3b26af?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/papaya,fruit,tree/all',
     journalReference: 'Susila, A.D., Mahmud, Z.. 2019. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 25(2):197-203.'
   },
   {
@@ -966,7 +966,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 28.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/avocado,fruit,green/all',
     journalReference: 'Wibowo, A., Wibowo, A.. 2018. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 41(2):99-110.'
   },
   {
@@ -980,7 +980,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 28.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/avocado,fruit,green/all',
     journalReference: 'Purwanto, E., Susila, A.D.. 2018. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 23(3):138-148.'
   },
   {
@@ -994,7 +994,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 31.0°C dan kelembaban optimal 60%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1596482672455-87c2fb8b0b55?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/scallion,green,onion/all',
     journalReference: 'Sari, N., Pratama, R.. 2020. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 17(1):122-129.'
   },
   {
@@ -1008,7 +1008,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 31.0°C dan kelembaban optimal 60%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1596482672455-87c2fb8b0b55?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/scallion,green,onion/all',
     journalReference: 'Wibowo, A., Sari, N.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 28(3):39-51.'
   },
   {
@@ -1022,7 +1022,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 30.0°C dan kelembaban optimal 75%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1596482672455-87c2fb8b0b55?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/scallion,green,onion/all',
     journalReference: 'Hidayat, T., Purwanto, E.. 2020. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 36(3):72-79.'
   },
   {
@@ -1036,7 +1036,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 29.0°C dan kelembaban optimal 80%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1596482672455-87c2fb8b0b55?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/scallion,green,onion/all',
     journalReference: 'Sari, N., Hidayat, T.. 2020. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 39(3):164-172.'
   },
   {
@@ -1050,7 +1050,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 32.0°C dan kelembaban optimal 75%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 55%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1517282009859-f000ec3b26af?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/papaya,fruit,tree/all',
     journalReference: 'Hidayat, T., Mahmud, Z.. 2020. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Buletin Penelitian Hortikultura*. 25(3):126-134.'
   },
   {
@@ -1064,7 +1064,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 32.0°C dan kelembaban optimal 75%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 55%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1517282009859-f000ec3b26af?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/papaya,fruit,tree/all',
     journalReference: 'Mahmud, Z., Purwanto, E.. 2024. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 28(1):106-115.'
   },
   {
@@ -1078,7 +1078,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 28.0°C dan kelembaban optimal 80%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1517282009859-f000ec3b26af?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/papaya,fruit,tree/all',
     journalReference: 'Mahmud, Z., Wibowo, A.. 2018. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Buletin Penelitian Hortikultura*. 30(3):135-143.'
   },
   {
@@ -1092,7 +1092,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 30.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1517282009859-f000ec3b26af?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/papaya,fruit,tree/all',
     journalReference: 'Pratama, R., Sari, N.. 2022. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Buletin Penelitian Hortikultura*. 15(4):88-93.'
   },
   {
@@ -1106,7 +1106,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 32.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 55%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1517282009859-f000ec3b26af?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/papaya,fruit,tree/all',
     journalReference: 'Susila, A.D., Pratama, R.. 2020. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Agronomi Indonesia*. 19(2):70-80.'
   },
   {
@@ -1120,7 +1120,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 33.0°C dan kelembaban optimal 60%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1517282009859-f000ec3b26af?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/papaya,fruit,tree/all',
     journalReference: 'Hidayat, T., Wibowo, A.. 2018. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Buletin Penelitian Hortikultura*. 32(4):21-29.'
   },
   {
@@ -1134,7 +1134,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman buah ini membutuhkan lingkungan tumbuh dengan suhu sekitar 26.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 55%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1517282009859-f000ec3b26af?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/papaya,fruit,tree/all',
     journalReference: 'Hidayat, T., Mahmud, Z.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 22(4):118-129.'
   },
   {
@@ -1148,7 +1148,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 28.0°C dan kelembaban optimal 75%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/monstera,deliciosa,leaf/all',
     journalReference: 'Wibowo, A., Kusuma, D.. 2020. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 23(4):51-62.'
   },
   {
@@ -1162,7 +1162,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 27.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1629857999863-718da029a1bb?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/aglaonema,plant,leaf/all',
     journalReference: 'Wibowo, A., Kusuma, D.. 2020. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 46(3):158-170.'
   },
   {
@@ -1176,7 +1176,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 29.0°C dan kelembaban optimal 80%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 55%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1629857999863-718da029a1bb?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/aglaonema,plant,leaf/all',
     journalReference: 'Mahmud, Z., Susila, A.D.. 2018. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Lanskap Indonesia*. 24(3):82-91.'
   },
   {
@@ -1190,7 +1190,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 29.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1629857999863-718da029a1bb?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/aglaonema,plant,leaf/all',
     journalReference: 'Susila, A.D., Kusuma, D.. 2023. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 48(4):94-105.'
   },
   {
@@ -1204,7 +1204,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 29.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1629857999863-718da029a1bb?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/aglaonema,plant,leaf/all',
     journalReference: 'Hidayat, T., Wibowo, A.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Lanskap Indonesia*. 32(1):18-23.'
   },
   {
@@ -1218,7 +1218,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 28.0°C dan kelembaban optimal 75%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/monstera,deliciosa,leaf/all',
     journalReference: 'Mahmud, Z., Sari, N.. 2019. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Lanskap Indonesia*. 12(2):171-181.'
   },
   {
@@ -1232,7 +1232,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 28.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/monstera,deliciosa,leaf/all',
     journalReference: 'Wibowo, A., Susila, A.D.. 2024. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Lanskap Indonesia*. 21(2):21-26.'
   },
   {
@@ -1246,7 +1246,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 26.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/monstera,deliciosa,leaf/all',
     journalReference: 'Susila, A.D., Susila, A.D.. 2020. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 36(1):54-61.'
   },
   {
@@ -1260,7 +1260,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 36.0°C dan kelembaban optimal 30%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 15%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1509313210333-6a56e6dce882?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/mini,cactus,succulent/all',
     journalReference: 'Sari, N., Pratama, R.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 24(1):184-193.'
   },
   {
@@ -1274,7 +1274,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 32.0°C dan kelembaban optimal 35%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 20%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1509313210333-6a56e6dce882?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/mini,cactus,succulent/all',
     journalReference: 'Kusuma, D., Susila, A.D.. 2018. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 22(3):89-99.'
   },
   {
@@ -1288,7 +1288,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 30.0°C dan kelembaban optimal 40%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 25%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1509313210333-6a56e6dce882?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/mini,cactus,succulent/all',
     journalReference: 'Kusuma, D., Wibowo, A.. 2024. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 35(2):34-43.'
   },
   {
@@ -1302,7 +1302,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 34.0°C dan kelembaban optimal 35%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 20%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1509313210333-6a56e6dce882?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/mini,cactus,succulent/all',
     journalReference: 'Hidayat, T., Mahmud, Z.. 2023. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 25(3):102-107.'
   },
   {
@@ -1316,7 +1316,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 28.0°C dan kelembaban optimal 60%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 40%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1598887142487-3c854d58d844?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/snake,plant,sansevieria/all',
     journalReference: 'Mahmud, Z., Wibowo, A.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 11(3):189-198.'
   },
   {
@@ -1330,7 +1330,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 30.0°C dan kelembaban optimal 50%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 30%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1598887142487-3c854d58d844?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/snake,plant,sansevieria/all',
     journalReference: 'Sari, N., Sari, N.. 2024. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 29(3):138-149.'
   },
   {
@@ -1344,7 +1344,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 26.0°C dan kelembaban optimal 60%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1598887142487-3c854d58d844?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/snake,plant,sansevieria/all',
     journalReference: 'Kusuma, D., Mahmud, Z.. 2024. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 47(2):60-71.'
   },
   {
@@ -1358,7 +1358,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 28.0°C dan kelembaban optimal 80%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 60%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/monstera,deliciosa,leaf/all',
     journalReference: 'Susila, A.D., Mahmud, Z.. 2018. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Ilmu Pertanian Indonesia*. 32(1):116-124.'
   },
   {
@@ -1372,7 +1372,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 25.0°C dan kelembaban optimal 85%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman continuous untuk menjaga kadar air tanah di level 65%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/monstera,deliciosa,leaf/all',
     journalReference: 'Wibowo, A., Mahmud, Z.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 36(1):90-98.'
   },
   {
@@ -1386,7 +1386,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 28.0°C dan kelembaban optimal 65%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 55%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/red,rose,flower/all',
     journalReference: 'Wibowo, A., Sari, N.. 2023. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Lanskap Indonesia*. 18(4):20-25.'
   },
   {
@@ -1400,7 +1400,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 30.0°C dan kelembaban optimal 70%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 50%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/red,rose,flower/all',
     journalReference: 'Sari, N., Pratama, R.. 2021. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Lanskap Indonesia*. 22(1):157-163.'
   },
   {
@@ -1414,7 +1414,7 @@ export const PLANT_PRESETS: PlantRecommendation[] = [
     desc: 'Tanaman tanaman hias ini membutuhkan lingkungan tumbuh dengan suhu sekitar 32.0°C dan kelembaban optimal 55%. Profil mikroklimat ini telah diverifikasi berdasar studi agronomi IPB.',
     tips: 'Gunakan pola penyiraman pulsed untuk menjaga kadar air tanah di level 45%. Hindari genangan air berlebih atau stres kekeringan.',
     isPlant: true,
-    imageUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=400&q=80',
+    imageUrl: 'https://loremflickr.com/800/400/red,rose,flower/all',
     journalReference: 'Pratama, R., Susila, A.D.. 2022. Pengaruh Mikroklimat Terhadap Pertumbuhan dan Hasil Tanaman. *Jurnal Hortikultura Indonesia*. 16(2):33-40.'
   },
 ];

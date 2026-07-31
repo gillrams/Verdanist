@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Thermometer, Droplets, Sun, Wind, Bell, Droplet, TrendingUp, TrendingDown } from "lucide-react";
@@ -66,6 +67,13 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [showAiPrompt, setShowAiPrompt] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowAiPrompt(false), 12000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const [isNotifModalOpen, setIsNotifModalOpen] = useState(false);
   const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
   const [timerModalTab, setTimerModalTab] = useState<'schedule' | 'interval'>('schedule');
@@ -323,14 +331,27 @@ export default function Dashboard() {
 
           <div className="flex items-center gap-2 shrink-0 pt-0">
             <div className="relative group flex items-center justify-center">
-              <button onClick={() => setIsAiModalOpen(true)} className="w-9 h-9 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center hover:scale-110 hover:bg-emerald-500/20 transition-all shadow-sm border border-emerald-500/20 relative z-10">
-                <span className="material-symbols-rounded text-[18px]">spa</span>
+              <button onClick={() => { setIsAiModalOpen(true); setShowAiPrompt(false); }} className="w-10 h-10 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center hover:scale-110 hover:bg-amber-500/25 transition-all shadow-[0_0_15px_rgba(245,158,11,0.2)] border border-amber-500/30 relative z-10">
+                <span className="material-symbols-rounded text-[20px]">spa</span>
               </button>
-              {/* Bouncing tooltip prompt */}
-              <div className="absolute top-full mt-3 right-0 md:left-1/2 md:-translate-x-1/2 md:right-auto w-[140px] bg-emerald-600 text-white text-[10px] font-bold px-3 py-2 rounded-xl shadow-lg pointer-events-none animate-bounce z-20">
-                <div className="absolute -top-1.5 right-3 md:left-1/2 md:-translate-x-1/2 md:right-auto w-3 h-3 bg-emerald-600 rotate-45 rounded-sm"></div>
-                Coba atur otomatis dengan Nisita! 🌿
-              </div>
+              {/* Anime-themed bouncy tooltip prompt */}
+              <AnimatePresence>
+                {showAiPrompt && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                    className="absolute top-full mt-4 right-0 md:left-1/2 md:-translate-x-1/2 md:right-auto w-[240px] bg-gradient-to-br from-[#FFF8ED] to-[#FCEABB] dark:from-[#2A2311] dark:to-[#1A1608] text-[#5C4B2E] dark:text-[#E8DCC2] text-[11px] font-extrabold p-3 rounded-[1.5rem] shadow-xl border-[3px] border-[#F6D365] dark:border-[#8E7835] pointer-events-none animate-bounce z-20 flex items-center gap-3"
+                  >
+                    <div className="absolute -top-2 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto w-4 h-4 bg-[#FFF8ED] dark:bg-[#2A2311] border-l-[3px] border-t-[3px] border-[#F6D365] dark:border-[#8E7835] rotate-45 rounded-sm"></div>
+                    <div className="text-[32px] drop-shadow-md">🌱✨</div>
+                    <div className="flex flex-col">
+                      <span className="text-[#D48135] dark:text-[#E8A05C] text-[10px] uppercase tracking-widest mb-0.5">Hai! Aku Nisita</span>
+                      <span className="leading-snug">Klik di sini untuk atur kebunmu secara otomatis!</span>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
             <ThemeToggle className="w-9 h-9 bg-card border border-border" />
             <div className="relative">

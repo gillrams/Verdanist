@@ -70,7 +70,7 @@ export default function Dashboard() {
   const [showAiPrompt, setShowAiPrompt] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowAiPrompt(false), 12000);
+    const timer = setTimeout(() => setShowAiPrompt(false), 5000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -341,10 +341,10 @@ export default function Dashboard() {
                     initial={{ opacity: 0, y: -10, scale: 0.9 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                    className="absolute top-full mt-4 right-0 md:left-1/2 md:-translate-x-1/2 md:right-auto w-[240px] bg-gradient-to-br from-[#FFF8ED] to-[#FCEABB] dark:from-[#2A2311] dark:to-[#1A1608] text-[#5C4B2E] dark:text-[#E8DCC2] text-[11px] font-extrabold p-3 rounded-[1.5rem] shadow-xl border-[3px] border-[#F6D365] dark:border-[#8E7835] pointer-events-none animate-bounce z-20 flex items-center gap-3"
+                    className="absolute top-full mt-4 right-0 md:left-1/2 md:-translate-x-1/2 md:right-auto w-[240px] bg-gradient-to-br from-[#FFF8ED] to-[#FCEABB] dark:from-[#2A2311] dark:to-[#1A1608] text-[#5C4B2E] dark:text-[#E8DCC2] text-[11px] font-extrabold p-3 rounded-[1.5rem] shadow-xl border-[3px] border-[#F6D365] dark:border-[#8E7835] pointer-events-none z-20 flex items-center gap-3"
                   >
                     <div className="absolute -top-2 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto w-4 h-4 bg-[#FFF8ED] dark:bg-[#2A2311] border-l-[3px] border-t-[3px] border-[#F6D365] dark:border-[#8E7835] rotate-45 rounded-sm"></div>
-                    <div className="text-[32px] drop-shadow-md">🌱✨</div>
+                    <img src="/nisita.png" alt="Nisita" className="w-11 h-11 rounded-full border-2 border-white/60 dark:border-white/10 shadow-sm shrink-0 object-cover" />
                     <div className="flex flex-col">
                       <span className="text-[#D48135] dark:text-[#E8A05C] text-[10px] uppercase tracking-widest mb-0.5">Hai! Aku Nisita</span>
                       <span className="leading-snug">Klik di sini untuk atur kebunmu secara otomatis!</span>

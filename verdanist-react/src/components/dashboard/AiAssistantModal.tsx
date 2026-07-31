@@ -584,17 +584,6 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
                       src={activeRecommend.imageUrl}
                       alt={activeRecommend.name}
                       className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000 ease-in-out"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        // If the image fails to load (e.g. Unsplash blocked or 404),
-                        // Try a specific, beautiful high-quality generic plant photo from Unsplash if the specific one fails
-                        if (!target.src.includes('1518531933037')) {
-                          target.src = 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=800&auto=format&fit=crop';
-                        } else {
-                          // Absolute fallback if Unsplash itself is blocked
-                          target.src = `https://placehold.co/800x400/061d12/10b981?text=${encodeURIComponent((activeRecommend.name || 'Visual').substring(0, 15))}&font=Montserrat`;
-                        }
-                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-black/30 dark:from-[#061d12] dark:via-transparent dark:to-transparent pointer-events-none"></div>
                     <div className="absolute inset-0 bg-emerald-500/10 mix-blend-overlay group-hover:opacity-0 transition-opacity duration-700 pointer-events-none"></div>

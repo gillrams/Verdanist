@@ -436,14 +436,14 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
             <div className="flex items-start justify-between">
               <div>
                 <span className="bg-emerald-700/10 text-emerald-700 dark:text-emerald-400 border border-emerald-700/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 w-max">
-                  <span className="material-symbols-rounded text-[11px]">psychology</span>
-                  AGRONOMI AI
+                  <span className="material-symbols-rounded text-[11px]">spa</span>
+                  NISITA
                 </span>
                 <h3 className="text-xl sm:text-2xl font-bold text-foreground mt-3 tracking-tight flex items-center gap-2">
-                  Optimalisasi Mikroklimat AI
+                  Tanya Nisita 🌿
                 </h3>
                 <p className="text-xs text-muted-foreground font-semibold mt-1 max-w-xl leading-relaxed">
-                  Sinergikan kecerdasan buatan dengan modul IoT ESP32 Anda. Cukup sebutkan nama tanaman, dan biarkan AI kami memformulasikan iklim mikro presisi terbaik secara real-time.
+                  Hai! Aku Nisita, asisten kebun pintarmu. Beritahu aku tanaman apa yang sedang kamu rawat, dan aku akan bantu aturkan suhu, kelembaban, dan jadwal siram yang paling pas buat mereka!
                 </p>
               </div>
               <button

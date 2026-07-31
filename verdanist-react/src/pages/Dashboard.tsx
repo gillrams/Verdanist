@@ -322,9 +322,16 @@ export default function Dashboard() {
           </div>
 
           <div className="flex items-center gap-2 shrink-0 pt-0">
-            <button onClick={() => setIsAiModalOpen(true)} className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center animate-pulse shadow-sm border border-primary/20">
-              <span className="material-symbols-rounded text-[18px]">psychology</span>
-            </button>
+            <div className="relative group flex items-center justify-center">
+              <button onClick={() => setIsAiModalOpen(true)} className="w-9 h-9 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center hover:scale-110 hover:bg-emerald-500/20 transition-all shadow-sm border border-emerald-500/20 relative z-10">
+                <span className="material-symbols-rounded text-[18px]">spa</span>
+              </button>
+              {/* Bouncing tooltip prompt */}
+              <div className="absolute top-full mt-3 right-0 md:left-1/2 md:-translate-x-1/2 md:right-auto w-[140px] bg-emerald-600 text-white text-[10px] font-bold px-3 py-2 rounded-xl shadow-lg pointer-events-none animate-bounce z-20">
+                <div className="absolute -top-1.5 right-3 md:left-1/2 md:-translate-x-1/2 md:right-auto w-3 h-3 bg-emerald-600 rotate-45 rounded-sm"></div>
+                Coba atur otomatis dengan Nisita! 🌿
+              </div>
+            </div>
             <ThemeToggle className="w-9 h-9 bg-card border border-border" />
             <div className="relative">
               <button 

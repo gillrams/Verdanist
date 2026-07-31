@@ -60,13 +60,14 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
     if (!isDeviceOnline && forcedState === undefined) {
       onShowAlert?.(
         'Perangkat Offline',
-        'ESP32 saat ini sedang offline. Perintah akan disimpan, tetapi perangkat mungkin tidak langsung merespon sampai kembali terhubung ke jaringan.',
+        'ESP32 saat ini sedang offline. Pompa tidak dapat dinyalakan secara manual sampai perangkat kembali terhubung ke jaringan.',
         () => {},
         false,
         'Mengerti',
         '',
         'warning'
       );
+      return;
     }
     
     const newState = forcedState !== undefined ? forcedState : !isPumpOn;

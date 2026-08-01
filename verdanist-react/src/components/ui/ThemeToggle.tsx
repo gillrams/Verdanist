@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Moon, Sun } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
+import { StatusBar, Style } from "@capacitor/status-bar";
 
 interface ThemeToggleProps {
   className?: string;
@@ -11,15 +13,44 @@ export function ThemeToggle({ className = "" }: ThemeToggleProps) {
   useEffect(() => {
     // Check initial
     const storedTheme = localStorage.getItem("verdanist_theme");
-    const isDark = storedTheme === "dark" || (!storedTheme && document.documentElement.classList.contains("dark"));
+    
+    // Helper to apply theme
+    const applyTheme = (isDark: boolean) => {
+      if (isDark) {
+        setTheme("dark");
+        document.documentElement.classList.add("dark");
+      } else {
+        setTheme("light");
+        document.documentElement.classList.remove("dark");
+      }
+      
+      // Update Native Status Bar
+      if (Capacitor.isNativePlatform()) {
+        try {
+          StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light });
+          StatusBar.setBackgroundColor({ color: isDark ? '#111214' : '#FAFAFA' });
+        } catch (e) {}
+      }
+    };
 
-    if (isDark) {
-      setTheme("dark");
-      document.documentElement.classList.add("dark");
+    if (storedTheme) {
+      applyTheme(storedTheme === "dark");
     } else {
-      setTheme("light");
-      document.documentElement.classList.remove("dark");
+      // Auto detect system theme
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      applyTheme(prefersDark);
     }
+
+    // Listen for system theme changes if no manual override
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem("verdanist_theme")) {
+        applyTheme(e.matches);
+      }
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
   const toggle = () => {
@@ -30,6 +61,14 @@ export function ThemeToggle({ className = "" }: ThemeToggleProps) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
+    }
+    
+    // Update Native Status Bar
+    if (Capacitor.isNativePlatform()) {
+      try {
+        StatusBar.setStyle({ style: nextTheme === "dark" ? Style.Dark : Style.Light });
+        StatusBar.setBackgroundColor({ color: nextTheme === "dark" ? '#111214' : '#FAFAFA' });
+      } catch (e) {}
     }
   };
 

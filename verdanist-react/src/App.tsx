@@ -1,4 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { App as CapApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 import Welcome from './pages/Welcome';
 import DemoDashboard from './pages/DemoDashboard';
 import Dashboard from './pages/Dashboard';
@@ -22,6 +25,18 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import AppLayout from './components/layout/AppLayout';
 
 function App() {
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      CapApp.addListener('backButton', ({ canGoBack }) => {
+        if (!canGoBack) {
+          CapApp.minimizeApp();
+        } else {
+          window.history.back();
+        }
+      });
+    }
+  }, []);
+
   return (
     <LanguageProvider>
     <AuthProvider>

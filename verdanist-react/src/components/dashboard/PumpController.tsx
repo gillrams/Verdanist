@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
 import { Settings, Timer as TimerIcon } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 // Removed global PUMP_DURATION
 
@@ -60,16 +62,22 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
     if (!isDeviceOnline && forcedState === undefined) {
       onShowAlert?.(
         'Perangkat Offline',
-        'ESP32 saat ini sedang offline. Pompa tidak dapat dinyalakan secara manual sampai perangkat kembali terhubung ke jaringan.',
+        'ESP32 saat ini sedang offline. Perintah akan disimpan, tetapi perangkat mungkin tidak langsung merespon sampai kembali terhubung ke jaringan.',
         () => {},
         false,
         'Mengerti',
         '',
         'warning'
       );
-      return;
     }
     
+    // Haptics feedback
+    if (Capacitor.isNativePlatform()) {
+      try {
+        await Haptics.impact({ style: ImpactStyle.Light });
+      } catch (e) {}
+    }
+
     const newState = forcedState !== undefined ? forcedState : !isPumpOn;
     isUpdatingRef.current = true;
     setIsPumpOn(newState);
@@ -311,10 +319,6 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
       setMode(targetMode);
       await supabase.from('device_settings').update({ mode: targetMode }).eq('device_id', deviceId);
       
-      if (targetMode === 'manual' && isPumpOn) {
-        handleTogglePumpRef.current(false);
-      }
-      
       if (targetMode === 'timer') {
         setShowTimerPicker(true);
       }
@@ -539,7 +543,7 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
         </motion.button>
 
         {/* Timer Animation */}
-        {isPumpOn && isDeviceOnline && (
+        {isPumpOn && (
           <div className="mt-2">
             <div className="flex justify-between items-center mb-1 text-xs font-bold text-muted-foreground">
               <span className="flex items-center gap-1 text-destructive">

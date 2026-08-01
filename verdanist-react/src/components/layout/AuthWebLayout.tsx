@@ -3,6 +3,7 @@ import { ImageWithFallback } from '../ui/ImageWithFallback';
 import logoLight from '../../assets/Logo_Light_Samping.png';
 import logoDark from '../../assets/Logo_Dark_samping.png';
 import { Download, Smartphone, Leaf } from 'lucide-react';
+
 import { Capacitor } from '@capacitor/core';
 
 interface AuthWebLayoutProps {
@@ -10,6 +11,8 @@ interface AuthWebLayoutProps {
 }
 
 export default function AuthWebLayout({ children }: AuthWebLayoutProps) {
+  const isNative = Capacitor.isNativePlatform();
+
   return (
     <div className="min-h-[100dvh] bg-background flex">
       {/* Kolom Kiri: Main Content - Menjaga tampilan asli mobile layout */}
@@ -18,7 +21,7 @@ export default function AuthWebLayout({ children }: AuthWebLayoutProps) {
       </div>
 
       {/* Kolom Kanan: Banner Promosi Khusus Desktop */}
-      {!Capacitor.isNativePlatform() && (
+      {!isNative && (
         <div className="hidden md:flex flex-1 bg-secondary/30 relative items-center justify-center p-12 overflow-hidden">
           {/* Background Decorative Elements */}
           <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3"></div>
@@ -61,8 +64,8 @@ export default function AuthWebLayout({ children }: AuthWebLayoutProps) {
             </div>
 
             <a
-            href="/verdanist.apk"
-            download="verdanist.apk"
+              href="/verdanist.apk"
+              download="Verdanist.apk"
               className="w-full max-w-xs bg-primary text-primary-foreground hover:bg-primary/90 transition-all rounded-2xl px-6 py-4 flex items-center justify-center gap-3 font-semibold shadow-lg hover:-translate-y-1 active:scale-[0.98]"
             >
               <Download className="w-5 h-5" />

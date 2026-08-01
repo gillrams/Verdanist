@@ -7,8 +7,8 @@ import { SplashScreen } from "../components/layout/SplashScreen";
 import logoLight from "../assets/Logo_Light_Samping.png";
 import logoDark from "../assets/Logo_Dark_samping.png";
 import { ThemeToggle } from '../components/ui/ThemeToggle';
-import AuthWebLayout from '../components/layout/AuthWebLayout';
 import { Capacitor } from '@capacitor/core';
+import AuthWebLayout from '../components/layout/AuthWebLayout';
 
 export default function Welcome() {
   const navigate = useNavigate();
@@ -16,6 +16,8 @@ export default function Welcome() {
   const [showSplash, setShowSplash] = React.useState(() => {
     return !sessionStorage.getItem('splash_shown');
   });
+
+  const isNative = Capacitor.isNativePlatform();
 
   useEffect(() => {
     if (user && currentFarm && !showSplash) {
@@ -100,8 +102,8 @@ export default function Welcome() {
             Lihat Demo
           </button>
 
-          {/* Tombol download APK — hanya tampil di mobile, di desktop sudah ada di panel kanan, dan sembunyikan jika sudah di aplikasi native */}
-          {!Capacitor.isNativePlatform() && (
+          {/* Tombol download APK — hanya tampil di mobile, di desktop sudah ada di panel kanan */}
+          {!isNative && (
             <div className="md:hidden pt-2">
               <div className="flex items-center gap-3 mb-3">
                 <div className="flex-1 h-px bg-border" />
@@ -109,8 +111,8 @@ export default function Welcome() {
                 <div className="flex-1 h-px bg-border" />
               </div>
               <a
-              href="/verdanist.apk"
-              download="verdanist.apk"
+                href="/verdanist.apk"
+                download="Verdanist.apk"
                 className="w-full border border-primary/40 text-primary bg-primary/5 hover:bg-primary/10 active:scale-[0.98] transition-all rounded-2xl py-3.5 flex items-center justify-center gap-2.5"
                 style={{ fontWeight: 600, fontSize: 15 }}
               >

@@ -4,7 +4,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../lib/supabase';
 import {
   Building2, Bell, ChevronRight,
-  Sun, Wifi, LogOut, Key, Camera, Pencil, Globe, X
+  Sun, Wifi, LogOut, Key, Camera, Pencil, Globe
 } from "lucide-react";
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { useNavigate } from 'react-router-dom';
@@ -102,11 +102,6 @@ export default function Settings() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [showTokenModal, setShowTokenModal] = useState(false);
-
-  const savedTokens = JSON.parse(localStorage.getItem('verdanist_saved_tokens') || '{}');
-  const activeToken = currentFarm?.id ? savedTokens[currentFarm.id] : null;
 
   const handleUpdateName = async () => {
     const newName = window.prompt(t('settings.enterNewName'), user?.displayName || "");
@@ -116,6 +111,12 @@ export default function Settings() {
     const { error } = await supabase.auth.updateUser({
       data: { full_name: newName.trim() }
     });
+    
+    // Update the profiles table as well so it reflects in the Admin dashboard
+    try {
+      await supabase.from('profiles').update({ full_name: newName.trim() }).eq('id', user?.id);
+    } catch (e) { console.error('Profiles table update failed', e); }
+
     setIsUpdatingProfile(false);
     
     if (error) {
@@ -165,6 +166,11 @@ export default function Settings() {
         throw updateError;
       }
 
+      // 4. Update the profiles table as well
+      try {
+        await supabase.from('profiles').update({ custom_avatar_url: finalUrl }).eq('id', user.id);
+      } catch (e) { console.error('Profiles table update failed', e); }
+
       window.location.reload();
     } catch (error: any) {
       alert(t('settings.failPhoto') + (error.message || 'Error'));
@@ -201,11 +207,8 @@ export default function Settings() {
               </div>
             )}
             <div className="flex items-center gap-4">
-              <div className="relative group">
-                <div 
-                  className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/30 to-primary/80 flex items-center justify-center overflow-hidden border-2 border-transparent group-hover:border-primary/50 transition-all cursor-pointer"
-                  onClick={() => user?.avatarUrl ? setPreviewImage(user.avatarUrl) : fileInputRef.current?.click()}
-                >
+              <div className="relative cursor-pointer group" onClick={() => fileInputRef.current?.click()}>
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/30 to-primary/80 flex items-center justify-center overflow-hidden border-2 border-transparent group-hover:border-primary/50 transition-all">
                   {user?.avatarUrl ? (
                     <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
@@ -214,11 +217,8 @@ export default function Settings() {
                     </span>
                   )}
                 </div>
-                <div 
-                  className="absolute -bottom-1 -right-1 w-7 h-7 bg-card border border-border rounded-full flex items-center justify-center cursor-pointer hover:bg-secondary group-hover:scale-110 transition-transform shadow-sm"
-                  onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                >
-                  <Camera className="w-3.5 h-3.5 text-ring" />
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-card border border-border rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Camera className="w-3 h-3 text-ring" />
                 </div>
                 <input 
                   type="file" 
@@ -254,12 +254,14 @@ export default function Settings() {
           <div className="bg-card border border-border shadow-sm rounded-2xl overflow-hidden divide-y divide-border">
             <SettingsRow label={currentFarm?.name || "Kebun Utama"} sub={`${currentFarm?.location || 'Bogor'} · ${t('common.active')}`} suffix={<span className="text-ring" style={{ fontSize: 12, fontWeight: 600 }}>{t('settings.connected')}</span>} />
             <SettingsRow label={t('settings.changeFarm')} sub={t('settings.changeFarmSub')} onClick={() => { clearFarmAccess(); navigate('/farms'); }} />
-            <SettingsRow 
-              label={t('settings.accessToken')} 
-              sub={activeToken ? (activeToken.length > 6 ? activeToken.substring(0, activeToken.length - 6) + '●●●●●●' : activeToken) : '—'} 
-              icon={<Key className="w-4 h-4 text-ring" />} 
-              onClick={() => { if (activeToken) setShowTokenModal(true); }}
-            />
+            <SettingsRow label={t('settings.accessToken')} sub={(() => {
+              const saved = JSON.parse(localStorage.getItem('verdanist_saved_tokens') || '{}');
+              const token = currentFarm?.id ? saved[currentFarm.id] : null;
+              if (token && token.length > 6) {
+                return token.substring(0, token.length - 6) + '●●●●●●';
+              }
+              return token || '—';
+            })()} icon={<Key className="w-4 h-4 text-ring" />} />
           </div>
         </div>
 
@@ -306,6 +308,38 @@ export default function Settings() {
           </div>
         </div>
 
+        <SectionHeader icon={<Building2 className="w-4 h-4 text-ring" />} title="Versi Aplikasi" />
+        <div className="px-6 mb-5">
+          <div className="bg-card border border-border shadow-sm rounded-2xl p-4 flex flex-col gap-3">
+            <div className="flex justify-between items-center">
+              <div>
+                <p style={{ fontSize: 14, fontWeight: 500 }} className="text-foreground">Verdanist v2.4.1</p>
+                <p style={{ fontSize: 12 }} className="text-muted-foreground mt-0.5">Versi Saat Ini</p>
+              </div>
+              <button
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/version.json?t=' + new Date().getTime());
+                    const data = await res.json();
+                    if (data.latest_version && data.latest_version !== "2.4.1") {
+                      if (window.confirm(`Update tersedia: v${data.latest_version}\n\n${data.release_notes}\n\nApakah Anda ingin mengunduh sekarang?`)) {
+                        window.location.href = data.download_url;
+                      }
+                    } else {
+                      alert("Anda sudah menggunakan versi terbaru (v2.4.1).");
+                    }
+                  } catch (e) {
+                    alert("Gagal mengecek pembaruan.");
+                  }
+                }}
+                className="bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-xl text-xs font-bold transition-colors"
+              >
+                Cek Update
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div className="px-6 mb-4">
           <button
             onClick={handleLogout}
@@ -318,62 +352,6 @@ export default function Settings() {
         </div>
         <p style={{ fontSize: 11 }} className="text-center text-muted-foreground/40 mb-6">Verdanist v2.4.1 · Build 2026.05</p>
       </div>
-
-      {/* Photo Preview Modal */}
-      {previewImage && (
-        <div 
-          className="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center animate-in fade-in duration-200"
-          onClick={() => setPreviewImage(null)}
-        >
-          <div className="absolute top-6 right-6 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center cursor-pointer transition-colors">
-            <X className="w-5 h-5 text-white" />
-          </div>
-          <img 
-            src={previewImage} 
-            alt="Preview" 
-            className="max-w-[90vw] max-h-[80vh] object-contain rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200"
-            onClick={(e) => e.stopPropagation()} 
-          />
-        </div>
-      )}
-
-      {/* Token QR Modal */}
-      {showTokenModal && activeToken && (
-        <div 
-          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center p-6 animate-in fade-in duration-200"
-          onClick={() => setShowTokenModal(false)}
-        >
-          <div 
-            className="bg-card w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-border flex flex-col items-center text-center animate-in zoom-in-95 duration-200"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-4">
-              <Key className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-foreground mb-1">Access Token</h3>
-            <p className="text-sm text-muted-foreground mb-6">Scan QR code ini atau salin token untuk menghubungkan perangkat kebun.</p>
-            
-            <div className="bg-white p-4 rounded-2xl shadow-sm border border-border/50 mb-6 w-48 h-48 flex items-center justify-center">
-              <img 
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${activeToken}`}
-                alt="QR Code Token"
-                className="w-full h-full"
-              />
-            </div>
-            
-            <div className="bg-secondary/50 w-full rounded-xl p-3 mb-6 border border-border/50 relative group">
-              <p className="text-[13px] font-mono font-medium text-foreground break-all selection:bg-primary/20">{activeToken}</p>
-            </div>
-            
-            <button
-              onClick={() => setShowTokenModal(false)}
-              className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-bold hover:opacity-90 transition-opacity"
-            >
-              Tutup
-            </button>
-          </div>
-        </div>
-      )}
     </>
   );
 }

@@ -164,12 +164,14 @@ export default function NisitaChat() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              systemInstruction: {
-                parts: [{ text: SYSTEM_PROMPT }]
-              },
               contents: [
-                ...conversationHistory,
-                { role: 'user', parts: [{ text }] }
+                ...conversationHistory.map((m, idx) => {
+                  if (idx === 0) {
+                    return { ...m, parts: [{ text: `${SYSTEM_PROMPT}\n\nUser: ${m.parts[0].text}` }] };
+                  }
+                  return m;
+                }),
+                { role: 'user', parts: [{ text: conversationHistory.length === 0 ? `${SYSTEM_PROMPT}\n\nUser: ${text}` : text }] }
               ],
               generationConfig: {
                 maxOutputTokens: 1024,

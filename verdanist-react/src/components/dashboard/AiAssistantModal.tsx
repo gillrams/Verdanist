@@ -435,7 +435,7 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
             <div className="absolute top-0 left-0 w-full h-1 bg-amber-500/30" />
 
             {/* Header */}
-            <div className="flex items-start justify-between">
+            <div className="flex items-start justify-between shrink-0">
               <div>
                 <span className="bg-emerald-700/10 text-emerald-700 dark:text-emerald-400 border border-emerald-700/20 text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 w-max">
                   <span className="material-symbols-rounded text-[11px]">spa</span>

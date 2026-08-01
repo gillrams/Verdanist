@@ -6,6 +6,7 @@ interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  image?: { data: string; mimeType: string };
 }
 
 const MarkdownChatText = ({ text }: { text: string }) => {
@@ -23,8 +24,13 @@ const MarkdownChatText = ({ text }: { text: string }) => {
           cleanedLine = cleanedLine.replace(/^(-\s|\d+\.\s)/, '');
         }
 
-        const parts = cleanedLine.split(/(\*\*.*?\*\*)/g);
+        const parts = cleanedLine.split(/(!\[.*?\]\(.*?\))/g).flatMap(p => p.split(/(\*\*.*?\*\*)/g));
         const formattedParts = parts.map((part, i) => {
+          if (part.startsWith('![') && part.includes('](') && part.endsWith(')')) {
+            const alt = part.match(/!\[(.*?)\]/)?.[1] || '';
+            const url = part.match(/\((.*?)\)/)?.[1] || '';
+            return <img key={i} src={url} alt={alt} className="rounded-xl w-full max-w-sm mt-3 mb-2 shadow-md border border-border/50 object-cover" loading="lazy" />;
+          }
           if (part.startsWith('**') && part.endsWith('**')) {
             return <strong key={i} className="font-extrabold text-amber-700 dark:text-amber-400">{part.slice(2, -2)}</strong>;
           }
@@ -88,20 +94,17 @@ Kepribadianmu:
 - Hangat, ceria, dan supportive (seperti teman yang ahli berkebun)
 - Suka pakai emoji tapi tidak berlebihan
 - Jawab dalam Bahasa Indonesia yang santai tapi informatif
-- Kalau user bertanya di luar topik berkebun/tanaman/pertanian, tetap jawab dengan sopan tapi arahkan kembali ke topikmu
 
-Keahlianmu:
-- Semua tentang tanaman: budidaya, penyakit, hama, nutrisi, penyiraman
-- IoT greenhouse: suhu, kelembaban, soil moisture, misting, pompa
-- Rekomendasi mikroklimat optimal untuk berbagai tanaman
-- Diagnosis masalah tanaman dari deskripsi gejala
-- Tips budidaya dan perawatan tanaman
+Kemampuan Khusus (PENTING):
+1. **Melihat Gambar**: Jika user mengunggah gambar daun/tanaman yang sakit, perhatikan baik-baik gambar tersebut dan berikan diagnosis penyakit/hamanya, serta solusinya.
+2. **Menghasilkan Gambar**: Jika user memintamu untuk "menggambarkan", "buatkan gambar", atau "tampilkan gambar" sesuatu, kamu WAJIB membalas dengan format markdown gambar ini:
+![Judul Gambar](https://image.pollinations.ai/prompt/deskripsi_gambar_dalam_bahasa_inggris_dengan_tanda_plus?width=800&height=600&nologo=true)
+Contoh jika user minta gambar tomat merah besar: ![Tomat Merah](https://image.pollinations.ai/prompt/large+fresh+red+tomato+on+vine+cinematic+lighting+8k?width=800&height=600&nologo=true)
+JANGAN beri penjelasan panjang setelah mengirim gambar, cukup beri 1-2 kalimat pujian.
 
 Format jawaban:
 - Gunakan **bold** untuk poin penting
 - Gunakan bullet points (- ) untuk daftar
-- Gunakan numbering (1. 2. 3.) untuk langkah-langkah
-- Jaga jawaban tetap ringkas dan mudah dibaca (maks 200 kata kecuali memang perlu detail)
 - Sapa user dengan "kamu" dan panggil dirimu "Nisita" atau "aku"`;
 
 export default function NisitaChat() {
@@ -115,8 +118,24 @@ export default function NisitaChat() {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<{ file: File; base64: string; mimeType: string; preview: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64String = event.target?.result as string;
+      const base64Data = base64String.split(',')[1];
+      setSelectedImage({ file, base64: base64Data, mimeType: file.type, preview: base64String });
+    };
+    reader.readAsDataURL(file);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -140,10 +159,13 @@ export default function NisitaChat() {
       role: 'user',
       content: text,
       timestamp: new Date(),
+      image: selectedImage ? { data: selectedImage.base64, mimeType: selectedImage.mimeType } : undefined
     };
 
     setMessages(prev => [...prev, userMsg]);
     setInputValue('');
+    const imageToSend = selectedImage;
+    setSelectedImage(null);
     setIsTyping(true);
 
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -151,12 +173,7 @@ export default function NisitaChat() {
     if (apiKey) {
       try {
         // Build conversation history for Gemini
-        const conversationHistory = messages
-          .filter(m => m.id !== 'welcome')
-          .map(m => ({
-            role: m.role === 'assistant' ? 'model' : 'user',
-            parts: [{ text: m.content }]
-          }));
+        const conversationHistory = messages.filter(m => m.id !== 'welcome');
 
         const response = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
@@ -166,12 +183,23 @@ export default function NisitaChat() {
             body: JSON.stringify({
               contents: [
                 ...conversationHistory.map((m, idx) => {
-                  if (idx === 0) {
-                    return { ...m, parts: [{ text: `${SYSTEM_PROMPT}\n\nUser: ${m.parts[0].text}` }] };
+                  const parts: any[] = [{ text: idx === 0 ? `${SYSTEM_PROMPT}\n\nUser: ${m.content}` : m.content }];
+                  if (m.image) {
+                    parts.push({ inlineData: { data: m.image.data, mimeType: m.image.mimeType } });
                   }
-                  return m;
+                  return { role: m.role === 'assistant' ? 'model' : 'user', parts };
                 }),
-                { role: 'user', parts: [{ text: conversationHistory.length === 0 ? `${SYSTEM_PROMPT}\n\nUser: ${text}` : text }] }
+                {
+                  role: 'user',
+                  parts: imageToSend
+                    ? [
+                        { text: conversationHistory.length === 0 ? `${SYSTEM_PROMPT}\n\nUser: ${text}` : text },
+                        { inlineData: { data: imageToSend.base64, mimeType: imageToSend.mimeType } }
+                      ]
+                    : [
+                        { text: conversationHistory.length === 0 ? `${SYSTEM_PROMPT}\n\nUser: ${text}` : text }
+                      ]
+                }
               ],
               generationConfig: {
                 maxOutputTokens: 1024,
@@ -260,6 +288,9 @@ export default function NisitaChat() {
                 ? 'bg-gradient-to-br from-amber-500 to-orange-500 text-white rounded-br-md'
                 : 'bg-white/80 dark:bg-white/5 backdrop-blur-sm border border-border rounded-bl-md'
             }`}>
+              {msg.image && (
+                <img src={`data:${msg.image.mimeType};base64,${msg.image.data}`} alt="User upload" className="w-full max-w-sm rounded-xl mb-3 shadow-sm object-cover" />
+              )}
               {msg.role === 'user' ? (
                 <p className="text-[13px] font-medium leading-relaxed">{msg.content}</p>
               ) : (
@@ -302,8 +333,38 @@ export default function NisitaChat() {
         </motion.div>
       )}
 
+      {/* Image Preview Area */}
+      {selectedImage && (
+        <div className="px-1 pb-3">
+          <div className="relative inline-block">
+            <img src={selectedImage.preview} alt="Preview" className="h-20 w-auto rounded-xl border border-border shadow-sm object-cover" />
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 shadow-md transition-colors"
+            >
+              <span className="material-symbols-rounded text-sm">close</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Input Bar */}
-      <form onSubmit={sendMessage} className="flex items-center gap-2 pt-2 border-t border-border/50">
+      <form onSubmit={sendMessage} className="flex items-end gap-2 pt-2 border-t border-border/50">
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          ref={fileInputRef}
+          onChange={handleImageSelect}
+        />
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isTyping}
+          className="w-11 h-11 rounded-xl bg-secondary/80 hover:bg-secondary text-foreground flex items-center justify-center transition-all disabled:opacity-30 cursor-pointer shrink-0"
+        >
+          <span className="material-symbols-rounded text-lg">image</span>
+        </button>
         <input
           ref={inputRef}
           type="text"

@@ -192,7 +192,25 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
       const data = await response.json();
 
       if (data.choices?.[0]?.message?.content) {
-        setResult(data.choices[0].message.content);
+        let aiText = data.choices[0].message.content;
+        
+        // Cek dan bersihkan proses berpikir (thinking process) yang sering muncul di awal
+        const keywords = ['**Nama Tanaman**', '**Status Kesehatan**', '**Penyiraman**'];
+        let startIndex = -1;
+        
+        for (const keyword of keywords) {
+          const index = aiText.indexOf(keyword);
+          if (index !== -1) {
+            startIndex = index;
+            break;
+          }
+        }
+        
+        if (startIndex !== -1) {
+          aiText = aiText.substring(startIndex);
+        }
+
+        setResult(aiText);
       } else if (data.error) {
         if (data.error.code === 429 || data.error.message?.toLowerCase().includes('quota') || data.error.message?.toLowerCase().includes('limit')) {
           setResult('Ups! AI sedang kelelahan karena terlalu banyak request (Batas Kuota Tercapai). Silakan tunggu sekitar 1 menit dan coba lagi ya! ⏳');

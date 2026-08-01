@@ -16,8 +16,6 @@ import logoLight from '../assets/Logo_Light_Samping.png';
 import logoDark from '../assets/Logo_Dark_samping.png';
 import NotificationModal from '../components/dashboard/NotificationModal';
 import ActivityLog from '../components/dashboard/ActivityLog';
-import PlantScannerButton from '../components/dashboard/PlantScannerButton';
-import PlantScannerModal from '../components/dashboard/PlantScannerModal';
 import { getNotifPrefs, sendNotification } from '../utils/notifications';
 
 const formatLastSeen = (dateString: string | null) => {
@@ -80,7 +78,6 @@ export default function Dashboard() {
   const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
   const [timerModalTab, setTimerModalTab] = useState<'schedule' | 'interval'>('schedule');
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [modalDevice, setModalDevice] = useState<'indoor' | 'outdoor'>('indoor');
 
   const [alertState, setAlertState] = useState<{
@@ -571,11 +568,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-        {/* Plant Scanner */}
-        <div className="lg:col-span-7 order-4">
-          <PlantScannerButton onClick={() => setIsScannerOpen(true)} />
-        </div>
-
         {/* Right Column */}
         <div className="lg:col-span-5 lg:row-span-2 order-2 flex flex-col gap-4 lg:gap-6">
           
@@ -638,7 +630,6 @@ export default function Dashboard() {
       <PumpSettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} deviceId={modalDevice === 'indoor' ? 'ESP32_INDOOR' : 'ESP32_OUTDOOR'} onShowAlert={handleShowAlert} />
       <TimerModal isOpen={isTimerModalOpen} onClose={() => setIsTimerModalOpen(false)} deviceId={modalDevice === 'indoor' ? 'ESP32_INDOOR' : 'ESP32_OUTDOOR'} currentMode="timer" setMode={() => { }} onShowAlert={handleShowAlert} initialTab={timerModalTab} />
       <AlertModal {...alertState} onClose={() => setAlertState(p => ({ ...p, isOpen: false }))} />
-      <PlantScannerModal isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} />
 
     </div>
   );

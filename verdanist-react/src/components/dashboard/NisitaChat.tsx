@@ -393,7 +393,7 @@ export default function NisitaChat() {
       )}
 
       {/* Input Bar */}
-      <form onSubmit={sendMessage} className="flex items-end gap-2 pt-3 pb-1 border-t border-border/30 mt-2">
+      <form onSubmit={sendMessage} className="flex items-end gap-1.5 sm:gap-2 pt-3 pb-1 border-t border-border/30 mt-2">
         <input
           type="file"
           accept="image/*"
@@ -416,7 +416,7 @@ export default function NisitaChat() {
             onClick={() => fileInputRef.current?.click()}
             disabled={isTyping}
             title="Upload dari Galeri"
-            className="w-10 h-11 hover:bg-secondary text-foreground/70 hover:text-foreground flex items-center justify-center transition-all disabled:opacity-30 cursor-pointer"
+            className="w-9 sm:w-10 h-11 hover:bg-secondary text-foreground/70 hover:text-foreground flex items-center justify-center transition-all disabled:opacity-30 cursor-pointer"
           >
             <span className="material-symbols-rounded text-[1.1rem]">image</span>
           </button>
@@ -426,7 +426,7 @@ export default function NisitaChat() {
             onClick={() => cameraInputRef.current?.click()}
             disabled={isTyping}
             title="Ambil Foto"
-            className="w-10 h-11 hover:bg-secondary text-foreground/70 hover:text-foreground flex items-center justify-center transition-all disabled:opacity-30 cursor-pointer"
+            className="w-9 sm:w-10 h-11 hover:bg-secondary text-foreground/70 hover:text-foreground flex items-center justify-center transition-all disabled:opacity-30 cursor-pointer"
           >
             <span className="material-symbols-rounded text-[1.1rem]">photo_camera</span>
           </button>
@@ -437,7 +437,7 @@ export default function NisitaChat() {
           onClick={toggleRecording}
           disabled={isTyping || !SpeechRecognition}
           title="Bicara"
-          className={`w-11 h-11 rounded-full flex items-center justify-center transition-all shrink-0 shadow-sm ${isRecording ? 'bg-red-500/10 text-red-500 animate-pulse border border-red-500/30' : 'bg-secondary/40 border border-border/40 hover:bg-secondary text-foreground/70 hover:text-foreground disabled:opacity-30 cursor-pointer'}`}
+          className={`w-10 sm:w-11 h-11 rounded-full flex items-center justify-center transition-all shrink-0 shadow-sm ${isRecording ? 'bg-red-500/10 text-red-500 animate-pulse border border-red-500/30' : 'bg-secondary/40 border border-border/40 hover:bg-secondary text-foreground/70 hover:text-foreground disabled:opacity-30 cursor-pointer'}`}
         >
           <span className="material-symbols-rounded text-lg">{isRecording ? 'mic' : 'mic_none'}</span>
         </button>
@@ -447,9 +447,9 @@ export default function NisitaChat() {
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Ketik pesan ke Nisita..."
+          placeholder="Ketik pesan..."
           disabled={isTyping}
-          className="flex-1 bg-background/40 border border-border/50 rounded-full px-5 py-3 text-[13px] font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500/50 dark:text-white transition-all placeholder-muted-foreground/50 disabled:opacity-50 shadow-inner"
+          className="flex-1 min-w-0 bg-background/40 border border-border/50 rounded-full px-4 sm:px-5 py-3 text-[13px] font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500/50 dark:text-white transition-all placeholder-muted-foreground/50 disabled:opacity-50 shadow-inner"
         />
         
         <button

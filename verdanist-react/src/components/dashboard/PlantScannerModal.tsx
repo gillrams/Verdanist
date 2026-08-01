@@ -635,7 +635,7 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
                           setStep('capture');
                         }}
                         disabled={cooldown > 0}
-                        className={`flex-1 py-3 rounded-xl font-bold text-[13px] flex items-center justify-center gap-2 transition-all ${cooldown > 0 ? 'bg-muted border border-border/50 text-muted-foreground cursor-not-allowed opacity-70' : \`bg-gradient-to-br \${currentMode?.color} text-white shadow-lg hover:shadow-xl active:scale-[0.97] cursor-pointer\`}`}
+                        className={`flex-1 py-3 rounded-xl font-bold text-[13px] flex items-center justify-center gap-2 transition-all ${cooldown > 0 ? 'bg-muted border border-border/50 text-muted-foreground cursor-not-allowed opacity-70' : `bg-gradient-to-br ${currentMode?.color} text-white shadow-lg hover:shadow-xl active:scale-[0.97] cursor-pointer`}`}
                       >
                         <span className="material-symbols-rounded text-lg">replay</span>
                         Scan Lagi

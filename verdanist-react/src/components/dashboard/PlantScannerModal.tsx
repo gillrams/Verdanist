@@ -1,5 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 type ScanMode = 'identify' | 'disease' | 'care';
 type ScanStep = 'select-mode' | 'capture' | 'analyzing' | 'result';
@@ -18,20 +20,48 @@ const SCAN_MODES = [
     color: 'from-emerald-500 to-green-600',
     bgColor: 'bg-emerald-500/10 border-emerald-500/20',
     textColor: 'text-emerald-600 dark:text-emerald-400',
-    prompt: `Kamu adalah asisten ahli botani yang ramah. Jawab SEPENUHNYA dalam BAHASA INDONESIA yang santai tapi formal (jangan terlalu kaku, tapi jangan lebay). 
+    prompt: `Kamu adalah asisten ahli botani profesional. Jawab SEPENUHNYA dalam BAHASA INDONESIA.
 
-ATURAN SANGAT PENTING: JANGAN tampilkan proses berpikirmu. LANGSUNG berikan jawaban akhir sesuai format di bawah ini. JANGAN tambahkan teks pengantar atau penutup selain format ini.
+ATURAN SANGAT PENTING: JANGAN tampilkan proses berpikirmu. LANGSUNG berikan jawaban akhir sesuai format persis di bawah ini tanpa basa-basi.
 
-Identifikasi tanaman di gambar ini dan berikan informasi dengan format markdown yang rapi:
+Identifikasi tanaman di gambar ini dan berikan informasi dengan format markdown berikut:
 
-**Nama Tanaman**: [Nama umum di Indonesia] (*[Nama Latin]*)
-**Keluarga**: [Famili tanaman]
-**Asal Usul**: [Penjelasan singkat asal tanaman]
-**Ciri Khas**: [Ciri-ciri fisik yang menonjol dan mudah dikenali]
-**Fakta Unik**: [Satu fakta menarik tentang tanaman ini]
-**Komentar Singkat**: [Komentar ramah dan positif tentang tanaman ini, misal: "Tanaman ini sangat cocok ditanam di pekarangan rumah!"]
+### 🌿 Laporan Analisis Botani: [Nama Tanaman]
 
-Gunakan sedikit emoji yang relevan agar terlihat menarik tapi tetap profesional.`,
+> *"[Satu kalimat puitis atau menarik tentang tanaman]"*
+
+#### 📑 Profil Taksonomi & Identitas
+
+| Kategori | Detail Spesifikasi |
+| --- | --- |
+| **Nama Populer** | [Nama umum] |
+| **Nama Ilmiah** | *[Nama Latin]* |
+| **Famili Botani** | [Famili] |
+| **Asal Usul** | [Asal Usul] |
+
+---
+
+#### 🔍 Analisis Karakteristik Visual
+
+[Penjelasan singkat]
+
+* **Helai Daun:** [Penjelasan]
+* **Struktur Batang:** [Penjelasan]
+* **Formasi Tumbuh:** [Penjelasan]
+
+---
+
+#### 💡 Fakta Nutrisi & Budidaya
+
+1. **[Fakta 1 Judul]:** [Fakta 1]
+2. **[Fakta 2 Judul]:** [Fakta 2]
+3. **[Fakta 3 Judul]:** [Fakta 3]
+
+---
+
+#### 📌 Rekomendasi Penggunaan
+
+[Paragraf rekomendasi dengan emoji ✨]`,
   },
   {
     id: 'disease' as ScanMode,
@@ -41,20 +71,47 @@ Gunakan sedikit emoji yang relevan agar terlihat menarik tapi tetap profesional.
     color: 'from-rose-500 to-red-600',
     bgColor: 'bg-rose-500/10 border-rose-500/20',
     textColor: 'text-rose-600 dark:text-rose-400',
-    prompt: `Kamu adalah asisten ahli penyakit tanaman (fitopatologi) yang ramah. Jawab SEPENUHNYA dalam BAHASA INDONESIA yang santai tapi formal.
+    prompt: `Kamu adalah ahli fitopatologi profesional. Jawab SEPENUHNYA dalam BAHASA INDONESIA.
 
-ATURAN SANGAT PENTING: JANGAN tampilkan proses berpikirmu. LANGSUNG berikan jawaban akhir sesuai format di bawah ini. JANGAN tambahkan teks pengantar atau penutup selain format ini.
+ATURAN SANGAT PENTING: JANGAN tampilkan proses berpikirmu. LANGSUNG berikan jawaban akhir sesuai format persis di bawah ini.
 
-Analisis kondisi tanaman di gambar ini dan berikan diagnosis dengan format markdown yang rapi:
+Analisis kondisi tanaman di gambar ini dan berikan diagnosis dengan format markdown berikut:
 
-**Status Kesehatan**: [Pilih satu: Sehat / Mulai Bergejala / Sakit / Kritis]
-**Diagnosis**: [Nama penyakit/hama jika ada, atau "Tidak ada penyakit" jika sehat]
-**Gejala Terlihat**: [Deskripsi singkat apa yang terlihat pada gambar]
-**Penyebab**: [Penjelasan singkat penyebabnya]
-**Solusi & Perawatan**: [Langkah-langkah penanganan yang jelas dan mudah diikuti]
-**Pencegahan**: [Tips singkat agar tidak terulang]
+### 🩺 Rekam Medis Tanaman: [Nama Tanaman Jika Dikenali]
 
-Jika tanaman sehat, berikan tips perawatan umum. Gunakan sedikit emoji yang relevan agar menarik tapi tetap profesional.`,
+> *"[Satu kalimat semangat atau empati tentang kondisi tanaman]"*
+
+#### 📑 Status Klinis & Diagnosis
+
+| Kategori | Detail Spesifikasi |
+| --- | --- |
+| **Status Kesehatan** | [Sehat / Mulai Bergejala / Sakit / Kritis] |
+| **Diagnosis Utama** | [Nama penyakit/hama atau "Sehat Bugar"] |
+| **Tingkat Keparahan** | [Ringan / Sedang / Berat / Aman] |
+
+---
+
+#### 🔍 Observasi Gejala Visual
+
+[Penjelasan singkat kondisi tanaman]
+
+* **Daun:** [Kondisi daun]
+* **Batang:** [Kondisi batang]
+* **Indikasi Lain:** [Indikasi tambahan]
+
+---
+
+#### 💊 Protokol Penanganan & Solusi
+
+1. **[Langkah 1 Judul]:** [Langkah 1]
+2. **[Langkah 2 Judul]:** [Langkah 2]
+3. **[Langkah 3 Judul]:** [Langkah 3]
+
+---
+
+#### 🛡️ Tindakan Preventif
+
+[Paragraf rekomendasi pencegahan agar tidak terulang ✨]`,
   },
   {
     id: 'care' as ScanMode,
@@ -64,39 +121,74 @@ Jika tanaman sehat, berikan tips perawatan umum. Gunakan sedikit emoji yang rele
     color: 'from-sky-500 to-blue-600',
     bgColor: 'bg-sky-500/10 border-sky-500/20',
     textColor: 'text-sky-600 dark:text-sky-400',
-    prompt: `Kamu adalah asisten ahli perawatan tanaman yang ramah. Jawab SEPENUHNYA dalam BAHASA INDONESIA yang santai tapi formal.
+    prompt: `Kamu adalah ahli hortikultura profesional. Jawab SEPENUHNYA dalam BAHASA INDONESIA.
 
-ATURAN SANGAT PENTING: JANGAN tampilkan proses berpikirmu. LANGSUNG berikan jawaban akhir sesuai format di bawah ini. JANGAN tambahkan teks pengantar atau penutup selain format ini.
+ATURAN SANGAT PENTING: JANGAN tampilkan proses berpikirmu. LANGSUNG berikan jawaban akhir sesuai format persis di bawah ini.
 
-Berikan panduan perawatan untuk tanaman di gambar ini dengan format markdown yang rapi:
+Berikan panduan perawatan tanaman di gambar ini dengan format markdown berikut:
 
-**Penyiraman**: [Panduan frekuensi dan jumlah air]
-**Sinar Matahari**: [Kebutuhan cahaya matahari]
-**Suhu & Kelembaban**: [Kondisi lingkungan yang ideal]
-**Pemupukan**: [Rekomendasi jenis pupuk dan jadwalnya]
-**Media Tanam**: [Karakteristik tanah yang disarankan]
-**Pemangkasan**: [Tips pemangkasan jika diperlukan]
-**Perhatian Khusus**: [Hal-hal yang harus dihindari saat merawat tanaman ini]
+### 🪴 Buku Panduan Perawatan: [Nama Tanaman]
 
-Gunakan sedikit emoji yang relevan agar informasi mudah dibaca dan tetap profesional.`,
+> *"[Satu kalimat motivasi tentang merawat tanaman ini]"*
+
+#### 📑 Parameter Lingkungan Ideal
+
+| Kategori | Detail Spesifikasi |
+| --- | --- |
+| **Intensitas Cahaya** | [Langsung / Terang / Teduh] |
+| **Suhu Optimal** | [Rentang suhu misal: 20°C - 30°C] |
+| **Kelembaban** | [Rendah / Sedang / Tinggi] |
+| **Tingkat Kesulitan** | [Pemula / Menengah / Ahli] |
+
+---
+
+#### 💧 Rutinitas Esensial
+
+[Penjelasan singkat pentingnya konsistensi]
+
+* **Penyiraman:** [Panduan penyiraman]
+* **Pemupukan:** [Jadwal dan jenis pupuk]
+* **Media Tanam:** [Komposisi tanah ideal]
+
+---
+
+#### ✂️ Tips Pemeliharaan Lanjutan
+
+1. **[Tips 1 Judul]:** [Tips 1]
+2. **[Tips 2 Judul]:** [Tips 2]
+3. **[Tips 3 Judul]:** [Tips 3]
+
+---
+
+#### ⚠️ Peringatan Kritis
+
+[Paragraf hal-hal terlarang atau sangat berbahaya bagi tanaman ini ✨]`,
   },
 ];
 
 // Simple markdown-to-HTML for AI result display
 function SimpleMarkdown({ text }: { text: string }) {
-  const html = text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/^- (.*)/gm, '<li>$1</li>')
-    .replace(/(<li>.*<\/li>)/gs, '<ul class="list-disc pl-4 space-y-1">$1</ul>')
-    .replace(/\n{2,}/g, '<br/><br/>')
-    .replace(/\n/g, '<br/>');
+  const renderers = {
+    h3: ({node, ...props}: any) => <h3 className="text-[16px] font-extrabold text-emerald-700 dark:text-emerald-400 mt-5 mb-3 flex items-center gap-2" {...props} />,
+    h4: ({node, ...props}: any) => <h4 className="text-[14px] font-bold text-emerald-600 dark:text-emerald-500 mt-6 mb-3 flex items-center gap-2 border-b border-border/50 pb-2" {...props} />,
+    blockquote: ({node, ...props}: any) => <blockquote className="border-l-4 border-emerald-500 pl-4 py-2 my-4 bg-emerald-500/10 dark:bg-emerald-500/5 rounded-r-xl italic text-foreground/80 font-medium text-[13px]" {...props} />,
+    table: ({node, ...props}: any) => <div className="overflow-x-auto my-4 rounded-xl border border-border/50 shadow-sm"><table className="w-full text-left border-collapse text-[13px]" {...props} /></div>,
+    th: ({node, ...props}: any) => <th className="bg-emerald-50 dark:bg-emerald-950/30 p-3 border-b border-border/50 font-bold text-emerald-800 dark:text-emerald-300" {...props} />,
+    td: ({node, ...props}: any) => <td className="p-3 border-b border-border/50 text-foreground/90 align-top" {...props} />,
+    ul: ({node, ...props}: any) => <ul className="list-disc pl-5 space-y-2 my-3 text-[13px] text-foreground/90 marker:text-emerald-500" {...props} />,
+    ol: ({node, ...props}: any) => <ol className="list-decimal pl-5 space-y-2 my-3 text-[13px] text-foreground/90 marker:text-emerald-500 font-bold" {...props} />,
+    li: ({node, ...props}: any) => <li className="font-normal leading-relaxed" {...props} />,
+    hr: ({node, ...props}: any) => <hr className="my-6 border-border/60 border-dashed" {...props} />,
+    p: ({node, ...props}: any) => <p className="mb-3 text-[13px] text-foreground/90 leading-relaxed" {...props} />,
+    strong: ({node, ...props}: any) => <strong className="font-bold text-foreground" {...props} />,
+  };
 
   return (
-    <div
-      className="text-[13px] leading-relaxed text-foreground/90 prose-strong:text-foreground prose-strong:font-bold"
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    <div className="markdown-body">
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={renderers}>
+        {text}
+      </ReactMarkdown>
+    </div>
   );
 }
 
@@ -195,7 +287,7 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
         let aiText = data.choices[0].message.content;
         
         // Cek dan bersihkan proses berpikir (thinking process) yang sering muncul di awal
-        const keywords = ['**Nama Tanaman**', '**Status Kesehatan**', '**Penyiraman**'];
+        const keywords = ['### 🌿', '### 🩺', '### 🪴', '###', '####'];
         let startIndex = -1;
         
         for (const keyword of keywords) {

@@ -393,7 +393,7 @@ export default function NisitaChat() {
       )}
 
       {/* Input Bar */}
-      <form onSubmit={sendMessage} className="flex items-end gap-2 pt-2 border-t border-border/50">
+      <form onSubmit={sendMessage} className="flex items-end gap-2 pt-3 pb-1 border-t border-border/30 mt-2">
         <input
           type="file"
           accept="image/*"
@@ -409,23 +409,24 @@ export default function NisitaChat() {
           ref={cameraInputRef}
           onChange={handleImageSelect}
         />
-        <div className="flex bg-secondary/50 rounded-xl overflow-hidden border border-border/50 shrink-0">
+        
+        <div className="flex bg-secondary/40 rounded-full overflow-hidden border border-border/40 shrink-0 shadow-sm">
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isTyping}
             title="Upload dari Galeri"
-            className="w-10 h-11 hover:bg-secondary text-foreground/80 hover:text-foreground flex items-center justify-center transition-all disabled:opacity-30 cursor-pointer"
+            className="w-10 h-11 hover:bg-secondary text-foreground/70 hover:text-foreground flex items-center justify-center transition-all disabled:opacity-30 cursor-pointer"
           >
             <span className="material-symbols-rounded text-[1.1rem]">image</span>
           </button>
-          <div className="w-[1px] bg-border/50 h-6 my-auto" />
+          <div className="w-[1px] bg-border/40 h-6 my-auto" />
           <button
             type="button"
             onClick={() => cameraInputRef.current?.click()}
             disabled={isTyping}
             title="Ambil Foto"
-            className="w-10 h-11 hover:bg-secondary text-foreground/80 hover:text-foreground flex items-center justify-center transition-all disabled:opacity-30 cursor-pointer"
+            className="w-10 h-11 hover:bg-secondary text-foreground/70 hover:text-foreground flex items-center justify-center transition-all disabled:opacity-30 cursor-pointer"
           >
             <span className="material-symbols-rounded text-[1.1rem]">photo_camera</span>
           </button>
@@ -436,7 +437,7 @@ export default function NisitaChat() {
           onClick={toggleRecording}
           disabled={isTyping || !SpeechRecognition}
           title="Bicara"
-          className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all shrink-0 ${isRecording ? 'bg-red-500/10 text-red-500 animate-pulse border border-red-500/30' : 'bg-secondary/80 hover:bg-secondary text-foreground/80 hover:text-foreground disabled:opacity-30 cursor-pointer'}`}
+          className={`w-11 h-11 rounded-full flex items-center justify-center transition-all shrink-0 shadow-sm ${isRecording ? 'bg-red-500/10 text-red-500 animate-pulse border border-red-500/30' : 'bg-secondary/40 border border-border/40 hover:bg-secondary text-foreground/70 hover:text-foreground disabled:opacity-30 cursor-pointer'}`}
         >
           <span className="material-symbols-rounded text-lg">{isRecording ? 'mic' : 'mic_none'}</span>
         </button>
@@ -448,12 +449,13 @@ export default function NisitaChat() {
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Ketik pesan ke Nisita..."
           disabled={isTyping}
-          className="flex-1 bg-background/50 border border-border rounded-xl px-4 py-3 text-[13px] font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 dark:text-white transition-all placeholder-muted-foreground/50 disabled:opacity-50"
+          className="flex-1 bg-background/40 border border-border/50 rounded-full px-5 py-3 text-[13px] font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500/50 dark:text-white transition-all placeholder-muted-foreground/50 disabled:opacity-50 shadow-inner"
         />
+        
         <button
           type="submit"
           disabled={isTyping || !inputValue.trim()}
-          className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-md hover:shadow-lg active:scale-95 shrink-0"
+          className="w-11 h-11 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-95 shrink-0"
         >
           {isTyping ? (
             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

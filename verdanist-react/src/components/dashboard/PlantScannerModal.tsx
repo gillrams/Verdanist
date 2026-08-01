@@ -167,7 +167,12 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
       if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
         setResult(data.candidates[0].content.parts[0].text);
       } else if (data.error) {
-        setResult(`Waduh, ada masalah: ${data.error.message}`);
+        // Cek apakah error karena limit/kuota
+        if (data.error.code === 429 || data.error.message.toLowerCase().includes('quota') || data.error.message.toLowerCase().includes('limit')) {
+          setResult('Ups! AI sedang kelelahan karena terlalu banyak request (Batas Kuota Tercapai). Silakan tunggu sekitar 1 menit dan coba lagi ya! ⏳');
+        } else {
+          setResult(`Waduh, ada kendala dari AI: ${data.error.message}`);
+        }
       } else {
         setResult('Hmm, AI tidak bisa menganalisis gambar ini. Coba foto dari sudut yang lebih jelas ya!');
       }

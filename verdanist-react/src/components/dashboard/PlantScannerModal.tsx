@@ -259,20 +259,43 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
                     {SCAN_MODES.map((mode, i) => (
                       <motion.button
                         key={mode.id}
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.08 }}
+                        transition={{ delay: i * 0.1, type: 'spring', stiffness: 200, damping: 20 }}
                         onClick={() => handleModeSelect(mode.id)}
-                        className={`w-full flex items-center gap-4 p-4 rounded-2xl border ${mode.bgColor} hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer text-left group`}
+                        className="relative w-full overflow-hidden p-4 rounded-[1.25rem] bg-white dark:bg-white/5 border border-border/60 hover:border-transparent shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.4)] transition-all duration-300 cursor-pointer text-left group active:scale-[0.98]"
                       >
-                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${mode.color} flex items-center justify-center shadow-lg shrink-0`}>
-                          <span className="material-symbols-rounded text-white text-xl">{mode.icon}</span>
+                        {/* Decorative gradient background that fades in on hover */}
+                        <div className={`absolute inset-0 bg-gradient-to-br ${mode.color} opacity-0 group-hover:opacity-[0.03] dark:group-hover:opacity-[0.08] transition-opacity duration-300`} />
+                        
+                        {/* Decorative blur circle on the right */}
+                        <div className={`absolute -right-8 -top-8 w-32 h-32 rounded-full bg-gradient-to-br ${mode.color} opacity-10 blur-2xl group-hover:opacity-20 transition-opacity duration-500`} />
+
+                        <div className="relative z-10 flex items-center gap-4">
+                          {/* Icon Container */}
+                          <div className="relative shrink-0">
+                            <div className={`w-[3.25rem] h-[3.25rem] rounded-[1rem] bg-gradient-to-br ${mode.color} flex items-center justify-center shadow-lg shadow-black/10 dark:shadow-black/30 group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 z-10 relative`}>
+                              <span className="material-symbols-rounded text-white text-[26px] drop-shadow-sm">{mode.icon}</span>
+                            </div>
+                            {/* Pulsing ring behind icon on hover */}
+                            <div className={`absolute inset-0 rounded-[1rem] bg-gradient-to-br ${mode.color} opacity-0 group-hover:opacity-30 scale-100 group-hover:scale-110 transition-all duration-300`} />
+                          </div>
+
+                          {/* Text content */}
+                          <div className="flex-1 min-w-0 py-1">
+                            <h3 className={`font-bold text-[15px] ${mode.textColor} group-hover:text-foreground transition-colors duration-300 tracking-tight`}>
+                              {mode.title}
+                            </h3>
+                            <p className="text-muted-foreground/80 dark:text-white/50 text-[12px] font-medium mt-0.5 leading-snug">
+                              {mode.subtitle}
+                            </p>
+                          </div>
+
+                          {/* Arrow */}
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-secondary/80 group-hover:bg-gradient-to-br ${mode.color} transition-colors duration-300 shrink-0 shadow-sm border border-border/50 group-hover:border-transparent`}>
+                            <span className="material-symbols-rounded text-muted-foreground group-hover:text-white transition-colors text-[18px]">arrow_forward</span>
+                          </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-foreground font-bold text-[14px]">{mode.title}</h3>
-                          <p className="text-muted-foreground text-[11px] font-medium mt-0.5">{mode.subtitle}</p>
-                        </div>
-                        <span className="material-symbols-rounded text-muted-foreground/40 group-hover:text-foreground/60 transition-colors text-lg">chevron_right</span>
                       </motion.button>
                     ))}
 

@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect, type FormEvent } from 'react';
+
+const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 import { motion } from 'framer-motion';
 
 interface ChatMessage {
@@ -118,10 +120,51 @@ export default function NisitaChat() {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const [selectedImage, setSelectedImage] = useState<{ file: File; base64: string; mimeType: string; preview: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = 'id-ID';
+
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setInputValue(prev => prev ? `${prev} ${transcript}` : transcript);
+        setIsRecording(false);
+      };
+
+      recognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error', event.error);
+        setIsRecording(false);
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsRecording(false);
+      };
+    }
+  }, []);
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      recognitionRef.current?.stop();
+      setIsRecording(false);
+    } else {
+      try {
+        recognitionRef.current?.start();
+        setIsRecording(true);
+      } catch (e) {
+        console.error("Speech recognition failed to start", e);
+      }
+    }
+  };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -135,6 +178,7 @@ export default function NisitaChat() {
     };
     reader.readAsDataURL(file);
     if (fileInputRef.current) fileInputRef.current.value = '';
+    if (cameraInputRef.current) cameraInputRef.current.value = '';
   };
 
   const scrollToBottom = () => {
@@ -357,14 +401,46 @@ export default function NisitaChat() {
           ref={fileInputRef}
           onChange={handleImageSelect}
         />
+        <input
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          ref={cameraInputRef}
+          onChange={handleImageSelect}
+        />
+        <div className="flex bg-secondary/50 rounded-xl overflow-hidden border border-border/50 shrink-0">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isTyping}
+            title="Upload dari Galeri"
+            className="w-10 h-11 hover:bg-secondary text-foreground/80 hover:text-foreground flex items-center justify-center transition-all disabled:opacity-30 cursor-pointer"
+          >
+            <span className="material-symbols-rounded text-[1.1rem]">image</span>
+          </button>
+          <div className="w-[1px] bg-border/50 h-6 my-auto" />
+          <button
+            type="button"
+            onClick={() => cameraInputRef.current?.click()}
+            disabled={isTyping}
+            title="Ambil Foto"
+            className="w-10 h-11 hover:bg-secondary text-foreground/80 hover:text-foreground flex items-center justify-center transition-all disabled:opacity-30 cursor-pointer"
+          >
+            <span className="material-symbols-rounded text-[1.1rem]">photo_camera</span>
+          </button>
+        </div>
+
         <button
           type="button"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isTyping}
-          className="w-11 h-11 rounded-xl bg-secondary/80 hover:bg-secondary text-foreground flex items-center justify-center transition-all disabled:opacity-30 cursor-pointer shrink-0"
+          onClick={toggleRecording}
+          disabled={isTyping || !SpeechRecognition}
+          title="Bicara"
+          className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all shrink-0 ${isRecording ? 'bg-red-500/10 text-red-500 animate-pulse border border-red-500/30' : 'bg-secondary/80 hover:bg-secondary text-foreground/80 hover:text-foreground disabled:opacity-30 cursor-pointer'}`}
         >
-          <span className="material-symbols-rounded text-lg">image</span>
+          <span className="material-symbols-rounded text-lg">{isRecording ? 'mic' : 'mic_none'}</span>
         </button>
+
         <input
           ref={inputRef}
           type="text"

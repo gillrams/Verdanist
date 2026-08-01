@@ -22,7 +22,10 @@ const SCAN_MODES = [
     textColor: 'text-emerald-600 dark:text-emerald-400',
     prompt: `Kamu adalah asisten ahli botani profesional. Jawab SEPENUHNYA dalam BAHASA INDONESIA.
 
-ATURAN SANGAT PENTING: JANGAN tampilkan proses berpikirmu. LANGSUNG berikan jawaban akhir sesuai format persis di bawah ini tanpa basa-basi.
+ATURAN SANGAT PENTING:
+1. JANGAN tampilkan proses berpikirmu. LANGSUNG berikan jawaban akhir.
+2. WAJIB patuhi format Markdown di bawah ini 100%.
+3. Bagian yang berupa TABEL (menggunakan simbol | dan ---) WAJIB dibiarkan sebagai tabel Markdown, JANGAN diubah menjadi paragraf atau list.
 
 Identifikasi tanaman di gambar ini dan berikan informasi dengan format markdown berikut:
 
@@ -73,7 +76,10 @@ Identifikasi tanaman di gambar ini dan berikan informasi dengan format markdown 
     textColor: 'text-rose-600 dark:text-rose-400',
     prompt: `Kamu adalah ahli fitopatologi profesional. Jawab SEPENUHNYA dalam BAHASA INDONESIA.
 
-ATURAN SANGAT PENTING: JANGAN tampilkan proses berpikirmu. LANGSUNG berikan jawaban akhir sesuai format persis di bawah ini.
+ATURAN SANGAT PENTING:
+1. JANGAN tampilkan proses berpikirmu. LANGSUNG berikan jawaban akhir.
+2. WAJIB patuhi format Markdown di bawah ini 100%.
+3. Bagian yang berupa TABEL (menggunakan simbol | dan ---) WAJIB dibiarkan sebagai tabel Markdown, JANGAN diubah menjadi paragraf atau list.
 
 Analisis kondisi tanaman di gambar ini dan berikan diagnosis dengan format markdown berikut:
 
@@ -123,7 +129,10 @@ Analisis kondisi tanaman di gambar ini dan berikan diagnosis dengan format markd
     textColor: 'text-sky-600 dark:text-sky-400',
     prompt: `Kamu adalah ahli hortikultura profesional. Jawab SEPENUHNYA dalam BAHASA INDONESIA.
 
-ATURAN SANGAT PENTING: JANGAN tampilkan proses berpikirmu. LANGSUNG berikan jawaban akhir sesuai format persis di bawah ini.
+ATURAN SANGAT PENTING:
+1. JANGAN tampilkan proses berpikirmu. LANGSUNG berikan jawaban akhir.
+2. WAJIB patuhi format Markdown di bawah ini 100%.
+3. Bagian yang berupa TABEL (menggunakan simbol | dan ---) WAJIB dibiarkan sebagai tabel Markdown, JANGAN diubah menjadi paragraf atau list.
 
 Berikan panduan perawatan tanaman di gambar ini dengan format markdown berikut:
 

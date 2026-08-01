@@ -351,46 +351,46 @@ export default function NisitaChat() {
 
         {isTyping && <TypingIndicator />}
 
+        {/* Quick Prompts (only show at start) */}
+        {messages.length <= 1 && !isTyping && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-wrap gap-2 px-1 pt-2 pb-1"
+          >
+            {quickPrompts.map((prompt, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  setInputValue(prompt.text);
+                  inputRef.current?.focus();
+                }}
+                className="px-3 py-2 bg-amber-500/5 hover:bg-amber-500/15 border border-amber-500/15 hover:border-amber-500/30 rounded-xl text-[11px] font-semibold text-foreground/70 hover:text-foreground transition-all flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>{prompt.icon}</span>
+                {prompt.text}
+              </button>
+            ))}
+          </motion.div>
+        )}
+
+        {/* Image Preview Area */}
+        {selectedImage && (
+          <div className="px-1 pt-2 pb-1">
+            <div className="relative inline-block">
+              <img src={selectedImage.preview} alt="Preview" className="h-20 w-auto rounded-xl border border-border shadow-sm object-cover" />
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 shadow-md transition-colors"
+              >
+                <span className="material-symbols-rounded text-sm">close</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </div>
-
-      {/* Quick Prompts (only show at start) */}
-      {messages.length <= 1 && !isTyping && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-wrap gap-2 px-1 pb-3"
-        >
-          {quickPrompts.map((prompt, i) => (
-            <button
-              key={i}
-              onClick={() => {
-                setInputValue(prompt.text);
-                inputRef.current?.focus();
-              }}
-              className="px-3 py-2 bg-amber-500/5 hover:bg-amber-500/15 border border-amber-500/15 hover:border-amber-500/30 rounded-xl text-[11px] font-semibold text-foreground/70 hover:text-foreground transition-all flex items-center gap-1.5 cursor-pointer"
-            >
-              <span>{prompt.icon}</span>
-              {prompt.text}
-            </button>
-          ))}
-        </motion.div>
-      )}
-
-      {/* Image Preview Area */}
-      {selectedImage && (
-        <div className="px-1 pb-3">
-          <div className="relative inline-block">
-            <img src={selectedImage.preview} alt="Preview" className="h-20 w-auto rounded-xl border border-border shadow-sm object-cover" />
-            <button
-              onClick={() => setSelectedImage(null)}
-              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 shadow-md transition-colors"
-            >
-              <span className="material-symbols-rounded text-sm">close</span>
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Input Bar */}
       <form onSubmit={sendMessage} className="flex items-end gap-1.5 sm:gap-2 pt-3 pb-1 border-t border-border/30 mt-2">

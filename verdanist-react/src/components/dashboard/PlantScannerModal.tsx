@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -206,6 +206,17 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
   const [selectedMode, setSelectedMode] = useState<ScanMode | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [result, setResult] = useState<string>('');
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (cooldown > 0) {
+      interval = setInterval(() => {
+        setCooldown((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [cooldown]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -215,6 +226,7 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
     setSelectedMode(null);
     setCapturedImage(null);
     setResult('');
+    setCooldown(0);
   };
 
   const handleClose = () => {
@@ -319,7 +331,8 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
         setResult(aiText);
       } else if (data.error) {
         if (data.error.code === 429 || data.error.message?.toLowerCase().includes('quota') || data.error.message?.toLowerCase().includes('limit')) {
-          setResult('Ups! AI sedang kelelahan karena terlalu banyak request (Batas Kuota Tercapai). Silakan tunggu sekitar 1 menit dan coba lagi ya! ⏳');
+          setCooldown(60);
+          setResult('Ups! AI sedang kelelahan karena terlalu banyak request (Batas Kuota Tercapai). Silakan tunggu hitung mundur selesai dan coba lagi ya! ⏳');
         } else {
           setResult(`Waduh, ada kendala dari AI: ${data.error.message}`);
         }
@@ -600,6 +613,17 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
                         <span className="text-foreground font-bold text-[13px]">Hasil Analisis AI</span>
                       </div>
                       <SimpleMarkdown text={result} />
+                      
+                      {cooldown > 0 && (
+                        <motion.div 
+                          initial={{ opacity: 0, height: 0 }} 
+                          animate={{ opacity: 1, height: 'auto' }}
+                          className="mt-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center justify-between"
+                        >
+                          <span className="text-[12px] text-rose-600 dark:text-rose-400 font-medium">Tunggu sebelum mencoba lagi:</span>
+                          <span className="font-mono font-bold text-rose-700 dark:text-rose-300 bg-rose-500/20 px-2.5 py-1 rounded-md">{cooldown}s</span>
+                        </motion.div>
+                      )}
                     </div>
 
                     {/* Action buttons */}
@@ -610,7 +634,8 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
                           setResult('');
                           setStep('capture');
                         }}
-                        className={`flex-1 py-3 rounded-xl bg-gradient-to-br ${currentMode?.color} text-white font-bold text-[13px] flex items-center justify-center gap-2 shadow-lg active:scale-[0.97] transition-all cursor-pointer`}
+                        disabled={cooldown > 0}
+                        className={`flex-1 py-3 rounded-xl font-bold text-[13px] flex items-center justify-center gap-2 transition-all ${cooldown > 0 ? 'bg-muted border border-border/50 text-muted-foreground cursor-not-allowed opacity-70' : \`bg-gradient-to-br \${currentMode?.color} text-white shadow-lg hover:shadow-xl active:scale-[0.97] cursor-pointer\`}`}
                       >
                         <span className="material-symbols-rounded text-lg">replay</span>
                         Scan Lagi

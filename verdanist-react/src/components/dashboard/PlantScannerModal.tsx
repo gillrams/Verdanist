@@ -276,7 +276,7 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
               }
             ],
             temperature: 0.7,
-            max_tokens: 1024,
+            max_tokens: 4096,
           })
         }
       );
@@ -286,7 +286,12 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
       if (data.choices?.[0]?.message?.content) {
         let aiText = data.choices[0].message.content;
         
-        // Cek dan bersihkan proses berpikir (thinking process) yang sering muncul di awal
+        // Buang tag <think> jika model (seperti Qwen) men-generate-nya
+        if (aiText.includes('</think>')) {
+          aiText = aiText.split('</think>')[1].trim();
+        }
+
+        // Cek dan bersihkan sisa teks pengantar yang sering muncul di awal
         const keywords = ['### 🌿', '### 🩺', '### 🪴', '###', '####'];
         let startIndex = -1;
         

@@ -429,7 +429,7 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 30 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className={`relative bg-gradient-to-b from-white/95 to-white/90 dark:from-[#082317]/95 dark:to-[#04150E]/95 backdrop-blur-3xl rounded-[2.5rem] w-full max-w-2xl shadow-[0_40px_80px_rgba(0,0,0,0.5)] border border-border p-6 sm:p-8 z-10 scrollbar-none flex flex-col ${modalMode === 'chat' ? 'h-[85vh]' : 'max-h-[85vh] overflow-y-auto space-y-6'}`}
+            className={`relative bg-gradient-to-b from-white/95 to-white/90 dark:from-[#082317]/95 dark:to-[#04150E]/95 backdrop-blur-3xl rounded-[2.5rem] w-full max-w-2xl shadow-[0_40px_80px_rgba(0,0,0,0.5)] border border-border p-6 sm:p-8 z-10 scrollbar-none ${modalMode === 'chat' ? 'flex flex-col h-[85vh] md:h-[600px]' : 'max-h-[85vh] overflow-y-auto space-y-6'}`}
           >
 
             <div className="absolute top-0 left-0 w-full h-1 bg-amber-500/30" />

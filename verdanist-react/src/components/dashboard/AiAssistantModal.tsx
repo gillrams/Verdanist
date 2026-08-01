@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
+import NisitaChat from './NisitaChat';
 
 interface AiAssistantModalProps {
   isOpen: boolean;
@@ -107,6 +108,7 @@ export default function AiAssistantModal({ isOpen, onClose, deviceId, onShowAler
   const [customRecommend, setCustomRecommend] = useState<PlantRecommendation | null>(null);
   const [applyLoading, setApplyLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'Semua' | 'Sayuran' | 'Buah' | 'Tanaman Hias' | 'Palawija & Herbal'>('Semua');
+  const [modalMode, setModalMode] = useState<'preset' | 'chat'>('preset');
 
   const filteredPresets = PLANT_PRESETS.filter(p => activeTab === 'Semua' || p.category === activeTab);
 
@@ -427,10 +429,10 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 30 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="relative bg-gradient-to-b from-white/95 to-white/90 dark:from-[#082317]/95 dark:to-[#04150E]/95 backdrop-blur-3xl rounded-[2.5rem] w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-[0_40px_80px_rgba(0,0,0,0.5)] border border-border p-6 sm:p-8 z-10 space-y-6 scrollbar-none"
+            className={`relative bg-gradient-to-b from-white/95 to-white/90 dark:from-[#082317]/95 dark:to-[#04150E]/95 backdrop-blur-3xl rounded-[2.5rem] w-full max-w-2xl shadow-[0_40px_80px_rgba(0,0,0,0.5)] border border-border p-6 sm:p-8 z-10 scrollbar-none flex flex-col ${modalMode === 'chat' ? 'h-[85vh]' : 'max-h-[85vh] overflow-y-auto space-y-6'}`}
           >
 
-            <div className="absolute top-0 left-0 w-full h-1 bg-emerald-700/20" />
+            <div className="absolute top-0 left-0 w-full h-1 bg-amber-500/30" />
 
             {/* Header */}
             <div className="flex items-start justify-between">
@@ -453,6 +455,43 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
                 <span className="material-symbols-rounded text-base font-bold">close</span>
               </button>
             </div>
+
+            {/* Mode Toggle: Preset vs Chat */}
+            <div className="flex items-center bg-background/60 border border-border rounded-2xl p-1 gap-1 mt-4 mb-2 shrink-0">
+              <button
+                onClick={() => setModalMode('preset')}
+                className={`flex-1 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                  modalMode === 'preset'
+                    ? 'bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/25 shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <span className="material-symbols-rounded text-sm">grid_view</span>
+                Preset Tanaman
+              </button>
+              <button
+                onClick={() => setModalMode('chat')}
+                className={`flex-1 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                  modalMode === 'chat'
+                    ? 'bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/25 shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <span className="material-symbols-rounded text-sm">chat</span>
+                Chat Nisita
+              </button>
+            </div>
+
+            {/* Chat Mode */}
+            {modalMode === 'chat' && (
+              <div className="flex-1 min-h-0 overflow-hidden mt-2">
+                <NisitaChat />
+              </div>
+            )}
+
+            {/* Preset Mode Content */}
+            {modalMode === 'preset' && (
+              <>
 
             {/* Interactive Query Input */}
             <form onSubmit={handleSearch} className="relative group">
@@ -746,6 +785,9 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
                 </div>
 
               </motion.div>
+            )}
+
+              </> /* End preset mode */
             )}
 
           </motion.div>

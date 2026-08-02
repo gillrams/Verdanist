@@ -194,7 +194,7 @@ function SimpleMarkdown({ text }: { text: string }) {
 
   return (
     <div className="markdown-body">
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={renderers}>
+      <ReactMarkdown remarkPlugins={[remarkGfm as any]} components={renderers}>
         {text}
       </ReactMarkdown>
     </div>

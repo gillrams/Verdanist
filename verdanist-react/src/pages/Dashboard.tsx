@@ -206,6 +206,8 @@ export default function Dashboard() {
     ? { suhu: indoorSensor.temp, rh: indoorSensor.hum, tanah: 45, cahaya: 8200, co2: 412 }
     : { suhu: outdoorSensor.temp, rh: outdoorSensor.hum, tanah: 38, cahaya: 62000, co2: 415 };
 
+  const currentSensorConnected = zone === 'indoor' ? deviceOnline.indoor : deviceOnline.outdoor;
+
   // Count sensors that have actual data from DHT11
   const connectedSensorsCount = [deviceOnline.indoor, deviceOnline.outdoor].filter(Boolean).length;
   const hour = new Date().getHours();

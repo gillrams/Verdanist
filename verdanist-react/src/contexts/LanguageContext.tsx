@@ -99,6 +99,7 @@ const translations = {
   'admin.saveSys': { id: 'Simpan Sistem', en: 'Save System' },
   'admin.saved': { id: 'Tersimpan', en: 'Saved' },
   'admin.confirmDelete': { id: 'Hapus kebun ini?', en: 'Delete this farm?' },
+  'admin.confirmDeleteUser': { id: 'Apakah Anda yakin ingin menghapus pengguna ini?', en: 'Are you sure you want to delete this user?' },
 
   // ─── Analytics ───
   'analytics.title': { id: 'Tren sensor & pemakaian pompa', en: 'Sensor trends & pump usage' },

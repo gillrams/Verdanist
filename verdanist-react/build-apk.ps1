@@ -77,11 +77,9 @@ Write-Host "=== RESULT ===" -ForegroundColor Green
 $apkPath = "$androidDir\app\build\outputs\apk\debug\app-debug.apk"
 if (Test-Path $apkPath) {
     $size = (Get-Item $apkPath).Length / 1MB
-    $finalApk = "$projectDir\verdanist.apk"
-    Copy-Item -Path $apkPath -Destination $finalApk -Force
     Write-Host "========================================" -ForegroundColor Green
     Write-Host "  APK BERHASIL DIBUAT!" -ForegroundColor Green
-    Write-Host "  Lokasi: $finalApk" -ForegroundColor Cyan
+    Write-Host "  Lokasi: $apkPath" -ForegroundColor Cyan
     Write-Host "  Ukuran: $([math]::Round($size, 2)) MB" -ForegroundColor Cyan
     Write-Host "========================================" -ForegroundColor Green
 } else {

@@ -208,10 +208,9 @@ export default function Dashboard() {
 
   // Count sensors that have actual data from DHT11
   const connectedSensorsCount = [deviceOnline.indoor, deviceOnline.outdoor].filter(Boolean).length;
-  // Is current zone sensor connected?
-  const currentSensorConnected = zone === 'indoor' ? deviceOnline.indoor : deviceOnline.outdoor;
-
   const hour = new Date().getHours();
+  const greeting = hour < 11 ? t('dash.greeting.morning') : hour < 15 ? t('dash.greeting.afternoon') : hour < 18 ? t('dash.greeting.evening') : t('dash.greeting.night');
+
   const [ptrHeight, setPtrHeight] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const ptrStartY = useRef(0);

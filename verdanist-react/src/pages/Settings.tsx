@@ -60,6 +60,10 @@ export default function Settings() {
   const [notifTemp, setNotifTemp] = useState(false);
   const [notifRH, setNotifRH] = useState(false);
   const [notifPump, setNotifPump] = useState(false);
+  
+  const CURRENT_VERSION = "2.4.1";
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [updateData, setUpdateData] = useState<any>(null);
 
   // Load local notification settings on mount
   useEffect(() => {
@@ -67,6 +71,21 @@ export default function Settings() {
     setNotifTemp(prefs.notifTemp);
     setNotifRH(prefs.notifRH);
     setNotifPump(prefs.notifPump);
+
+    // Check for updates
+    const checkUpdate = async () => {
+      try {
+        const res = await fetch('/version.json?t=' + new Date().getTime());
+        const data = await res.json();
+        if (data.latest_version && data.latest_version !== CURRENT_VERSION) {
+          setUpdateAvailable(true);
+          setUpdateData(data);
+        }
+      } catch (e) {
+        console.error("Gagal mengecek pembaruan", e);
+      }
+    };
+    checkUpdate();
   }, []);
 
   const handleNotifToggle = async (type: 'temp' | 'rh' | 'pump', value: boolean) => {
@@ -313,29 +332,25 @@ export default function Settings() {
           <div className="bg-card border border-border shadow-sm rounded-2xl p-4 flex flex-col gap-3">
             <div className="flex justify-between items-center">
               <div>
-                <p style={{ fontSize: 14, fontWeight: 500 }} className="text-foreground">Verdanist v2.4.1</p>
+                <p style={{ fontSize: 14, fontWeight: 500 }} className="text-foreground">Verdanist v{CURRENT_VERSION}</p>
                 <p style={{ fontSize: 12 }} className="text-muted-foreground mt-0.5">Versi Saat Ini</p>
               </div>
-              <button
-                onClick={async () => {
-                  try {
-                    const res = await fetch('/version.json?t=' + new Date().getTime());
-                    const data = await res.json();
-                    if (data.latest_version && data.latest_version !== "2.4.1") {
-                      if (window.confirm(`Update tersedia: v${data.latest_version}\n\n${data.release_notes}\n\nApakah Anda ingin mengunduh sekarang?`)) {
-                        window.location.href = data.download_url;
-                      }
-                    } else {
-                      alert("Anda sudah menggunakan versi terbaru (v2.4.1).");
+              {updateAvailable && updateData ? (
+                <button
+                  onClick={() => {
+                    if (window.confirm(`Update tersedia: v${updateData.latest_version}\n\n${updateData.release_notes}\n\nApakah Anda ingin mengunduh sekarang?`)) {
+                      window.location.href = updateData.download_url;
                     }
-                  } catch (e) {
-                    alert("Gagal mengecek pembaruan.");
-                  }
-                }}
-                className="bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-xl text-xs font-bold transition-colors"
-              >
-                Cek Update
-              </button>
+                  }}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-xl text-xs font-bold transition-colors shadow-sm animate-pulse"
+                >
+                  Update Tersedia
+                </button>
+              ) : (
+                <span className="text-xs font-medium text-muted-foreground bg-secondary px-3 py-1.5 rounded-lg">
+                  Versi Terbaru
+                </span>
+              )}
             </div>
           </div>
         </div>

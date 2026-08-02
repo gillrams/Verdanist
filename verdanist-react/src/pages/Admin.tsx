@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import {
   Building2, Users, Cpu, CheckCircle2, Clock,
-  Wifi, WifiOff, UserCheck, RefreshCw, ShieldAlert
+  Wifi, WifiOff, UserCheck, RefreshCw, ShieldAlert,
+  Trash2, UserMinus
 } from "lucide-react";
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -69,6 +70,19 @@ export default function Admin() {
       alert('Gagal mengubah role: ' + error.message);
     } else {
       setUsers(u => u.map(user => user.id === id ? { ...user, role } : user));
+    }
+    setActionLoading(null);
+  };
+
+  const deleteUser = async (id: string) => {
+    if (!confirm(t('admin.confirmDeleteUser') || 'Apakah Anda yakin ingin menghapus pengguna ini?')) return;
+    setActionLoading(id);
+    const { error } = await supabase.from('profiles').delete().eq('id', id);
+    if (error) {
+      console.error(error);
+      alert('Gagal menghapus pengguna: ' + error.message);
+    } else {
+      setUsers(u => u.filter(user => user.id !== id));
     }
     setActionLoading(null);
   };
@@ -244,22 +258,42 @@ export default function Admin() {
 
                   <div className="bg-card border border-border rounded-2xl divide-y divide-border overflow-hidden shadow-sm mt-3">
                     {users.filter(u => u.role !== "guest").map((user) => (
-                      <div key={user.id} className="flex items-center gap-3 px-4 py-3.5 hover:bg-secondary/50 transition-colors">
-                        <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-secondary">
-                          <span style={{ fontFamily: "'Fredoka', sans-serif", fontSize: 15, fontWeight: 600 }} className="text-primary">
-                            {(user.display_name || user.email || "U")[0].toUpperCase()}
-                          </span>
+                      <div key={user.id} className="flex flex-col sm:flex-row sm:items-center gap-3 px-4 py-3.5 hover:bg-secondary/50 transition-colors">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-secondary">
+                            <span style={{ fontFamily: "'Fredoka', sans-serif", fontSize: 15, fontWeight: 600 }} className="text-primary">
+                              {(user.display_name || user.email || "U")[0].toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p style={{ fontWeight: 600, fontSize: 13 }} className="text-foreground">{user.display_name || user.email}</p>
+                            <p style={{ fontSize: 11 }} className="text-muted-foreground capitalize">{user.role}</p>
+                          </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p style={{ fontWeight: 600, fontSize: 13 }} className="text-foreground">{user.display_name || user.email}</p>
-                          <p style={{ fontSize: 11 }} className="text-muted-foreground capitalize">{user.role}</p>
+                        <div className="flex flex-wrap items-center gap-2 pl-12 sm:pl-0">
+                          <button
+                            onClick={() => updateRole(user.id, user.role === 'admin' ? 'farmer' : 'admin')}
+                            className="text-muted-foreground hover:text-primary transition-colors text-xs border border-border px-2 py-1.5 rounded-lg bg-card"
+                          >
+                            {t('admin.changeTo')} {user.role === 'admin' ? 'Farmer' : 'Admin'}
+                          </button>
+                          <button
+                            onClick={() => updateRole(user.id, 'guest')}
+                            className="text-orange-500 hover:text-orange-600 transition-colors text-xs border border-orange-500/30 bg-orange-500/10 px-2 py-1.5 rounded-lg flex items-center gap-1"
+                            title="Jadikan Guest (Cabut Akses)"
+                          >
+                            <UserMinus className="w-3.5 h-3.5" />
+                            Guest
+                          </button>
+                          <button
+                            onClick={() => deleteUser(user.id)}
+                            className="text-destructive hover:text-destructive/80 transition-colors text-xs border border-destructive/30 bg-destructive/10 px-2 py-1.5 rounded-lg flex items-center gap-1"
+                            title="Hapus Pengguna"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            Hapus
+                          </button>
                         </div>
-                        <button
-                          onClick={() => updateRole(user.id, user.role === 'admin' ? 'farmer' : 'admin')}
-                          className="text-muted-foreground hover:text-primary transition-colors text-xs border border-border px-2 py-1 rounded"
-                        >
-                          {t('admin.changeTo')} {user.role === 'admin' ? 'Farmer' : 'Admin'}
-                        </button>
                       </div>
                     ))}
                   </div>

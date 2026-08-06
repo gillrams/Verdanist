@@ -29,7 +29,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-[#F0FDF4] dark:bg-[#071E14]">
       {/* Sidebar - only visible on desktop (lg and up) */}
-      <Sidebar />
+      <Sidebar onOpenScanner={() => setIsScannerOpen(true)} />
 
       {/* Main Content Area */}
       <main className="flex-1 w-full overflow-x-hidden min-h-screen pb-20 lg:pb-0 relative flex flex-col">

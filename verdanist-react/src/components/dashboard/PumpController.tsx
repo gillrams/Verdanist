@@ -287,7 +287,7 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
     
     const intervalTimer = setInterval(() => {
       // Jika offline, jangan jalankan hitung mundur dan jangan trigger pompa
-      if (device.status === 'offline') return;
+      if (!isDeviceOnline) return;
 
       const remaining = calcIntervalRemaining();
       setIntervalTimeLeft(remaining);

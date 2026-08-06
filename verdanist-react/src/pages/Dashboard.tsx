@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -164,10 +164,10 @@ export default function Dashboard() {
           const humThresh = payload.new.hum_threshold ?? 50;
 
           if (prefs.notifTemp && newTemp > tempThresh && newTemp > prev.temp) {
-            sendNotification(`temp_${payload.new.device_id}`, `≡ƒîí∩╕Å Suhu Ekstrem (${devName})`, { body: `Suhu mencapai ${newTemp.toFixed(1)}┬░C (Melebihi batas ${tempThresh}┬░C)` });
+            sendNotification(`temp_${payload.new.device_id}`, `🌡️ Suhu Ekstrem (${devName})`, { body: `Suhu mencapai ${newTemp.toFixed(1)}°C (Melebihi batas ${tempThresh}°C)` });
           }
           if (prefs.notifRH && newHum < humThresh && newHum < prev.hum) {
-            sendNotification(`rh_${payload.new.device_id}`, `≡ƒÆº Kelembaban Rendah (${devName})`, { body: `Kelembaban turun ke ${newHum.toFixed(1)}% (Di bawah batas ${humThresh}%)` });
+            sendNotification(`rh_${payload.new.device_id}`, `💧 Kelembaban Rendah (${devName})`, { body: `Kelembaban turun ke ${newHum.toFixed(1)}% (Di bawah batas ${humThresh}%)` });
           }
           
           // Update ref so the timer picks it up immediately
@@ -283,7 +283,7 @@ export default function Dashboard() {
           <div className="flex flex-col gap-2.5">
             <div>
               <p style={{ fontSize: 13 }} className="text-muted-foreground mb-1.5">
-                {greeting} ┬╖ {currentFarm?.name || 'Persada Farm Bogor'}
+                {greeting} · {currentFarm?.name || 'Persada Farm Bogor'}
               </p>
               <div className="flex items-center gap-2 flex-wrap">
                 {weather && (
@@ -292,7 +292,7 @@ export default function Dashboard() {
                       {getWeatherInfo(weather.weatherCode, weather.isDay).icon}
                     </div>
                     <span className="text-primary" style={{ fontSize: 11, fontWeight: 600 }}>
-                      {getWeatherInfo(weather.weatherCode, weather.isDay).desc}, {weather.temperature.toFixed(0)}┬░C
+                      {getWeatherInfo(weather.weatherCode, weather.isDay).desc}, {weather.temperature.toFixed(0)}°C
                     </span>
                   </div>
                 )}
@@ -368,7 +368,7 @@ export default function Dashboard() {
                     {currentSensorConnected ? 'LIVE' : 'OFFLINE'}
                   </span>
                   <span className="text-muted-foreground" style={{ fontSize: 12 }}>
-                    ┬╖ {currentSensorConnected ? t('dash.realtime') : 'No Sensor Data'}
+                    · {currentSensorConnected ? t('dash.realtime') : 'No Sensor Data'}
                   </span>
                 </div>
                 <div className="bg-muted rounded-xl p-0.5 flex">
@@ -399,7 +399,7 @@ export default function Dashboard() {
                     <span
                       className={`mt-4 ${sensorData.suhu !== null ? 'text-muted-foreground' : 'text-muted-foreground/20'}`}
                       style={{ fontSize: 22, fontWeight: 500 }}
-                    >┬░C</span>
+                    >°C</span>
                   </div>
                   <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                     <Thermometer className={`w-3.5 h-3.5 ${sensorData.suhu !== null ? 'text-ring' : 'text-muted-foreground/30'}`} />
@@ -461,7 +461,7 @@ export default function Dashboard() {
             </div>
         </div>
 
-          {/* Charts separated ΓÇö live data, updates every 1 min, max 30 points */}
+          {/* Charts separated — live data, updates every 1 min, max 30 points */}
           <div className="lg:col-span-7 order-3 grid grid-cols-1 gap-3 lg:gap-4">
             {/* Suhu Chart */}
             <div className="bg-card border border-border rounded-3xl p-4 shadow-[var(--shadow-custom)]">
@@ -471,7 +471,7 @@ export default function Dashboard() {
                 </span>
                 <span className="text-muted-foreground flex items-center gap-1.5" style={{ fontSize: 11 }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-ring animate-pulse inline-block" />
-                  Live ┬╖ 1 min
+                  Live · 1 min
                 </span>
               </div>
               {currentSensorConnected && (zone === 'indoor' ? indoorChartData : outdoorChartData).length > 1 ? (
@@ -509,7 +509,7 @@ export default function Dashboard() {
                 </span>
                 <span className="text-muted-foreground flex items-center gap-1.5" style={{ fontSize: 11 }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-chart-2 animate-pulse inline-block" />
-                  Live ┬╖ 1 min
+                  Live · 1 min
                 </span>
               </div>
               {currentSensorConnected && (zone === 'indoor' ? indoorChartData : outdoorChartData).length > 1 ? (

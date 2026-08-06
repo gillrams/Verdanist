@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Capacitor } from '@capacitor/core';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 type ScanMode = 'identify' | 'disease' | 'care';
 type ScanStep = 'select-mode' | 'capture' | 'analyzing' | 'result';
@@ -239,6 +241,25 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
     setStep('capture');
   };
 
+  const handleCapacitorCamera = async () => {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Base64,
+        source: CameraSource.Camera
+      });
+      
+      if (image.base64String) {
+        const mimeType = `image/${image.format}`;
+        setCapturedImage(`data:${mimeType};base64,${image.base64String}`);
+        analyzeImage(image.base64String, mimeType);
+      }
+    } catch (e) {
+      console.log('Camera capture cancelled or failed', e);
+    }
+  };
+
   const handleImageCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -474,14 +495,7 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
                       ref={fileInputRef}
                       onChange={handleImageCapture}
                     />
-                    <input
-                      type="file"
-                      accept="image/*"
-                      capture="environment"
-                      className="hidden"
-                      ref={cameraInputRef}
-                      onChange={handleImageCapture}
-                    />
+                    {/* The camera input is replaced by handleCapacitorCamera */}
 
                     {/* Camera Area */}
                     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-900/20 to-teal-900/30 dark:from-emerald-900/40 dark:to-teal-900/50 border border-emerald-500/20 aspect-[4/3] flex flex-col items-center justify-center gap-4">
@@ -504,7 +518,7 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
                     {/* Action Buttons */}
                     <div className="flex gap-3 mt-4">
                       <button
-                        onClick={() => cameraInputRef.current?.click()}
+                        onClick={handleCapacitorCamera}
                         className={`flex-1 py-3.5 rounded-xl bg-gradient-to-br ${currentMode?.color} text-white font-bold text-[13px] flex items-center justify-center gap-2 shadow-lg hover:shadow-xl active:scale-[0.97] transition-all cursor-pointer`}
                       >
                         <span className="material-symbols-rounded text-lg">photo_camera</span>

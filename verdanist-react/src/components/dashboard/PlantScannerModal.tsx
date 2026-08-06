@@ -260,11 +260,11 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
   const analyzeImage = async (base64Data: string, mimeType: string) => {
     setStep('analyzing');
 
-    const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     const modeConfig = SCAN_MODES.find(m => m.id === selectedMode);
 
     if (!apiKey) {
-      setResult('API Key Groq tidak ditemukan. Pastikan VITE_GROQ_API_KEY sudah diatur di Vercel.');
+      setResult('API Key Gemini tidak ditemukan. Pastikan VITE_GEMINI_API_KEY sudah diatur di Vercel atau .env.');
       setStep('result');
       return;
     }
@@ -277,26 +277,23 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
 
     try {
       const response = await fetch(
-        'https://api.groq.com/openai/v1/chat/completions',
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
         {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'llama-3.2-90b-vision-preview',
-            messages: [
+            contents: [
               {
-                role: 'user',
-                content: [
-                  { type: 'text', text: modeConfig.prompt },
-                  { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64Data}` } }
+                parts: [
+                  { text: modeConfig.prompt },
+                  { inlineData: { mimeType: mimeType, data: base64Data } }
                 ]
               }
             ],
-            temperature: 0.7,
-            max_tokens: 4096,
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 4096,
+            }
           })
         }
       );
@@ -304,25 +301,14 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
       const data = await response.json();
 
       if (!response.ok) {
-        console.error("Groq API Error:", data);
-        if (response.status === 404) {
-          setResult('Model AI (vision) tidak ditemukan atau sedang tidak tersedia di Groq.');
-        } else if (response.status === 429) {
-          setCooldown(60);
-          setResult('Ups! AI sedang kelelahan karena terlalu banyak request. Tunggu sebentar dan coba lagi! ⏳');
-        } else {
-          setResult(`Waduh, ada kendala dari AI: ${data.error?.message || response.statusText}`);
-        }
+        console.error("Gemini API Error:", data);
+        setResult(`Waduh, ada kendala dari AI: ${data.error?.message || response.statusText}`);
         setStep('result');
         return;
       }
 
-      if (data.choices?.[0]?.message?.content) {
-        let aiText = data.choices[0].message.content;
-
-        if (aiText.includes('</think>')) {
-          aiText = aiText.split('</think>')[1].trim();
-        }
+      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+        let aiText = data.candidates[0].content.parts[0].text;
 
         const keywords = ['### 🌿', '### 🩺', '### 🪴', '###', '####'];
         let startIndex = -1;
@@ -333,13 +319,6 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
         if (startIndex !== -1) aiText = aiText.substring(startIndex);
 
         setResult(aiText);
-      } else if (data.error) {
-        if (data.error.code === 429 || data.error.message?.toLowerCase().includes('quota') || data.error.message?.toLowerCase().includes('limit')) {
-          setCooldown(60);
-          setResult('Ups! AI sedang kelelahan karena terlalu banyak request. Tunggu sebentar dan coba lagi! ⏳');
-        } else {
-          setResult(`Waduh, ada kendala dari AI: ${data.error.message}`);
-        }
       } else {
         setResult('Hmm, AI tidak bisa menganalisis gambar ini. Coba foto dari sudut yang lebih jelas ya!');
       }

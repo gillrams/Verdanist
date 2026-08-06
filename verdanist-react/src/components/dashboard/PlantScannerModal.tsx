@@ -285,7 +285,7 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+            model: 'llama-3.2-11b-vision-preview',
             messages: [
               {
                 role: 'user',
@@ -302,6 +302,20 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
       );
 
       const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Groq API Error:", data);
+        if (response.status === 404) {
+          setResult('Model AI (vision) tidak ditemukan atau sedang tidak tersedia di Groq.');
+        } else if (response.status === 429) {
+          setCooldown(60);
+          setResult('Ups! AI sedang kelelahan karena terlalu banyak request. Tunggu sebentar dan coba lagi! ⏳');
+        } else {
+          setResult(`Waduh, ada kendala dari AI: ${data.error?.message || response.statusText}`);
+        }
+        setStep('result');
+        return;
+      }
 
       if (data.choices?.[0]?.message?.content) {
         let aiText = data.choices[0].message.content;

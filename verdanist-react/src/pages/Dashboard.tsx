@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Thermometer, Droplets, Sun, Wind, Bell, Droplet, TrendingUp, TrendingDown, RefreshCw } from "lucide-react";
+import { Thermometer, Droplets, Sun, Wind, Bell, Droplet, TrendingUp, TrendingDown } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import TimerModal from '../components/dashboard/TimerModal';
@@ -40,7 +40,7 @@ const formatLastSeen = (dateString: string | null) => {
 };
 
 const MAX_CHART_POINTS = 30;
-const CHART_INTERVAL_MS = 60_000;
+const CHART_INTERVAL_MS = 60_000; // Record a chart point every 1 minute
 
 type ChartPoint = { time: string; suhu: number | null; humidity: number | null };
 
@@ -52,6 +52,7 @@ export default function Dashboard() {
   const [zone, setZone] = useState<"indoor" | "outdoor">("indoor");
   const [currentTime, setCurrentTime] = useState(new Date());
 
+  // Live chart data (sliding window, max 30 points)
   const [indoorChartData, setIndoorChartData] = useState<ChartPoint[]>([]);
   const [outdoorChartData, setOutdoorChartData] = useState<ChartPoint[]>([]);
 
@@ -93,10 +94,24 @@ export default function Dashboard() {
     const fetchInitial = async () => {
       const { data: sData } = await supabase.from('device_settings').select('*').in('device_id', ['ESP32_INDOOR', 'ESP32_OUTDOOR']);
       if (sData) {
+        const now = Date.now();
+        let initIndoorOnline = false;
+        let initOutdoorOnline = false;
+        
         sData.forEach(d => {
-          if (d.device_id === 'ESP32_INDOOR') setIndoorSensor(p => ({ ...p, temp: d.temperature ?? null, hum: d.humidity ?? null, mode: d.mode || p.mode, lastSeen: d.last_seen ?? null }));
-          if (d.device_id === 'ESP32_OUTDOOR') setOutdoorSensor(p => ({ ...p, temp: d.temperature ?? null, hum: d.humidity ?? null, mode: d.mode || p.mode, lastSeen: d.last_seen ?? null }));
+          if (d.device_id === 'ESP32_INDOOR') {
+            lastSeenRef.current.indoor = d.last_seen ?? null;
+            setIndoorSensor(p => ({ ...p, temp: d.temperature ?? null, hum: d.humidity ?? null, mode: d.mode || p.mode, lastSeen: d.last_seen ?? null }));
+            if (d.last_seen) initIndoorOnline = (now - new Date(d.last_seen).getTime()) < 15000;
+          }
+          if (d.device_id === 'ESP32_OUTDOOR') {
+            lastSeenRef.current.outdoor = d.last_seen ?? null;
+            setOutdoorSensor(p => ({ ...p, temp: d.temperature ?? null, hum: d.humidity ?? null, mode: d.mode || p.mode, lastSeen: d.last_seen ?? null }));
+            if (d.last_seen) initOutdoorOnline = (now - new Date(d.last_seen).getTime()) < 15000;
+          }
         });
+        
+        setDeviceOnline({ indoor: initIndoorOnline, outdoor: initOutdoorOnline });
       }
       const { data: pData } = await supabase.from('device_status').select('*').in('device_id', ['ESP32_INDOOR', 'ESP32_OUTDOOR']);
       if (pData) {
@@ -104,6 +119,18 @@ export default function Dashboard() {
           if (d.device_id === 'ESP32_INDOOR') setIndoorPump(p => ({ ...p, on: d.pump_active || false }));
           if (d.device_id === 'ESP32_OUTDOOR') setOutdoorPump(p => ({ ...p, on: d.pump_active || false }));
         });
+      }
+      // Seed chart with initial data point
+      const initTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      if (sData) {
+        const indoorRow = sData.find((d: any) => d.device_id === 'ESP32_INDOOR');
+        const outdoorRow = sData.find((d: any) => d.device_id === 'ESP32_OUTDOOR');
+        if (indoorRow) {
+          setIndoorChartData([{ time: initTime, suhu: indoorRow.temperature ?? null, humidity: indoorRow.humidity ?? null }]);
+        }
+        if (outdoorRow) {
+          setOutdoorChartData([{ time: initTime, suhu: outdoorRow.temperature ?? null, humidity: outdoorRow.humidity ?? null }]);
+        }
       }
       setLoading(false);
     };
@@ -113,36 +140,19 @@ export default function Dashboard() {
       const now = new Date();
       setCurrentTime(now);
       
+      // Read lastSeen from ref (always up-to-date, no nested setState issues)
+      const indoorLS = lastSeenRef.current.indoor;
+      const outdoorLS = lastSeenRef.current.outdoor;
+      const newIndoor = indoorLS ? (now.getTime() - new Date(indoorLS).getTime()) < 15000 : false;
+      const newOutdoor = outdoorLS ? (now.getTime() - new Date(outdoorLS).getTime()) < 15000 : false;
+
       setDeviceOnline(prev => {
-        let newIndoor = prev.indoor;
-        let newOutdoor = prev.outdoor;
-        
-        setIndoorSensor(indoor => {
-          if (indoor.lastSeen) {
-            const last = new Date(indoor.lastSeen);
-            newIndoor = (now.getTime() - last.getTime()) < 15000;
-          } else {
-            newIndoor = false;
-          }
-          return indoor;
-        });
-
-        setOutdoorSensor(outdoor => {
-          if (outdoor.lastSeen) {
-            const last = new Date(outdoor.lastSeen);
-            newOutdoor = (now.getTime() - last.getTime()) < 15000;
-          } else {
-            newOutdoor = false;
-          }
-          return outdoor;
-        });
-
         if (newIndoor !== prev.indoor || newOutdoor !== prev.outdoor) {
           return { indoor: newIndoor, outdoor: newOutdoor };
         }
         return prev;
       });
-    }, 1000);
+    }, 5000);
 
     const sub = supabase.channel('dashboard_updates')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'device_settings' }, payload => {
@@ -154,13 +164,17 @@ export default function Dashboard() {
           const humThresh = payload.new.hum_threshold ?? 50;
 
           if (prefs.notifTemp && newTemp > tempThresh && newTemp > prev.temp) {
-            sendNotification(`temp_${payload.new.device_id}`, `🌡️ Suhu Ekstrem (${devName})`, { body: `Suhu mencapai ${newTemp.toFixed(1)}°C (Melebihi batas ${tempThresh}°C)` });
+            sendNotification(`temp_${payload.new.device_id}`, `≡ƒîí∩╕Å Suhu Ekstrem (${devName})`, { body: `Suhu mencapai ${newTemp.toFixed(1)}┬░C (Melebihi batas ${tempThresh}┬░C)` });
           }
           if (prefs.notifRH && newHum < humThresh && newHum < prev.hum) {
-            sendNotification(`rh_${payload.new.device_id}`, `💧 Kelembaban Rendah (${devName})`, { body: `Kelembaban turun ke ${newHum.toFixed(1)}% (Di bawah batas ${humThresh}%)` });
+            sendNotification(`rh_${payload.new.device_id}`, `≡ƒÆº Kelembaban Rendah (${devName})`, { body: `Kelembaban turun ke ${newHum.toFixed(1)}% (Di bawah batas ${humThresh}%)` });
           }
           
-          return { ...prev, temp: newTemp, hum: newHum, mode: payload.new.mode ?? prev.mode, lastSeen: payload.new.last_seen ?? prev.lastSeen };
+          // Update ref so the timer picks it up immediately
+          const newLastSeen = payload.new.last_seen ?? prev.lastSeen;
+          if (payload.new.device_id === 'ESP32_INDOOR') lastSeenRef.current.indoor = newLastSeen;
+          if (payload.new.device_id === 'ESP32_OUTDOOR') lastSeenRef.current.outdoor = newLastSeen;
+          return { ...prev, temp: newTemp, hum: newHum, mode: payload.new.mode ?? prev.mode, lastSeen: newLastSeen };
         };
 
         if (payload.new.device_id === 'ESP32_INDOOR') {
@@ -176,9 +190,9 @@ export default function Dashboard() {
           
           if (prefs.notifPump && pumpActive !== prev.on) {
             if (pumpActive) {
-              sendNotification(`pump_${payload.new.device_id}`, `💦 Pompa Menyala`, { body: `Pompa misting ${devName} sedang aktif.`, requireInteraction: false }, true);
+              sendNotification(`pump_${payload.new.device_id}`, `≡ƒÆª Pompa Menyala`, { body: `Pompa misting ${devName} sedang aktif.`, requireInteraction: false }, true);
             } else {
-              sendNotification(`pump_${payload.new.device_id}`, `⏹️ Pompa Berhenti`, { body: `Pompa misting ${devName} dimatikan.`, requireInteraction: false }, true);
+              sendNotification(`pump_${payload.new.device_id}`, `ΓÅ╣∩╕Å Pompa Berhenti`, { body: `Pompa misting ${devName} dimatikan.`, requireInteraction: false }, true);
             }
           }
 
@@ -231,68 +245,20 @@ export default function Dashboard() {
     return () => clearInterval(chartTimer);
   }, []);
 
-  const sensorData = zone === "indoor"
-    ? { suhu: indoorSensor.temp, rh: indoorSensor.hum, tanah: 45, cahaya: 8200, co2: 412 }
-    : { suhu: outdoorSensor.temp, rh: outdoorSensor.hum, tanah: 38, cahaya: 62000, co2: 415 };
-
-  const currentSensorConnected = zone === 'indoor' ? deviceOnline.indoor : deviceOnline.outdoor;
-
   // Count sensors that have actual data from DHT11
   const connectedSensorsCount = [deviceOnline.indoor, deviceOnline.outdoor].filter(Boolean).length;
+  // Is current zone sensor connected?
+  const currentSensorConnected = zone === 'indoor' ? deviceOnline.indoor : deviceOnline.outdoor;
+
+  const sensorData = zone === "indoor"
+    ? { suhu: currentSensorConnected ? indoorSensor.temp : null, rh: currentSensorConnected ? indoorSensor.hum : null, tanah: 45, cahaya: 8200, co2: 412 }
+    : { suhu: currentSensorConnected ? outdoorSensor.temp : null, rh: currentSensorConnected ? outdoorSensor.hum : null, tanah: 38, cahaya: 62000, co2: 415 };
+
   const hour = new Date().getHours();
   const greeting = hour < 11 ? t('dash.greeting.morning') : hour < 15 ? t('dash.greeting.afternoon') : hour < 18 ? t('dash.greeting.evening') : t('dash.greeting.night');
 
-  const [ptrHeight, setPtrHeight] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const ptrStartY = useRef(0);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (window.scrollY === 0) {
-      ptrStartY.current = e.touches[0].clientY;
-    } else {
-      ptrStartY.current = 0;
-    }
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (ptrStartY.current > 0 && window.scrollY === 0) {
-      const y = e.touches[0].clientY;
-      const diff = y - ptrStartY.current;
-      if (diff > 0) {
-        setPtrHeight(Math.min(diff * 0.4, 80));
-      }
-    }
-  };
-
-  const handleTouchEnd = () => {
-    if (ptrHeight >= 60) {
-      setIsRefreshing(true);
-      setPtrHeight(50);
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
-    } else {
-      setPtrHeight(0);
-    }
-    ptrStartY.current = 0;
-  };
-
   return (
-    <div 
-      className="flex flex-col min-h-screen bg-background pb-20 lg:pb-6 lg:pt-6 w-full relative"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
-      {/* Pull To Refresh Indicator */}
-      <div 
-        className="absolute top-0 left-0 w-full flex items-center justify-center overflow-hidden transition-all duration-200 z-50 pointer-events-none"
-        style={{ height: `${ptrHeight}px`, opacity: ptrHeight > 10 ? 1 : 0 }}
-      >
-        <div className={`w-9 h-9 rounded-full bg-card shadow-lg flex items-center justify-center border border-border ${isRefreshing ? 'animate-spin' : ''}`} style={{ transform: `rotate(${ptrHeight * 3}deg)` }}>
-          <RefreshCw className="w-5 h-5 text-primary" />
-        </div>
-      </div>
+    <div className="flex flex-col min-h-screen bg-background pb-20 lg:pb-6 lg:pt-6 w-full">
       
       {/* Top Brand Bar - logo hanya tampil di mobile, desktop pakai sidebar */}
       <div className="px-6 pt-10 lg:pt-0 pb-4 flex items-center justify-between">
@@ -317,7 +283,7 @@ export default function Dashboard() {
           <div className="flex flex-col gap-2.5">
             <div>
               <p style={{ fontSize: 13 }} className="text-muted-foreground mb-1.5">
-                {greeting} · {currentFarm?.name || 'Persada Farm Bogor'}
+                {greeting} ┬╖ {currentFarm?.name || 'Persada Farm Bogor'}
               </p>
               <div className="flex items-center gap-2 flex-wrap">
                 {weather && (
@@ -326,7 +292,7 @@ export default function Dashboard() {
                       {getWeatherInfo(weather.weatherCode, weather.isDay).icon}
                     </div>
                     <span className="text-primary" style={{ fontSize: 11, fontWeight: 600 }}>
-                      {getWeatherInfo(weather.weatherCode, weather.isDay).desc}, {weather.temperature.toFixed(0)}°C
+                      {getWeatherInfo(weather.weatherCode, weather.isDay).desc}, {weather.temperature.toFixed(0)}┬░C
                     </span>
                   </div>
                 )}
@@ -402,7 +368,7 @@ export default function Dashboard() {
                     {currentSensorConnected ? 'LIVE' : 'OFFLINE'}
                   </span>
                   <span className="text-muted-foreground" style={{ fontSize: 12 }}>
-                    · {currentSensorConnected ? t('dash.realtime') : 'No Sensor Data'}
+                    ┬╖ {currentSensorConnected ? t('dash.realtime') : 'No Sensor Data'}
                   </span>
                 </div>
                 <div className="bg-muted rounded-xl p-0.5 flex">
@@ -433,7 +399,7 @@ export default function Dashboard() {
                     <span
                       className={`mt-4 ${sensorData.suhu !== null ? 'text-muted-foreground' : 'text-muted-foreground/20'}`}
                       style={{ fontSize: 22, fontWeight: 500 }}
-                    >°C</span>
+                    >┬░C</span>
                   </div>
                   <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                     <Thermometer className={`w-3.5 h-3.5 ${sensorData.suhu !== null ? 'text-ring' : 'text-muted-foreground/30'}`} />
@@ -495,7 +461,7 @@ export default function Dashboard() {
             </div>
         </div>
 
-          {/* Charts separated — live data, updates every 1 min, max 30 points */}
+          {/* Charts separated ΓÇö live data, updates every 1 min, max 30 points */}
           <div className="lg:col-span-7 order-3 grid grid-cols-1 gap-3 lg:gap-4">
             {/* Suhu Chart */}
             <div className="bg-card border border-border rounded-3xl p-4 shadow-[var(--shadow-custom)]">
@@ -505,7 +471,7 @@ export default function Dashboard() {
                 </span>
                 <span className="text-muted-foreground flex items-center gap-1.5" style={{ fontSize: 11 }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-ring animate-pulse inline-block" />
-                  Live · 1 min
+                  Live ┬╖ 1 min
                 </span>
               </div>
               {currentSensorConnected && (zone === 'indoor' ? indoorChartData : outdoorChartData).length > 1 ? (
@@ -535,15 +501,15 @@ export default function Dashboard() {
               )}
             </div>
 
-            {/* Kelembaban / Tanah Chart */}
+            {/* Kelembaban Chart */}
             <div className="bg-card border border-border rounded-3xl p-4 shadow-[var(--shadow-custom)]">
               <div className="flex items-center justify-between mb-3">
                 <span style={{ fontWeight: 600, fontSize: 14 }} className="text-foreground">
-                  {zone === 'indoor' ? t('dash.humChart') : t('dash.soilChart')}
+                  {t('dash.humChart')}
                 </span>
                 <span className="text-muted-foreground flex items-center gap-1.5" style={{ fontSize: 11 }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-chart-2 animate-pulse inline-block" />
-                  Live · 1 min
+                  Live ┬╖ 1 min
                 </span>
               </div>
               {currentSensorConnected && (zone === 'indoor' ? indoorChartData : outdoorChartData).length > 1 ? (
@@ -554,10 +520,6 @@ export default function Dashboard() {
                         <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
                         <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                       </linearGradient>
-                      <linearGradient id="soilGradMobile" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
-                      </linearGradient>
                     </defs>
                     <XAxis dataKey="time" tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} domain={[30, 100]} />
@@ -565,11 +527,7 @@ export default function Dashboard() {
                       contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 12, color: "var(--color-foreground)", fontSize: 12 }}
                       labelStyle={{ color: "var(--color-muted-foreground)" }}
                     />
-                    {zone === 'indoor' ? (
-                      <Area type="monotone" dataKey="humidity" name={t('dash.humPercent')} stroke="#3b82f6" strokeWidth={2} fill="url(#humGradMobile)" dot={false} animationDuration={500} />
-                    ) : (
-                      <Area type="monotone" dataKey="soil" name={t('dash.soilPercent')} stroke="#f97316" strokeWidth={2} fill="url(#soilGradMobile)" dot={false} animationDuration={500} />
-                    )}
+                    <Area type="monotone" dataKey="humidity" name={t('dash.humPercent')} stroke="#3b82f6" strokeWidth={2} fill="url(#humGradMobile)" dot={false} animationDuration={500} />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
@@ -606,8 +564,8 @@ export default function Dashboard() {
                     isDeviceOnline={deviceOnline.indoor}
                     mode={indoorSensor.mode}
                     setMode={(m) => setIndoorSensor(p => ({ ...p, mode: m as any }))}
-                    temp={indoorSensor.temp ?? undefined}
-                    humidity={indoorSensor.hum ?? undefined}
+                    temp={deviceOnline.indoor ? (indoorSensor.temp ?? undefined) : undefined}
+                    humidity={deviceOnline.indoor ? (indoorSensor.hum ?? undefined) : undefined}
                     onOpenSettings={() => { setModalDevice('indoor'); setIsSettingsModalOpen(true); }}
                     onOpenTimerModal={(tab = 'schedule') => { setModalDevice('indoor'); setTimerModalTab(tab); setIsTimerModalOpen(true); }}
                     onShowAlert={handleShowAlert}
@@ -619,8 +577,8 @@ export default function Dashboard() {
                     isDeviceOnline={deviceOnline.outdoor}
                     mode={outdoorSensor.mode}
                     setMode={(m) => setOutdoorSensor(p => ({ ...p, mode: m as any }))}
-                    temp={outdoorSensor.temp ?? undefined}
-                    humidity={outdoorSensor.hum ?? undefined}
+                    temp={deviceOnline.outdoor ? (outdoorSensor.temp ?? undefined) : undefined}
+                    humidity={deviceOnline.outdoor ? (outdoorSensor.hum ?? undefined) : undefined}
                     onOpenSettings={() => { setModalDevice('outdoor'); setIsSettingsModalOpen(true); }}
                     onOpenTimerModal={(tab = 'schedule') => { setModalDevice('outdoor'); setTimerModalTab(tab); setIsTimerModalOpen(true); }}
                     onShowAlert={handleShowAlert}

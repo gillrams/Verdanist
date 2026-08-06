@@ -14,7 +14,7 @@
     "@capacitor/filesystem": "^8.0.0",
     "@capacitor/geolocation": "^8.2.0",
     "react-markdown": "^9.0.0",
-    "remark-gfm": "^3.0.1",
+    "remark-gfm": "^4.0.0",
     "@capacitor/android": "^8.4.0",
     "@capacitor/app": "^8.1.0",
     "@capacitor/camera": "^8.2.0",

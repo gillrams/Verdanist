@@ -260,12 +260,11 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
   const analyzeImage = async (base64Data: string, mimeType: string) => {
     setStep('analyzing');
 
-    // Menggunakan API Key Groq dari environment variable
-    const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     const modeConfig = SCAN_MODES.find(m => m.id === selectedMode);
 
     if (!apiKey) {
-      setResult('API Key Groq tidak ditemukan. Pastikan VITE_GROQ_API_KEY sudah diatur di Vercel atau .env.');
+      setResult('API Key Gemini tidak ditemukan. Pastikan VITE_GEMINI_API_KEY sudah diatur di Vercel atau .env.');
       setStep('result');
       return;
     }
@@ -278,59 +277,49 @@ export default function PlantScannerModal({ isOpen, onClose }: PlantScannerModal
 
     try {
       const response = await fetch(
-        'https://api.groq.com/openai/v1/chat/completions',
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
         {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-            messages: [
+            contents: [
               {
-                role: 'user',
-                content: [
-                  { type: 'text', text: modeConfig.prompt },
-                  { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64Data}` } }
+                parts: [
+                  { text: modeConfig.prompt },
+                  { inline_data: { mime_type: mimeType, data: base64Data } }
                 ]
               }
             ],
-            temperature: 0.7,
-            max_tokens: 4096,
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 4096,
+            }
           })
         }
       );
 
       const data = await response.json();
 
-      if (data.choices?.[0]?.message?.content) {
-        let aiText = data.choices[0].message.content;
-        
-        // Buang tag <think> jika model (seperti Qwen) men-generate-nya
+      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+        let aiText = data.candidates[0].content.parts[0].text;
+
+        // Buang tag <think> jika ada
         if (aiText.includes('</think>')) {
           aiText = aiText.split('</think>')[1].trim();
         }
 
-        // Cek dan bersihkan sisa teks pengantar yang sering muncul di awal
+        // Bersihkan teks pengantar sebelum heading markdown
         const keywords = ['### 🌿', '### 🩺', '### 🪴', '###', '####'];
         let startIndex = -1;
-        
         for (const keyword of keywords) {
           const index = aiText.indexOf(keyword);
-          if (index !== -1) {
-            startIndex = index;
-            break;
-          }
+          if (index !== -1) { startIndex = index; break; }
         }
-        
-        if (startIndex !== -1) {
-          aiText = aiText.substring(startIndex);
-        }
+        if (startIndex !== -1) aiText = aiText.substring(startIndex);
 
         setResult(aiText);
       } else if (data.error) {
-        if (data.error.code === 429 || data.error.message?.toLowerCase().includes('quota') || data.error.message?.toLowerCase().includes('limit')) {
+        if (data.error.code === 429) {
           setCooldown(60);
           setResult('Ups! AI sedang kelelahan karena terlalu banyak request (Batas Kuota Tercapai). Silakan tunggu hitung mundur selesai dan coba lagi ya! ⏳');
         } else {

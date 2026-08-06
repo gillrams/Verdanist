@@ -4,7 +4,8 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../lib/supabase';
 import {
   Building2, Bell, ChevronRight,
-  Sun, Wifi, LogOut, Key, Camera, Pencil, Globe
+  Sun, Wifi, LogOut, Key, Camera, Pencil, Globe,
+  Smartphone, Download, CheckCircle2
 } from "lucide-react";
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { useNavigate } from 'react-router-dom';
@@ -61,7 +62,7 @@ export default function Settings() {
   const [notifRH, setNotifRH] = useState(false);
   const [notifPump, setNotifPump] = useState(false);
   
-  const CURRENT_VERSION = "2.4.1";
+  const CURRENT_VERSION = "3.0.0";
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [updateData, setUpdateData] = useState<any>(null);
 
@@ -327,31 +328,53 @@ export default function Settings() {
           </div>
         </div>
 
-        <SectionHeader icon={<Building2 className="w-4 h-4 text-ring" />} title="Versi Aplikasi" />
+        <SectionHeader icon={<Smartphone className="w-4 h-4 text-ring" />} title="Versi Aplikasi" />
         <div className="px-6 mb-5">
-          <div className="bg-card border border-border shadow-sm rounded-2xl p-4 flex flex-col gap-3">
+          <div className="bg-card border border-border shadow-sm rounded-2xl p-5 flex flex-col gap-4 relative overflow-hidden">
+            {updateAvailable && updateData ? (
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-ring animate-pulse" />
+            ) : null}
+            
             <div className="flex justify-between items-center">
-              <div>
-                <p style={{ fontSize: 14, fontWeight: 500 }} className="text-foreground">Verdanist v{CURRENT_VERSION}</p>
-                <p style={{ fontSize: 12 }} className="text-muted-foreground mt-0.5">Versi Saat Ini</p>
+              <div className="flex gap-4 items-center">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${updateAvailable ? 'bg-primary/10 border-primary/30 border' : 'bg-secondary'}`}>
+                  {updateAvailable ? (
+                    <Download className="w-6 h-6 text-primary" />
+                  ) : (
+                    <CheckCircle2 className="w-6 h-6 text-green-500" />
+                  )}
+                </div>
+                <div>
+                  <p style={{ fontSize: 16, fontWeight: 600 }} className="text-foreground">Verdanist v{CURRENT_VERSION}</p>
+                  <p style={{ fontSize: 12 }} className="text-muted-foreground mt-0.5">
+                    {updateAvailable ? "Versi baru tersedia!" : "Anda menggunakan versi terbaru"}
+                  </p>
+                </div>
               </div>
-              {updateAvailable && updateData ? (
+            </div>
+
+            {updateAvailable && updateData && (
+              <div className="mt-2 flex flex-col gap-3 border-t border-border/50 pt-4">
+                <div className="bg-secondary/50 rounded-xl p-3 border border-border/50">
+                  <p style={{ fontSize: 12, fontWeight: 700 }} className="text-foreground mb-1">Pembaruan v{updateData.latest_version}:</p>
+                  <p style={{ fontSize: 12, whiteSpace: 'pre-wrap' }} className="text-muted-foreground leading-relaxed">
+                    {updateData.release_notes}
+                  </p>
+                </div>
                 <button
                   onClick={() => {
-                    if (window.confirm(`Update tersedia: v${updateData.latest_version}\n\n${updateData.release_notes}\n\nApakah Anda ingin mengunduh sekarang?`)) {
-                      window.location.href = updateData.download_url;
+                    if (window.confirm(`Unduh Verdanist v${updateData.latest_version} sekarang?`)) {
+                      window.open('https://verdanist.id' + updateData.download_url, '_system');
                     }
                   }}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-xl text-xs font-bold transition-colors shadow-sm animate-pulse"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-3 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
+                  style={{ fontWeight: 600, fontSize: 14 }}
                 >
-                  Update Tersedia
+                  <Download className="w-4 h-4" />
+                  Update Sekarang
                 </button>
-              ) : (
-                <span className="text-xs font-medium text-muted-foreground bg-secondary px-3 py-1.5 rounded-lg">
-                  Versi Terbaru
-                </span>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -365,7 +388,7 @@ export default function Settings() {
             {t('settings.logoutBtn')}
           </button>
         </div>
-        <p style={{ fontSize: 11 }} className="text-center text-muted-foreground/40 mb-6">Verdanist v2.4.1 · Build 2026.05</p>
+        <p style={{ fontSize: 11 }} className="text-center text-muted-foreground/40 mb-6">Verdanist v3.0.0 · Build 2026.08</p>
       </div>
     </>
   );

@@ -4,8 +4,11 @@ import Sidebar from './Sidebar';
 import { Network } from '@capacitor/network';
 import { WifiOff } from 'lucide-react';
 
+import PlantScannerModal from '../dashboard/PlantScannerModal';
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [isOffline, setIsOffline] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   
   useEffect(() => {
     const initNetwork = async () => {
@@ -43,8 +46,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Bottom Navigation Bar - only visible on mobile/tablet */}
       <div className="lg:hidden">
-        <BottomNav />
+        <BottomNav onOpenScanner={() => setIsScannerOpen(true)} />
       </div>
+
+      <PlantScannerModal isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} />
     </div>
   );
 }

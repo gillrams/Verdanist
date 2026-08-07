@@ -5,6 +5,10 @@ import App from './App.tsx';
 import { initDeepLink } from './utils/deepLink';
 import { requestAllPermissions } from './utils/permissions';
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
+import { CapacitorUpdater } from '@capgo/capacitor-updater';
+
+// Tell Capgo this version loaded successfully (prevents auto-rollback)
+CapacitorUpdater.notifyAppReady();
 
 initDeepLink();
 requestAllPermissions();

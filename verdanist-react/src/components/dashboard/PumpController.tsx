@@ -11,6 +11,7 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
 interface PumpControllerProps {
   onOpenTimerModal?: (tab?: 'schedule' | 'interval') => void;
   onOpenSettings?: () => void;
+  onOpenWifiConfig?: () => void;
   onShowAlert?: (
     title: string,
     message: string,
@@ -30,7 +31,7 @@ interface PumpControllerProps {
 
 
 
-export default function PumpController({ onOpenTimerModal, onOpenSettings, onShowAlert, device = 'indoor', mode, setMode, temp, humidity, isDeviceOnline = true }: PumpControllerProps) {
+export default function PumpController({ onOpenWifiConfig, onOpenTimerModal, onOpenSettings, onShowAlert, device = 'indoor', mode, setMode, temp, humidity, isDeviceOnline = true }: PumpControllerProps) {
   const { t } = useLanguage();
   // ... existing logic is kept intact ...
   const deviceId = device === 'outdoor' ? 'ESP32_OUTDOOR' : 'ESP32_INDOOR';
@@ -420,9 +421,13 @@ export default function PumpController({ onOpenTimerModal, onOpenSettings, onSho
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <span className={`material-symbols-rounded text-[20px] ${isDeviceOnline ? 'text-primary animate-pulse' : 'text-destructive'}`}>
+          <button
+            onClick={onOpenWifiConfig}
+            className={`material-symbols-rounded text-[20px] transition-all hover:scale-110 ${isDeviceOnline ? 'text-primary animate-pulse' : 'text-destructive'}`}
+            title="Pengaturan WiFi"
+          >
             {isDeviceOnline ? 'wifi' : 'wifi_off'}
-          </span>
+          </button>
           <button
             onClick={onOpenSettings}
             className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all"

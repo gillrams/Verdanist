@@ -97,8 +97,9 @@
 //  SECTION 3 — WiFi & SUPABASE CREDENTIALS
 // ================================================================
 
-const char *WIFI_SSID     = "realme C71";
-const char *WIFI_PASSWORD = "ayamgoreng";
+// Kredensial Default (Fallback)
+const char *WIFI_DEFAULT_SSID     = "realme C71";
+const char *WIFI_DEFAULT_PASSWORD = "ayamgoreng";
 
 const char *SUPABASE_URL  = "https://pzktyggopmvyrkwcnwfo.supabase.co";
 const char *SUPABASE_KEY  =
@@ -150,11 +151,20 @@ float g_temp         = 0.0;
 float g_hum          = 0.0;
 int   g_validSensors = 0;
 
+float g_temp1 = -999.0, g_hum1 = -999.0;
+float g_temp2 = -999.0, g_hum2 = -999.0;
+float g_temp3 = -999.0, g_hum3 = -999.0;
+
 // System state
 bool g_pumpActive = false;
 bool g_sensorOK   = false;
 bool g_wifiOK     = false;
 bool g_ntpSynced  = false;
+
+// Kredensial WiFi Aktif (dari EEPROM)
+String g_wifiSSID = "";
+String g_wifiPass = "";
+String g_wifiStatusMsg = "disconnected";
 
 // Mode
 enum Mode { MODE_MANUAL = 0, MODE_AUTO = 1, MODE_TIMER = 2 };
@@ -189,21 +199,63 @@ void supabaseSendPumpStatus(bool state);
 // ================================================================
 
 void wifiConnect() {
-  Serial.printf("[WiFi] Menghubungkan ke '%s' ...", WIFI_SSID);
+  Serial.printf("[WiFi] Menghubungkan ke '%s' ...", g_wifiSSID.c_str());
   WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  WiFi.begin(g_wifiSSID.c_str(), g_wifiPass.c_str());
   int tries = 0;
   while (WiFi.status() != WL_CONNECTED && tries < 40) {
     delay(500);
     Serial.print(".");
     tries++;
   }
+  
   if (WiFi.status() == WL_CONNECTED) {
     g_wifiOK = true;
+    g_wifiStatusMsg = "connected";
     Serial.println("\n[WiFi] Terhubung! IP: " + WiFi.localIP().toString());
   } else {
+    Serial.println("\n[WiFi] GAGAL terhubung ke kredensial EEPROM.");
+    
+    // Fallback ke Default Hardcoded jika yang gagal adalah kredensial baru
+    if (g_wifiSSID != WIFI_DEFAULT_SSID) {
+      Serial.println("[WiFi] Menghapus kredensial salah dari EEPROM agar tidak looping...");
+      prefs.begin("verdanist", false);
+      prefs.remove("wifiSSID");
+      prefs.remove("wifiPass");
+      prefs.end();
+      
+      // Update memori global agar loop berikutnya tidak pakai WiFi salah lagi
+      g_wifiSSID = WIFI_DEFAULT_SSID;
+      g_wifiPass = WIFI_DEFAULT_PASSWORD;
+      
+      // Tandai bahwa ada error salah password
+      g_wifiStatusMsg = "error";
+      
+      // Putuskan koneksi sebelumnya agar tidak error "wifi:sta is connecting"
+      WiFi.disconnect();
+      delay(500);
+      
+      Serial.printf("[WiFi] Fallback ke '%s' ...", WIFI_DEFAULT_SSID);
+      WiFi.begin(WIFI_DEFAULT_SSID, WIFI_DEFAULT_PASSWORD);
+      tries = 0;
+      while (WiFi.status() != WL_CONNECTED && tries < 20) {
+        delay(500);
+        Serial.print(".");
+        tries++;
+      }
+      if (WiFi.status() == WL_CONNECTED) {
+        g_wifiOK = true;
+        Serial.println("\n[WiFi] Terhubung ke Fallback! IP: " + WiFi.localIP().toString());
+        return;
+      }
+    }
+    
     g_wifiOK = false;
-    Serial.println("\n[WiFi] GAGAL terhubung.");
+    g_wifiStatusMsg = "disconnected";
+    Serial.println("\n[WiFi] SEMUA KONEKSI GAGAL. Menyalakan Mode AP (Hotspot).");
+    WiFi.mode(WIFI_AP_STA);
+    WiFi.softAP("Verdanist-Setup", "verdanist123");
+    Serial.println("[WiFi] Mode AP Aktif. Connect ke 'Verdanist-Setup', IP: 192.168.4.1");
   }
 }
 
@@ -273,6 +325,7 @@ void saveSettings() {
   prefs.putInt("timerD", g_timerDuration);
   prefs.putFloat("tempTh", g_tempThreshold);
   prefs.putFloat("humTh", g_humThreshold);
+  // WiFi tidak disimpan di sini karena hanya disimpan saat ada perintah connect dari web
   prefs.end();
   Serial.println("[EEPROM] Setting disimpan.");
 }
@@ -285,6 +338,11 @@ void loadSettings() {
   g_timerDuration = prefs.getInt("timerD", 5);
   g_tempThreshold = prefs.getFloat("tempTh", 27.0);
   g_humThreshold  = prefs.getFloat("humTh", 65.0);
+  
+  // Load WiFi Credentials
+  g_wifiSSID = prefs.getString("wifiSSID", WIFI_DEFAULT_SSID);
+  g_wifiPass = prefs.getString("wifiPass", WIFI_DEFAULT_PASSWORD);
+  
   prefs.end();
 
   g_timerSetValues[0] = g_timerHour;
@@ -526,19 +584,40 @@ void processButtons() {
 void sensorRead() {
   float totalTemp = 0, totalHum = 0;
   int validCount = 0;
-  for (int i = 0; i < DHT_COUNT; i++) {
-    float t = dhtSensors[i]->readTemperature();
-    float h = dhtSensors[i]->readHumidity();
-    // DHT11 range: -40°C ~ 80°C
-    if (!isnan(t) && !isnan(h) && t > -40 && t < 80 && h >= 0 && h <= 100) {
-      totalTemp += t;
-      totalHum  += h;
-      validCount++;
-      Serial.printf("[DHT11] Suhu: %.1f°C  Kelembapan: %.1f%%\n", t, h);
-    } else {
-      Serial.printf("[DHT11] GAGAL BACA!\n");
-    }
+
+  // Baca Sensor 1
+  float t1 = dhtSensors[0]->readTemperature();
+  float h1 = dhtSensors[0]->readHumidity();
+  if (!isnan(t1) && !isnan(h1) && t1 > -40 && t1 < 80 && h1 >= 0 && h1 <= 100) {
+    g_temp1 = t1; g_hum1 = h1; totalTemp += t1; totalHum += h1; validCount++;
+    Serial.printf("[DHT11-1] Suhu: %.1f°C  Kelembapan: %.1f%%\n", t1, h1);
+  } else {
+    g_temp1 = -999; g_hum1 = -999;
+    Serial.printf("[DHT11-1] GAGAL BACA!\n");
   }
+
+  // Baca Sensor 2
+  float t2 = dhtSensors[1]->readTemperature();
+  float h2 = dhtSensors[1]->readHumidity();
+  if (!isnan(t2) && !isnan(h2) && t2 > -40 && t2 < 80 && h2 >= 0 && h2 <= 100) {
+    g_temp2 = t2; g_hum2 = h2; totalTemp += t2; totalHum += h2; validCount++;
+    Serial.printf("[DHT11-2] Suhu: %.1f°C  Kelembapan: %.1f%%\n", t2, h2);
+  } else {
+    g_temp2 = -999; g_hum2 = -999;
+    Serial.printf("[DHT11-2] GAGAL BACA!\n");
+  }
+
+  // Baca Sensor 3
+  float t3 = dhtSensors[2]->readTemperature();
+  float h3 = dhtSensors[2]->readHumidity();
+  if (!isnan(t3) && !isnan(h3) && t3 > -40 && t3 < 80 && h3 >= 0 && h3 <= 100) {
+    g_temp3 = t3; g_hum3 = h3; totalTemp += t3; totalHum += h3; validCount++;
+    Serial.printf("[DHT11-3] Suhu: %.1f°C  Kelembapan: %.1f%%\n", t3, h3);
+  } else {
+    g_temp3 = -999; g_hum3 = -999;
+    Serial.printf("[DHT11-3] GAGAL BACA!\n");
+  }
+
   if (validCount > 0) {
     g_sensorOK     = true;
     g_validSensors = validCount;
@@ -547,7 +626,9 @@ void sensorRead() {
   } else {
     g_sensorOK     = false;
     g_validSensors = 0;
-    Serial.println("[DHT11] SENSOR GAGAL TERBACA!");
+    g_temp = 0.0;
+    g_hum = 0.0;
+    Serial.println("[DHT11] SEMUA SENSOR GAGAL TERBACA!");
   }
 }
 
@@ -565,6 +646,22 @@ void supabaseSendSensor() {
   JsonDocument doc;
   doc["temperature"] = round(g_temp * 10.0) / 10.0;
   doc["humidity"]    = round(g_hum * 10.0) / 10.0;
+  
+  doc["valid_sensors"] = g_validSensors;
+  
+  if (g_temp1 != -999) { doc["temp_1"] = round(g_temp1 * 10.0) / 10.0; doc["hum_1"] = round(g_hum1 * 10.0) / 10.0; } else { doc["temp_1"] = nullptr; doc["hum_1"] = nullptr; }
+  if (g_temp2 != -999) { doc["temp_2"] = round(g_temp2 * 10.0) / 10.0; doc["hum_2"] = round(g_hum2 * 10.0) / 10.0; } else { doc["temp_2"] = nullptr; doc["hum_2"] = nullptr; }
+  if (g_temp3 != -999) { doc["temp_3"] = round(g_temp3 * 10.0) / 10.0; doc["hum_3"] = round(g_hum3 * 10.0) / 10.0; } else { doc["temp_3"] = nullptr; doc["hum_3"] = nullptr; }
+
+  // Gunakan "now" agar database menggunakan waktu server otomatis.
+  // Menghindari masalah jika ESP32 gagal sync NTP.
+  doc["last_seen"] = "now";
+  
+  // Status WiFi
+  doc["wifi_ssid"] = WiFi.SSID();
+  doc["wifi_signal"] = WiFi.RSSI();
+  doc["wifi_status"] = g_wifiStatusMsg;
+
   String body;
   serializeJson(doc, body);
 
@@ -629,11 +726,8 @@ void supabaseSendPumpStatus(bool state) {
   JsonDocument doc;
   doc["pump_active"] = state;
   
-  // Kirim format ISO 8601 yang valid untuk kolom timestamptz
-  String isoTime = getISOTimeStr();
-  if (isoTime != "") {
-    doc["last_sync"] = isoTime;
-  }
+  // Kirim format "now" agar server database mengisi waktu dengan akurat
+  doc["last_sync"] = "now";
   
   String body;
   serializeJson(doc, body);
@@ -800,6 +894,145 @@ void supabaseCheckSchedule() {
         pumpSet(false);
         supabaseSendPumpStatus(false);
         Serial.println("[TIMER] Jadwal selesai → Pompa OFF");
+      }
+    }
+  }
+  http.end();
+}
+
+// ================================================================
+//  SECTION 19B — SUPABASE: WIFI PROVISIONING
+// ================================================================
+
+void supabaseClearWifiCommand() {
+  HTTPClient http;
+  String url = String(SUPABASE_URL) + "/rest/v1/device_settings?device_id=eq." + DEVICE_ID;
+  http.begin(url);
+  http.addHeader("apikey", SUPABASE_KEY);
+  http.addHeader("Authorization", String("Bearer ") + SUPABASE_KEY);
+  http.addHeader("Content-Type", "application/json");
+  http.addHeader("Prefer", "return=minimal");
+  
+  JsonDocument doc;
+  doc["wifi_command"] = nullptr;
+  String body;
+  serializeJson(doc, body);
+  http.PATCH(body);
+  http.end();
+}
+
+void wifiScanAndSend() {
+  Serial.println("[WIFI] Memulai scan...");
+  int n = WiFi.scanNetworks();
+  
+  JsonDocument doc;
+  JsonArray results = doc.to<JsonArray>();
+  
+  for (int i = 0; i < n; ++i) {
+    JsonObject obj = results.add<JsonObject>();
+    obj["ssid"] = WiFi.SSID(i);
+    obj["rssi"] = WiFi.RSSI(i);
+    obj["secure"] = (WiFi.encryptionType(i) != WIFI_AUTH_OPEN);
+  }
+  
+  HTTPClient http;
+  String url = String(SUPABASE_URL) + "/rest/v1/device_settings?device_id=eq." + DEVICE_ID;
+  http.begin(url);
+  http.addHeader("apikey", SUPABASE_KEY);
+  http.addHeader("Authorization", String("Bearer ") + SUPABASE_KEY);
+  http.addHeader("Content-Type", "application/json");
+  http.addHeader("Prefer", "return=minimal");
+  
+  JsonDocument patchDoc;
+  patchDoc["wifi_scan_results"] = doc;
+  String body;
+  serializeJson(patchDoc, body);
+  
+  int code = http.PATCH(body);
+  if (code == 200 || code == 204) {
+    Serial.println("[WIFI] Hasil scan terkirim ke Supabase");
+  }
+  http.end();
+  WiFi.scanDelete();
+}
+
+void wifiReadNewCredsAndConnect() {
+  HTTPClient http;
+  String url = String(SUPABASE_URL) + "/rest/v1/device_settings?device_id=eq." + DEVICE_ID + "&select=wifi_new_ssid,wifi_new_password";
+  http.begin(url);
+  http.addHeader("apikey", SUPABASE_KEY);
+  http.addHeader("Authorization", String("Bearer ") + SUPABASE_KEY);
+
+  int code = http.GET();
+  if (code == 200) {
+    String body = http.getString();
+    JsonDocument doc;
+    DeserializationError err = deserializeJson(doc, body);
+    if (!err && doc.is<JsonArray>() && doc.size() > 0) {
+      if (!doc[0]["wifi_new_ssid"].isNull()) {
+        String newSSID = doc[0]["wifi_new_ssid"].as<String>();
+        String newPass = doc[0]["wifi_new_password"].isNull() ? "" : doc[0]["wifi_new_password"].as<String>();
+        
+        Serial.printf("[WIFI] Creds baru dari Web: SSID='%s'\n", newSSID.c_str());
+        
+        // Simpan ke EEPROM
+        prefs.begin("verdanist", false);
+        prefs.putString("wifiSSID", newSSID);
+        prefs.putString("wifiPass", newPass);
+        prefs.end();
+        
+        // Clear new creds di Supabase
+        HTTPClient patchHttp;
+        patchHttp.begin(String(SUPABASE_URL) + "/rest/v1/device_settings?device_id=eq." + DEVICE_ID);
+        patchHttp.addHeader("apikey", SUPABASE_KEY);
+        patchHttp.addHeader("Authorization", String("Bearer ") + SUPABASE_KEY);
+        patchHttp.addHeader("Content-Type", "application/json");
+        patchHttp.addHeader("Prefer", "return=minimal");
+        
+        JsonDocument patchDoc;
+        patchDoc["wifi_new_ssid"] = nullptr;
+        patchDoc["wifi_new_password"] = nullptr;
+        String pBody;
+        serializeJson(patchDoc, pBody);
+        patchHttp.PATCH(pBody);
+        patchHttp.end();
+        
+        delay(1000);
+        Serial.println("[WIFI] Restarting ESP32 untuk connect ke WiFi baru...");
+        ESP.restart();
+      }
+    }
+  }
+  http.end();
+}
+
+void supabaseCheckWifiCommand() {
+  if (!g_wifiOK) return;
+
+  HTTPClient http;
+  String url = String(SUPABASE_URL) + "/rest/v1/device_settings?device_id=eq." + DEVICE_ID + "&select=wifi_command";
+  
+  http.begin(url);
+  http.addHeader("apikey", SUPABASE_KEY);
+  http.addHeader("Authorization", String("Bearer ") + SUPABASE_KEY);
+
+  int code = http.GET();
+  if (code == 200) {
+    String body = http.getString();
+    JsonDocument doc;
+    DeserializationError err = deserializeJson(doc, body);
+    if (!err && doc.is<JsonArray>() && doc.size() > 0) {
+      if (!doc[0]["wifi_command"].isNull()) {
+        String cmd = doc[0]["wifi_command"].as<String>();
+        if (cmd == "scan") {
+          Serial.println("[WIFI] Menerima perintah SCAN dari Web");
+          supabaseClearWifiCommand();
+          wifiScanAndSend();
+        } else if (cmd == "connect") {
+          Serial.println("[WIFI] Menerima perintah CONNECT dari Web");
+          supabaseClearWifiCommand();
+          wifiReadNewCredsAndConnect();
+        }
       }
     }
   }
@@ -1119,10 +1352,11 @@ void loop() {
     supabaseSendSensor();
   }
 
-  // 5. Sinkronisasi mode dari web → update LED fisik
+  // 5. Sinkronisasi mode & perintah WiFi dari web
   if (now - lastModeSync >= INTERVAL_MODE_SYNC) {
     lastModeSync = now;
     supabaseReadMode();
+    supabaseCheckWifiCommand();
   }
 
   // 6. Cek jadwal timer

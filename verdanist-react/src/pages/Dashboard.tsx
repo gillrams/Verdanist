@@ -16,6 +16,8 @@ import logoDark from '../assets/Logo_Dark_samping.png';
 import NotificationModal from '../components/dashboard/NotificationModal';
 import ActivityLog from '../components/dashboard/ActivityLog';
 import { getNotifPrefs, sendNotification } from '../utils/notifications';
+import WiFiConfigModal from '../components/dashboard/WiFiConfigModal';
+import SensorDetailsModal from '../components/dashboard/SensorDetailsModal';
 
 const formatLastSeen = (dateString: string | null) => {
   if (!dateString) return 'Belum pernah';
@@ -44,6 +46,13 @@ const CHART_INTERVAL_MS = 60_000; // Record a chart point every 1 minute
 
 type ChartPoint = { time: string; suhu: number | null; humidity: number | null };
 
+interface SensorState {
+  temp: number | null; hum: number | null; mode: 'manual' | 'auto' | 'timer'; lastSeen: string | null;
+  validSensors: number; temp1: number | null; hum1: number | null; temp2: number | null; hum2: number | null; temp3: number | null; hum3: number | null;
+  tempThreshold: number; humThreshold: number;
+}
+
+const initSensor: SensorState = { temp: null, hum: null, mode: 'auto', lastSeen: null, validSensors: 0, temp1: null, hum1: null, temp2: null, hum2: null, temp3: null, hum3: null, tempThreshold: 0, humThreshold: 0 };
 
 export default function Dashboard() {
   const { currentFarm } = useAuth();
@@ -51,13 +60,14 @@ export default function Dashboard() {
   const { t, lang } = useLanguage();
   const [zone, setZone] = useState<"indoor" | "outdoor">("indoor");
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [showSensorModal, setShowSensorModal] = useState(false);
 
   // Live chart data (sliding window, max 30 points)
   const [indoorChartData, setIndoorChartData] = useState<ChartPoint[]>([]);
   const [outdoorChartData, setOutdoorChartData] = useState<ChartPoint[]>([]);
 
-  const [indoorSensor, setIndoorSensor] = useState<{ temp: number | null; hum: number | null; mode: 'manual' | 'auto' | 'timer'; lastSeen: string | null }>({ temp: null, hum: null, mode: 'auto', lastSeen: null });
-  const [outdoorSensor, setOutdoorSensor] = useState<{ temp: number | null; hum: number | null; mode: 'manual' | 'auto' | 'timer'; lastSeen: string | null }>({ temp: null, hum: null, mode: 'auto', lastSeen: null });
+  const [indoorSensor, setIndoorSensor] = useState<SensorState>(initSensor);
+  const [outdoorSensor, setOutdoorSensor] = useState<SensorState>(initSensor);
   const [deviceOnline, setDeviceOnline] = useState({ indoor: false, outdoor: false });
   const lastSeenRef = useRef<{ indoor: string | null; outdoor: string | null }>({ indoor: null, outdoor: null });
 
@@ -71,6 +81,7 @@ export default function Dashboard() {
   const [timerModalTab, setTimerModalTab] = useState<'schedule' | 'interval'>('schedule');
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [modalDevice, setModalDevice] = useState<'indoor' | 'outdoor'>('indoor');
+  const [isWifiModalOpen, setIsWifiModalOpen] = useState(false);
 
   const [alertState, setAlertState] = useState<{
     isOpen: boolean;
@@ -101,12 +112,12 @@ export default function Dashboard() {
         sData.forEach(d => {
           if (d.device_id === 'ESP32_INDOOR') {
             lastSeenRef.current.indoor = d.last_seen ?? null;
-            setIndoorSensor(p => ({ ...p, temp: d.temperature ?? null, hum: d.humidity ?? null, mode: d.mode || p.mode, lastSeen: d.last_seen ?? null }));
+            setIndoorSensor(p => ({ ...p, temp: d.temperature ?? null, hum: d.humidity ?? null, mode: d.mode || p.mode, lastSeen: d.last_seen ?? null, validSensors: d.valid_sensors ?? 0, temp1: d.temp_1 ?? null, hum1: d.hum_1 ?? null, temp2: d.temp_2 ?? null, hum2: d.hum_2 ?? null, temp3: d.temp_3 ?? null, hum3: d.hum_3 ?? null, tempThreshold: d.temp_threshold ?? 0, humThreshold: d.hum_threshold ?? 0 }));
             if (d.last_seen) initIndoorOnline = (now - new Date(d.last_seen).getTime()) < 15000;
           }
           if (d.device_id === 'ESP32_OUTDOOR') {
             lastSeenRef.current.outdoor = d.last_seen ?? null;
-            setOutdoorSensor(p => ({ ...p, temp: d.temperature ?? null, hum: d.humidity ?? null, mode: d.mode || p.mode, lastSeen: d.last_seen ?? null }));
+            setOutdoorSensor(p => ({ ...p, temp: d.temperature ?? null, hum: d.humidity ?? null, mode: d.mode || p.mode, lastSeen: d.last_seen ?? null, validSensors: d.valid_sensors ?? 0, temp1: d.temp_1 ?? null, hum1: d.hum_1 ?? null, temp2: d.temp_2 ?? null, hum2: d.hum_2 ?? null, temp3: d.temp_3 ?? null, hum3: d.hum_3 ?? null, tempThreshold: d.temp_threshold ?? 0, humThreshold: d.hum_threshold ?? 0 }));
             if (d.last_seen) initOutdoorOnline = (now - new Date(d.last_seen).getTime()) < 15000;
           }
         });
@@ -174,7 +185,7 @@ export default function Dashboard() {
           const newLastSeen = payload.new.last_seen ?? prev.lastSeen;
           if (payload.new.device_id === 'ESP32_INDOOR') lastSeenRef.current.indoor = newLastSeen;
           if (payload.new.device_id === 'ESP32_OUTDOOR') lastSeenRef.current.outdoor = newLastSeen;
-          return { ...prev, temp: newTemp, hum: newHum, mode: payload.new.mode ?? prev.mode, lastSeen: newLastSeen };
+          return { ...prev, temp: newTemp, hum: newHum, mode: payload.new.mode ?? prev.mode, lastSeen: newLastSeen, validSensors: payload.new.valid_sensors ?? prev.validSensors, temp1: payload.new.temp_1 ?? prev.temp1, hum1: payload.new.hum_1 ?? prev.hum1, temp2: payload.new.temp_2 ?? prev.temp2, hum2: payload.new.hum_2 ?? prev.hum2, temp3: payload.new.temp_3 ?? prev.temp3, hum3: payload.new.hum_3 ?? prev.hum3, tempThreshold: tempThresh, humThreshold: humThresh };
         };
 
         if (payload.new.device_id === 'ESP32_INDOOR') {
@@ -246,7 +257,7 @@ export default function Dashboard() {
   }, []);
 
   // Count sensors that have actual data from DHT11
-  const connectedSensorsCount = [deviceOnline.indoor, deviceOnline.outdoor].filter(Boolean).length;
+  const connectedSensorsCount = zone === 'indoor' ? indoorSensor.validSensors : outdoorSensor.validSensors;
   // Is current zone sensor connected?
   const currentSensorConnected = zone === 'indoor' ? deviceOnline.indoor : deviceOnline.outdoor;
 
@@ -297,24 +308,29 @@ export default function Dashboard() {
                   </div>
                 )}
                 {/* Sensor Connection Badge */}
-                <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md w-fit border transition-all ${
-                  connectedSensorsCount === 2
-                    ? 'bg-green-500/10 border-green-500/20'
-                    : connectedSensorsCount === 1
-                      ? 'bg-yellow-500/10 border-yellow-500/20'
-                      : 'bg-muted/60 border-border'
-                }`}>
-                  <div className={`w-1.5 h-1.5 rounded-full ${
-                    connectedSensorsCount === 2 ? 'bg-green-500 animate-pulse'
-                    : connectedSensorsCount === 1 ? 'bg-yellow-500 animate-pulse'
-                    : 'bg-muted-foreground/40'
+                <div 
+                  onClick={() => setShowSensorModal(true)}
+                  className={`
+                    flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-bold text-[10px] sm:text-xs tracking-wider cursor-pointer hover:opacity-80 transition-opacity
+                    ${!currentSensorConnected 
+                      ? 'bg-destructive/10 text-destructive border-destructive/20' 
+                      : 'bg-card text-foreground border-border shadow-sm'
+                    }
+                  `}
+                >
+                  <div className={`w-2 h-2 rounded-full ${
+                    !currentSensorConnected ? 'bg-destructive' :
+                    connectedSensorsCount === 3 ? 'bg-green-500 animate-pulse'
+                    : connectedSensorsCount > 0 ? 'bg-yellow-500 animate-pulse'
+                    : 'bg-destructive'
                   }`} />
-                  <span className={`${
-                    connectedSensorsCount === 2 ? 'text-green-600 dark:text-green-400'
-                    : connectedSensorsCount === 1 ? 'text-yellow-600 dark:text-yellow-400'
-                    : 'text-muted-foreground'
-                  }`} style={{ fontSize: 11, fontWeight: 600 }}>
-                    {connectedSensorsCount}/2 Sensor
+                  <span className={
+                    !currentSensorConnected ? 'text-destructive' :
+                    connectedSensorsCount === 3 ? 'text-green-600 dark:text-green-400'
+                    : connectedSensorsCount > 0 ? 'text-yellow-600 dark:text-yellow-400'
+                    : 'text-destructive'
+                  }>
+                    {connectedSensorsCount}/3 Sensor
                   </span>
                 </div>
               </div>
@@ -568,6 +584,7 @@ export default function Dashboard() {
                     humidity={deviceOnline.indoor ? (indoorSensor.hum ?? undefined) : undefined}
                     onOpenSettings={() => { setModalDevice('indoor'); setIsSettingsModalOpen(true); }}
                     onOpenTimerModal={(tab = 'schedule') => { setModalDevice('indoor'); setTimerModalTab(tab); setIsTimerModalOpen(true); }}
+                    onOpenWifiConfig={() => { setModalDevice('indoor'); setIsWifiModalOpen(true); }}
                     onShowAlert={handleShowAlert}
                   />
                 ) : (
@@ -581,6 +598,7 @@ export default function Dashboard() {
                     humidity={deviceOnline.outdoor ? (outdoorSensor.hum ?? undefined) : undefined}
                     onOpenSettings={() => { setModalDevice('outdoor'); setIsSettingsModalOpen(true); }}
                     onOpenTimerModal={(tab = 'schedule') => { setModalDevice('outdoor'); setTimerModalTab(tab); setIsTimerModalOpen(true); }}
+                    onOpenWifiConfig={() => { setModalDevice('outdoor'); setIsWifiModalOpen(true); }}
                     onShowAlert={handleShowAlert}
                   />
                 )
@@ -601,6 +619,7 @@ export default function Dashboard() {
       <NotificationModal isOpen={isNotifModalOpen} onClose={() => setIsNotifModalOpen(false)} />
       <PumpSettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} deviceId={modalDevice === 'indoor' ? 'ESP32_INDOOR' : 'ESP32_OUTDOOR'} onShowAlert={handleShowAlert} />
       <TimerModal isOpen={isTimerModalOpen} onClose={() => setIsTimerModalOpen(false)} deviceId={modalDevice === 'indoor' ? 'ESP32_INDOOR' : 'ESP32_OUTDOOR'} currentMode="timer" setMode={() => { }} onShowAlert={handleShowAlert} initialTab={timerModalTab} />
+      <WiFiConfigModal isOpen={isWifiModalOpen} onClose={() => setIsWifiModalOpen(false)} deviceId={modalDevice === 'indoor' ? 'ESP32_INDOOR' : 'ESP32_OUTDOOR'} />
       <AlertModal {...alertState} onClose={() => setAlertState(p => ({ ...p, isOpen: false }))} />
 
     </div>

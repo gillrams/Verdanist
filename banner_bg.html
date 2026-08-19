@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verdanist Banner Background</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #1a1a1a;
+            min-height: 100vh;
+        }
+
+        /* 
+           Banner Size: 60 x 160 cm 
+           Aspect Ratio: 3:8
+           We use a scaled down version for screen preview: 300px by 800px 
+        */
+        .banner {
+            width: 360px; /* 60 * 6 */
+            height: 960px; /* 160 * 6 */
+            position: relative;
+            background: linear-gradient(135deg, #f2fcf5 0%, #e0f2e9 100%);
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* Abstract Shape 1 (Top Right) */
+        .shape-1 {
+            position: absolute;
+            top: -100px;
+            right: -150px;
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.2) 0%, rgba(39, 174, 96, 0.4) 100%);
+            border-radius: 50%;
+            filter: blur(40px);
+        }
+
+        /* Abstract Shape 2 (Bottom Left) */
+        .shape-2 {
+            position: absolute;
+            bottom: -50px;
+            left: -150px;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(41, 128, 185, 0.3) 100%);
+            border-radius: 50%;
+            filter: blur(60px);
+        }
+
+        /* Abstract Shape 3 (Middle) */
+        .shape-3 {
+            position: absolute;
+            top: 40%;
+            left: 20%;
+            width: 600px;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(241, 196, 15, 0.05) 0%, rgba(243, 156, 18, 0.1) 100%);
+            border-radius: 50%;
+            transform: rotate(-45deg);
+            filter: blur(30px);
+        }
+
+        /* Geometric pattern overlay */
+        .pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(rgba(39, 174, 96, 0.1) 2px, transparent 2px);
+            background-size: 30px 30px;
+            opacity: 0.5;
+        }
+
+        /* Guide for safe areas (where to put text/logos) */
+        .safe-area {
+            position: absolute;
+            top: 5%;
+            left: 5%;
+            width: 90%;
+            height: 90%;
+            border: 2px dashed rgba(46, 204, 113, 0.3);
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .guide-text {
+            color: rgba(39, 174, 96, 0.6);
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 20px;
+        }
+
+        .guide-header { border-bottom: 1px dashed rgba(46, 204, 113, 0.3); }
+        .guide-footer { border-top: 1px dashed rgba(46, 204, 113, 0.3); }
+        
+    </style>
+</head>
+<body>
+    <div class="banner">
+        <div class="shape-1"></div>
+        <div class="shape-2"></div>
+        <div class="shape-3"></div>
+        <div class="pattern"></div>
+        
+        <!-- Garis bantu area aman (Bisa dihapus kodenya kalau mau murni polos) -->
+        <div class="safe-area">
+            <div class="guide-text guide-header">Area Logo (Header)</div>
+            <div class="guide-text">Area Judul & Fitur (Tengah)</div>
+            <div class="guide-text guide-footer">Area Footer & QR Code</div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,7 +1,5 @@
-import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Thermometer, Droplets, Activity, CheckCircle2, XCircle } from 'lucide-react';
-import { useLanguage } from '../../contexts/LanguageContext';
 
 interface SensorDetailsModalProps {
   isOpen: boolean;
@@ -26,8 +24,6 @@ export default function SensorDetailsModal({
   temp1, hum1, temp2, hum2, temp3, hum3,
   avgTemp, avgHum, tempThreshold, humThreshold, pumpActive
 }: SensorDetailsModalProps) {
-  const { t } = useLanguage();
-
   if (!isOpen) return null;
 
   const getStatusColor = (val: number | null, threshold: number, isTemp: boolean) => {

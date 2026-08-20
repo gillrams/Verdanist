@@ -620,6 +620,23 @@ export default function Dashboard() {
       <PumpSettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} deviceId={modalDevice === 'indoor' ? 'ESP32_INDOOR' : 'ESP32_OUTDOOR'} onShowAlert={handleShowAlert} />
       <TimerModal isOpen={isTimerModalOpen} onClose={() => setIsTimerModalOpen(false)} deviceId={modalDevice === 'indoor' ? 'ESP32_INDOOR' : 'ESP32_OUTDOOR'} currentMode="timer" setMode={() => { }} onShowAlert={handleShowAlert} initialTab={timerModalTab} />
       <WiFiConfigModal isOpen={isWifiModalOpen} onClose={() => setIsWifiModalOpen(false)} deviceId={modalDevice === 'indoor' ? 'ESP32_INDOOR' : 'ESP32_OUTDOOR'} />
+      <SensorDetailsModal
+        isOpen={showSensorModal}
+        onClose={() => setShowSensorModal(false)}
+        zone={zone}
+        validSensors={zone === 'indoor' ? indoorSensor.validSensors : outdoorSensor.validSensors}
+        temp1={zone === 'indoor' ? indoorSensor.temp1 : outdoorSensor.temp1}
+        hum1={zone === 'indoor' ? indoorSensor.hum1 : outdoorSensor.hum1}
+        temp2={zone === 'indoor' ? indoorSensor.temp2 : outdoorSensor.temp2}
+        hum2={zone === 'indoor' ? indoorSensor.hum2 : outdoorSensor.hum2}
+        temp3={zone === 'indoor' ? indoorSensor.temp3 : outdoorSensor.temp3}
+        hum3={zone === 'indoor' ? indoorSensor.hum3 : outdoorSensor.hum3}
+        avgTemp={zone === 'indoor' ? indoorSensor.temp : outdoorSensor.temp}
+        avgHum={zone === 'indoor' ? indoorSensor.hum : outdoorSensor.hum}
+        tempThreshold={zone === 'indoor' ? indoorSensor.tempThreshold : outdoorSensor.tempThreshold}
+        humThreshold={zone === 'indoor' ? indoorSensor.humThreshold : outdoorSensor.humThreshold}
+        pumpActive={zone === 'indoor' ? indoorPump.on : outdoorPump.on}
+      />
       <AlertModal {...alertState} onClose={() => setAlertState(p => ({ ...p, isOpen: false }))} />
 
     </div>

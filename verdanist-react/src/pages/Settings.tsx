@@ -322,9 +322,46 @@ export default function Settings() {
         <SectionHeader icon={<Wifi className="w-4 h-4 text-ring" />} title={t('settings.sensorConn')} />
         <div className="px-6 mb-5">
           <div className="bg-card border border-border shadow-sm rounded-2xl overflow-hidden divide-y divide-border">
-            <SettingsRow label="ESP32 Gateway" sub={`${t('settings.connected')} · 192.168.1.20`} suffix={<div className="w-2 h-2 rounded-full bg-ring" />} />
-            <SettingsRow label={t('settings.updateInterval')} sub={t('settings.every30s')} />
-            <SettingsRow label="API Endpoint" sub="api.verdanist.id/v2" />
+            <SettingsRow 
+              label="ESP32 Gateway" 
+              sub={`${t('settings.connected')} · 192.168.1.20`} 
+              suffix={<div className="w-2 h-2 rounded-full bg-ring" />} 
+              onClick={() => alert("ESP32 Gateway:\nMenampilkan status dan IP Address lokal modul ESP32 Anda di jaringan WiFi. Pastikan HP terhubung ke WiFi yang sama jika ingin mengakses halaman konfigurasi lokal.")}
+            />
+            <SettingsRow 
+              label={t('settings.updateInterval')} 
+              sub={(() => {
+                const saved = localStorage.getItem('verdanist_update_interval');
+                return saved ? `Setiap ${saved} detik` : t('settings.every30s');
+              })()}
+              onClick={() => {
+                const current = localStorage.getItem('verdanist_update_interval') || '30';
+                const newVal = window.prompt("Interval Update (detik):\nBerapa detik sekali aplikasi harus mengambil data sensor terbaru?", current);
+                if (newVal && !isNaN(Number(newVal)) && Number(newVal) >= 5) {
+                  localStorage.setItem('verdanist_update_interval', newVal);
+                  // Refresh to show changes
+                  window.location.reload();
+                } else if (newVal) {
+                  alert("Masukkan angka yang valid (minimal 5 detik).");
+                }
+              }}
+            />
+            <SettingsRow 
+              label="API Endpoint" 
+              sub={localStorage.getItem('verdanist_api_endpoint') || "api.verdanist.id/v2"} 
+              onClick={() => {
+                const current = localStorage.getItem('verdanist_api_endpoint') || "api.verdanist.id/v2";
+                const newVal = window.prompt("API Endpoint:\nAlamat server tempat data dikirim dan diterima. Kosongkan untuk mereset ke default pabrik.", current);
+                if (newVal !== null) {
+                  if (newVal.trim() === "") {
+                    localStorage.removeItem('verdanist_api_endpoint');
+                  } else {
+                    localStorage.setItem('verdanist_api_endpoint', newVal);
+                  }
+                  window.location.reload();
+                }
+              }}
+            />
           </div>
         </div>
 

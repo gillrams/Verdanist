@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Wifi, X, RefreshCw, Lock, Unlock, CheckCircle2, AlertCircle, Eye, EyeOff, QrCode, Info, XCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { Scanner } from '@yudiel/react-qr-scanner';
+import { AnimatedSignal } from '../ui/AnimatedSignal';
 
 interface WiFiConfigModalProps {
   isOpen: boolean;
@@ -520,19 +521,12 @@ export default function WiFiConfigModal({ isOpen, onClose, deviceId }: WiFiConfi
                       </p>
                     </div>
                   </div>
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4].map((bar) => (
-                      <div
-                        key={bar}
-                        className={`w-1.5 rounded-full transition-all duration-500 ${
-                          bar <= getSignalStrength(status.signal).bars 
-                            ? (status.state === 'connected' ? 'bg-primary' : 'bg-muted') 
-                            : 'bg-border'
-                        }`}
-                        style={{ height: `${bar * 6 + 4}px` }}
-                      />
-                    ))}
-                  </div>
+                  <AnimatedSignal
+                    strength={getSignalStrength(status.signal).bars}
+                    active={status.state === 'connected'}
+                    barColor={status.state === 'connected' ? 'bg-primary' : 'bg-muted'}
+                    maxBars={4}
+                  />
                 </div>
               </div>
             )}
@@ -633,15 +627,14 @@ export default function WiFiConfigModal({ isOpen, onClose, deviceId }: WiFiConfi
                               <p className="text-[11px] text-muted-foreground">{getSignalStrength(net.rssi).label} ({net.rssi} dBm)</p>
                             </div>
                           </div>
-                          <div className="flex gap-[3px] items-end h-4">
-                            {[1, 2, 3].map((bar) => (
-                              <div
-                                key={bar}
-                                className={`w-1 rounded-sm transition-colors ${bar <= getSignalStrength(net.rssi).bars ? (selectedNetwork?.ssid === net.ssid ? 'bg-primary' : 'bg-foreground/50') : 'bg-border'}`}
-                                style={{ height: `${bar * 30 + 10}%` }}
-                              />
-                            ))}
-                          </div>
+                          <AnimatedSignal
+                            strength={Math.min(getSignalStrength(net.rssi).bars, 3)}
+                            maxBars={3}
+                            barWidth="w-1"
+                            gap="gap-[3px]"
+                            baseHeight={4}
+                            barColor={selectedNetwork?.ssid === net.ssid ? 'bg-primary' : 'bg-foreground/50'}
+                          />
                         </div>
                       ))}
                     </div>

@@ -11,6 +11,10 @@ import { PushNotifications } from '@capacitor/push-notifications';
  * Call this function early (e.g., in App.tsx useEffect) so the user sees the system dialogs.
  */
 export async function requestAllPermissions() {
+  if (!Capacitor.isNativePlatform()) {
+    return; // Web permissions are handled by the browser when APIs are used
+  }
+
   // Camera permission (needed for QR scanner / photo capture)
   try {
     const camPerm = await Camera.requestPermissions();

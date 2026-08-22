@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -86,7 +86,7 @@ export default function Dashboard() {
   const [alertState, setAlertState] = useState<{
     isOpen: boolean;
     title: string;
-    message: string;
+    message: ReactNode;
     onConfirm: () => void;
     isNotification: boolean;
     confirmText: string;
@@ -97,7 +97,7 @@ export default function Dashboard() {
     isNotification: false, confirmText: 'OK', cancelText: lang === 'id' ? 'Batal' : 'Cancel', type: 'info'
   });
 
-  const handleShowAlert = (title: string, message: string, onConfirm?: () => void, isNotification = false, confirmText = 'OK', cancelText = t('dash.cancel'), type: 'warning' | 'success' | 'info' = 'warning') => {
+  const handleShowAlert = (title: string, message: ReactNode, onConfirm?: () => void, isNotification = false, confirmText = 'OK', cancelText = t('dash.cancel'), type: 'warning' | 'success' | 'info' = 'warning') => {
     setAlertState({ isOpen: true, title, message, onConfirm: onConfirm || (() => { }), isNotification, confirmText, cancelText, type });
   };
 

@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, CheckCircle2, Info, X } from 'lucide-react';
 
 interface AlertModalProps {
   isOpen: boolean;
   title: string;
-  message: string;
+  message: ReactNode;
   onConfirm: () => void;
   onClose: () => void;
   isNotification?: boolean;
@@ -91,7 +91,7 @@ export default function AlertModal({
             <h3 className="text-lg font-bold text-foreground mb-2">{title}</h3>
 
             {/* Message */}
-            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line mb-6">{message}</p>
+            <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line mb-6">{message}</div>
 
             {/* Buttons */}
             <div className="flex gap-3">

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
 import NisitaChat from './NisitaChat';
@@ -9,7 +9,7 @@ interface AiAssistantModalProps {
   deviceId: string;
   onShowAlert: (
     title: string,
-    message: string,
+    message: ReactNode,
     onConfirm?: () => void,
     isNotification?: boolean,
     confirmText?: string,
@@ -389,7 +389,22 @@ ATURAN KRITIS tentang "isPlant" & "isQuestion":
         setTimeout(() => {
           onShowAlert(
             'Konfigurasi AI Diterapkan! 🌿',
-            `Ajaib! Rekomendasi AI untuk **${plant.name}** berhasil disinkronkan ke **${deviceId}** secara real-time.\n\n• Batas Suhu Maksimal: **${plant.temp.toFixed(1)}°C**\n• Kelembaban Udara Minimal: **${plant.humidity}%**\n• Kelembaban Tanah Minimal: **${plant.soil}%**\n• Pola Watering: **${plant.pattern === 'continuous' ? 'Kontinu (Terus)' : 'Pulsasi (5s On/5s Off)'}**\n\nModul IoT ESP32 sekarang beroperasi sesuai profil mikroklimat tanaman Anda!`,
+            (
+              <div className="space-y-4 text-left mt-2">
+                <p>
+                  Ajaib! Rekomendasi AI untuk <strong className="text-foreground">{plant.name}</strong> berhasil disinkronkan ke <strong className="text-foreground">{deviceId}</strong> secara real-time.
+                </p>
+                <ul className="list-disc pl-5 space-y-1.5 marker:text-emerald-500">
+                  <li>Batas Suhu Maksimal: <strong className="text-foreground">{plant.temp.toFixed(1)}°C</strong></li>
+                  <li>Kelembaban Udara Minimal: <strong className="text-foreground">{plant.humidity}%</strong></li>
+                  <li>Kelembaban Tanah Minimal: <strong className="text-foreground">{plant.soil}%</strong></li>
+                  <li>Pola Watering: <strong className="text-foreground">{plant.pattern === 'continuous' ? 'Kontinu (Terus)' : 'Pulsasi (5s On/5s Off)'}</strong></li>
+                </ul>
+                <p>
+                  Modul IoT ESP32 sekarang beroperasi sesuai profil mikroklimat tanaman Anda!
+                </p>
+              </div>
+            ),
             undefined,
             true, // isNotification
             'Luar Biasa!',

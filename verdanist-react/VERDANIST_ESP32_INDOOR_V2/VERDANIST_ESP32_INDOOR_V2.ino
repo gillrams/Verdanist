@@ -89,7 +89,7 @@
 // ================================================================
 
 #define DHT_TYPE        DHT11
-#define RELAY_ACTIVE_LOW true      // Relay module umum = Active LOW
+#define RELAY_ACTIVE_LOW false     // Relay module umum = Active High
 #define DEBOUNCE_MS     200
 #define DHT_COUNT       3
 
@@ -98,8 +98,8 @@
 // ================================================================
 
 // Kredensial Default (Fallback)
-const char *WIFI_DEFAULT_SSID     = "realme C71";
-const char *WIFI_DEFAULT_PASSWORD = "ayamgoreng";
+const char *WIFI_DEFAULT_SSID     = "g-w";
+const char *WIFI_DEFAULT_PASSWORD = "22222222";
 
 const char *SUPABASE_URL  = "https://pzktyggopmvyrkwcnwfo.supabase.co";
 const char *SUPABASE_KEY  =
@@ -403,8 +403,11 @@ void updatePumpLEDs() {
 // ================================================================
 
 void setupPins() {
-  // --- Relay Output ---
-  pinMode(PIN_RELAY, OUTPUT);
+  // --- Relay Output (Standard Active HIGH) ---
+  digitalWrite(PIN_RELAY, LOW);                    // Set kondisi awal OFF (Mati)
+  pinMode(PIN_RELAY, OUTPUT);                      // Kembalikan ke mode OUTPUT standar
+  
+  // ... sisa kode setupPins() ke bawah tetap sama ...
 
   // --- Metal Push Buttons: Switch Input (Internal Pull-Up) ---
   pinMode(BTN_MODE_MANUAL, INPUT_PULLUP);
@@ -449,21 +452,20 @@ void setupPins() {
 bool isButtonPressed(int btnPin) {
   bool currentState = digitalRead(btnPin);
   unsigned long now = millis();
+  bool pressed = false;
 
   // Deteksi tepi turun (HIGH -> LOW): Tombol BARU SAJA ditekan
   if (currentState == LOW && g_lastBtnState[btnPin] == HIGH) {
     if (now - g_lastBtnPress[btnPin] > DEBOUNCE_MS) {
       g_lastBtnPress[btnPin] = now;
-      g_lastBtnState[btnPin] = LOW; // Tandai sudah ditekan
-      return true;
+      pressed = true;
     }
   }
-  // Deteksi tepi naik (LOW -> HIGH): Tombol dilepas
-  else if (currentState == HIGH) {
-    g_lastBtnState[btnPin] = HIGH; // Reset state agar bisa ditekan lagi
-  }
 
-  return false;
+  // Update status pin saat ini untuk iterasi loop berikutnya
+  g_lastBtnState[btnPin] = currentState;
+
+  return pressed;
 }
 
 void processButtons() {
@@ -1126,7 +1128,8 @@ void displayInit() {
 }
 
 void displayUpdate() {
-  tft.fillScreen(CLR_BG);
+  // === BARIS DI BAWAH INI DIHAPUS / DI-KOMENTARKAN ===
+  // tft.fillScreen(CLR_BG); 
 
   // ── Header ──
   tft.setTextDatum(TL_DATUM);
@@ -1134,12 +1137,16 @@ void displayUpdate() {
   tft.setTextColor(CLR_PRIMARY, CLR_BG);
   tft.drawString("VERDANIST INDOOR", 10, 8);
 
+  // Bersihkan area teks jam saja agar angka jam tidak menumpuk
+  tft.fillRect(360, 0, 115, 30, CLR_BG); 
   tft.setTextDatum(TR_DATUM);
   tft.setTextColor(CLR_TEXT, CLR_BG);
   tft.drawString(getCurrentTimeStr(), 470, 8);
 
   // Garis separator
   tft.drawLine(10, 32, 470, 32, CLR_PRIMARY);
+
+  // ... sisa kode displayUpdate() ke bawah tetap sama persis ...
 
   // ── Status Bar ──
   tft.setTextDatum(TL_DATUM);

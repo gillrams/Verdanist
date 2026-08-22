@@ -1,7 +1,7 @@
 # Build APK Script for Verdanist - v3 (Corretto JDK 21)
 $ErrorActionPreference = "Continue"
 
-$projectDir = "C:\verdanist\verdanist-react"
+$projectDir = "d:\Project IOT Verdanist\Verdanist\verdanist-react"
 $androidDir = "$projectDir\android"
 $sdkDir = "$projectDir\android\sdk"
 $jdkDir = "$projectDir\jdk21"

@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 import {
   Building2, Bell, ChevronRight,
   Sun, Wifi, LogOut, Key, Camera, Pencil, Globe,
-  Smartphone, Download, CheckCircle2, RefreshCw
+  Smartphone, Download, CheckCircle2
 } from "lucide-react";
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { useNavigate } from 'react-router-dom';
@@ -400,15 +400,15 @@ export default function Settings() {
                 </div>
                 <button
                   onClick={() => {
-                    if (window.confirm(`Terapkan pembaruan v${updateData.latest_version} sekarang? (Aplikasi akan dimuat ulang)`)) {
-                      window.location.reload();
+                    if (window.confirm(`Unduh Verdanist v${updateData.latest_version} sekarang?`)) {
+                      window.open('https://verdanist.id' + updateData.download_url, '_system');
                     }
                   }}
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-3 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-md"
                   style={{ fontWeight: 600, fontSize: 14 }}
                 >
-                  <RefreshCw className="w-4 h-4" />
-                  Perbarui Tampilan
+                  <Download className="w-4 h-4" />
+                  Update Sekarang
                 </button>
               </div>
             )}

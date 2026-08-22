@@ -1,12 +1,7 @@
 import { motion } from "framer-motion";
 
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'lottie-player': any;
-    }
-  }
-}
+// Bypass TS error for custom web component without global augmentation
+const LottiePlayer = 'lottie-player' as any;
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -58,14 +53,14 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
             transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
             className="relative z-10 drop-shadow-xl"
           >
-            <lottie-player 
+            <LottiePlayer 
               src="/avocado_animation.json"
               background="transparent" 
               speed="1" 
               style={{ width: '224px', height: '224px' }} 
               loop 
               autoplay
-            ></lottie-player>
+            ></LottiePlayer>
           </motion.div>
         </div>
       </motion.div>

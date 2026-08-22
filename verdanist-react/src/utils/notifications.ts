@@ -145,7 +145,7 @@ export function sendNotification(id: string, title: string, options?: Notificati
     if (navigator.serviceWorker) {
       navigator.serviceWorker.ready.then((registration) => {
         registration.showNotification(title, { icon: '/favicon.svg', badge: '/favicon.svg', ...options });
-      }).catch(err => {
+      }).catch(() => {
         // Fallback for browsers that don't support service worker notifications
         new Notification(title, { icon: '/favicon.svg', badge: '/favicon.svg', ...options });
       });

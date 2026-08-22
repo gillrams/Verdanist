@@ -254,7 +254,7 @@ void wifiConnect() {
     g_wifiStatusMsg = "disconnected";
     Serial.println("\n[WiFi] SEMUA KONEKSI GAGAL. Menyalakan Mode AP (Hotspot).");
     WiFi.mode(WIFI_AP_STA);
-    WiFi.softAP("Verdanist-Setup", "verdanist123");
+    WiFi.softAP("Verdanist-Setup"); // Password dihapus agar terbuka (open network)
     Serial.println("[WiFi] Mode AP Aktif. Connect ke 'Verdanist-Setup', IP: 192.168.4.1");
   }
 }

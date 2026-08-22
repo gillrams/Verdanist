@@ -142,7 +142,16 @@ export function sendNotification(id: string, title: string, options?: Notificati
     if (now - lastTime < COOLDOWN_MS) return;
   }
   try {
-    new Notification(title, { icon: '/favicon.svg', badge: '/favicon.svg', ...options });
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.ready.then((registration) => {
+        registration.showNotification(title, { icon: '/favicon.svg', badge: '/favicon.svg', ...options });
+      }).catch(err => {
+        // Fallback for browsers that don't support service worker notifications
+        new Notification(title, { icon: '/favicon.svg', badge: '/favicon.svg', ...options });
+      });
+    } else {
+      new Notification(title, { icon: '/favicon.svg', badge: '/favicon.svg', ...options });
+    }
     lastNotified[id] = now;
   } catch (e) {
     console.error('Error sending foreground notification', e);

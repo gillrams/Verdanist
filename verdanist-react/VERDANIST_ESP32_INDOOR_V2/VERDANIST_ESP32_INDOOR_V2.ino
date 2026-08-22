@@ -262,6 +262,11 @@ void wifiConnect() {
 void wifiMaintain() {
   if (WiFi.status() != WL_CONNECTED) {
     g_wifiOK = false;
+    // Jika sedang memancarkan Hotspot (AP), jangan agresif mencoba reconnect ke router
+    // agar koneksi HP user ke 'Verdanist-Setup' tidak terus-terusan terputus.
+    if (WiFi.getMode() == WIFI_AP_STA || WiFi.getMode() == WIFI_AP) {
+      return; 
+    }
     Serial.println("[WiFi] Terputus — reconnect...");
     WiFi.disconnect();
     wifiConnect();

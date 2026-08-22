@@ -1,7 +1,12 @@
 import { motion } from "framer-motion";
-import { ImageWithFallback } from "../ui/ImageWithFallback";
-import logoLight from "../../assets/Logo_Light_Sejajar.png";
-import logoDark from "../../assets/Logo_Dark_sejajar.png";
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'lottie-player': any;
+    }
+  }
+}
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -38,53 +43,31 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           setTimeout(onComplete, 2500); // Wait 2.5s before completing
         }}
       >
-        <div className="relative flex items-center justify-center">
-          {/* Ambient glow pulse behind logo */}
+        <div className="relative flex flex-col items-center justify-center">
+          {/* Ambient glow pulse behind animation */}
           <motion.div
-            className="absolute w-56 h-32 rounded-full"
-            style={{ background: "radial-gradient(ellipse, rgba(21,128,61,0.25) 0%, transparent 70%)" }}
+            className="absolute w-56 h-56 rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(21,128,61,0.2) 0%, transparent 70%)" }}
             initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: [0, 1, 0], scale: [0.5, 1.8, 2.2] }}
-            transition={{ delay: 0.4, duration: 2.2, times: [0, 0.4, 1], ease: "easeOut" }}
+            animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
+            transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
           />
           
           <motion.div
-            animate={{ y: [0, -8, 0] }}
+            animate={{ y: [0, -10, 0] }}
             transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+            className="relative z-10 drop-shadow-xl"
           >
-            {/* Light mode logo */}
-            <ImageWithFallback
-              src={logoLight}
-              alt="Verdanist"
-              className="block dark:hidden w-64 object-contain relative z-10 drop-shadow-xl"
-            />
-            {/* Dark mode logo */}
-            <ImageWithFallback
-              src={logoDark}
-              alt="Verdanist"
-              className="hidden dark:block w-64 object-contain relative z-10 drop-shadow-xl"
-            />
+            <lottie-player 
+              src="/avocado_animation.json"
+              background="transparent" 
+              speed="1" 
+              style={{ width: '224px', height: '224px' }} 
+              loop 
+              autoplay
+            ></lottie-player>
           </motion.div>
         </div>
-        
-        {/* Loading text/dots */}
-        <motion.div 
-          className="mt-8 flex items-center gap-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-        >
-          <div className="flex gap-1.5">
-            {[0, 1, 2].map((i) => (
-              <motion.div
-                key={i}
-                className="w-2 h-2 rounded-full bg-primary"
-                animate={{ y: [0, -6, 0], opacity: [0.3, 1, 0.3] }}
-                transition={{ repeat: Infinity, duration: 1, delay: i * 0.2 }}
-              />
-            ))}
-          </div>
-        </motion.div>
       </motion.div>
     </div>
   );

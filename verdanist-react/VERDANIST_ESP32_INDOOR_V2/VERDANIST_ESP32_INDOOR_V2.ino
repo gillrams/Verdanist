@@ -35,8 +35,10 @@
 #include <DHT.h>
 #include <HTTPClient.h>
 #include <Preferences.h>
-#include <TFT_eSPI.h>
 #include <WiFi.h>
+#include <WebServer.h>
+#include <DNSServer.h>
+#include <TFT_eSPI.h>
 #include <time.h>
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
@@ -160,6 +162,7 @@ bool g_pumpActive = false;
 bool g_sensorOK   = false;
 bool g_wifiOK     = false;
 bool g_ntpSynced  = false;
+bool g_localServerRunning = false;
 
 // Kredensial WiFi Aktif (dari EEPROM)
 String g_wifiSSID = "";
@@ -195,8 +198,80 @@ void supabaseSendMode();
 void supabaseSendPumpStatus(bool state);
 
 // ================================================================
-//  SECTION 6 — WiFi
+//  SECTION 6 — WiFi & CAPTIVE PORTAL
 // ================================================================
+
+WebServer server(80);
+DNSServer dnsServer;
+const byte DNS_PORT = 53;
+
+const char* htmlSetupPage = R"rawliteral(
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Verdanist WiFi Setup</title>
+  <style>
+    body { font-family: sans-serif; background-color: #101010; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .card { background-color: #202020; padding: 30px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); width: 90%; max-width: 400px; text-align: center; }
+    h2 { color: #2ecc71; margin-bottom: 20px; }
+    input[type=text], input[type=password] { width: 100%; padding: 12px; margin: 10px 0 20px 0; border: 1px solid #444; border-radius: 8px; background-color: #101010; color: white; box-sizing: border-box; }
+    input[type=submit] { background-color: #2ecc71; color: #101010; padding: 14px 20px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; }
+    input[type=submit]:hover { background-color: #27ae60; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Verdanist WiFi Setup</h2>
+    <form action="/save" method="POST">
+      <label style="display:block;text-align:left;" for="ssid">Nama WiFi (SSID):</label>
+      <input type="text" id="ssid" name="ssid" required placeholder="Masukkan nama WiFi">
+      
+      <label style="display:block;text-align:left;" for="pass">Password WiFi:</label>
+      <input type="password" id="pass" name="pass" placeholder="Kosongkan jika open">
+      
+      <input type="submit" value="Simpan & Restart">
+    </form>
+  </div>
+</body>
+</html>
+)rawliteral";
+
+// ── Captive Portal Detection Handlers ──
+// Setiap OS punya URL khusus untuk deteksi captive portal.
+// Kita respond dengan 302 Redirect ke "/" agar OS tahu ini captive portal
+// dan langsung buka popup browser ke halaman WiFi Setup.
+
+void handleCaptiveRedirect() {
+  server.sendHeader("Location", "http://192.168.4.1/", true);
+  server.send(302, "text/html", "");
+}
+
+void handleRoot() {
+  server.send(200, "text/html", htmlSetupPage);
+}
+
+void handleSave() {
+  if (server.hasArg("ssid")) {
+    String newSSID = server.arg("ssid");
+    String newPass = server.hasArg("pass") ? server.arg("pass") : "";
+    
+    // Save to EEPROM
+    prefs.begin("verdanist", false);
+    prefs.putString("wifiSSID", newSSID);
+    prefs.putString("wifiPass", newPass);
+    prefs.end();
+    
+    String successHtml = "<html><body style='background:#101010;color:white;text-align:center;font-family:sans-serif;margin-top:20vh;'><h2>Pengaturan Disimpan!</h2><p>ESP32 sedang restart untuk terhubung ke WiFi baru.</p><p>Silakan tutup halaman ini.</p></body></html>";
+    server.send(200, "text/html", successHtml);
+    
+    Serial.printf("[WiFi] Menerima kredensial dari Web Server lokal. SSID: %s\n", newSSID.c_str());
+    delay(2000);
+    ESP.restart();
+  } else {
+    server.send(400, "text/plain", "Bad Request: SSID is required.");
+  }
+}
 
 void wifiConnect() {
   Serial.printf("[WiFi] Menghubungkan ke '%s' ...", g_wifiSSID.c_str());
@@ -256,6 +331,42 @@ void wifiConnect() {
     WiFi.mode(WIFI_AP_STA);
     WiFi.softAP("Verdanist-Setup"); // Password dihapus agar terbuka (open network)
     Serial.println("[WiFi] Mode AP Aktif. Connect ke 'Verdanist-Setup', IP: 192.168.4.1");
+    
+    // ★ CAPTIVE PORTAL: Start DNS Server
+    // DNS server menjawab SEMUA DNS query dengan IP AP (192.168.4.1)
+    // Sehingga semua domain (google.com, apple.com, dll) resolve ke ESP32
+    dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
+    Serial.println("[WiFi] DNS Server dimulai — semua domain resolve ke 192.168.4.1");
+    
+    // Mulai Web Server untuk Captive Portal
+    if (!g_localServerRunning) {
+      // Halaman utama WiFi Setup
+      server.on("/", handleRoot);
+      server.on("/save", HTTP_POST, handleSave);
+      
+      // ★ CAPTIVE PORTAL: Endpoint deteksi per-platform
+      // iOS / macOS — Apple Captive Network Assistant
+      server.on("/hotspot-detect.html", handleCaptiveRedirect);
+      // Android — Google Connectivity Check
+      server.on("/generate_204", handleCaptiveRedirect);
+      server.on("/gen_204", handleCaptiveRedirect);
+      // Windows — Microsoft NCSI
+      server.on("/connecttest.txt", handleCaptiveRedirect);
+      server.on("/ncsi.txt", handleCaptiveRedirect);
+      server.on("/redirect", handleCaptiveRedirect);
+      // Firefox — Captive Portal Detection
+      server.on("/success.txt", handleCaptiveRedirect);
+      server.on("/canonical.html", handleCaptiveRedirect);
+      // Chrome / Chromium
+      server.on("/chrome/newtab", handleCaptiveRedirect);
+      
+      // ★ Catch-all: Semua URL lain yang tidak dikenali → redirect ke form setup
+      server.onNotFound(handleCaptiveRedirect);
+      
+      server.begin();
+      g_localServerRunning = true;
+      Serial.println("[WiFi] Web Server + Captive Portal dimulai pada port 80.");
+    }
   }
 }
 
@@ -1345,6 +1456,11 @@ void setup() {
 // ================================================================
 
 void loop() {
+  if (g_localServerRunning) {
+    dnsServer.processNextRequest();  // ★ CAPTIVE PORTAL: Process DNS queries
+    server.handleClient();
+  }
+
   unsigned long now = millis();
 
   // 1. Proses semua tombol fisik

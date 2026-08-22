@@ -3,6 +3,10 @@
   "appName": "Verdanist",
   "webDir": "dist",
   "bundledWebRuntime": false,
+  "server": {
+    "url": "https://verdanist.id",
+    "cleartext": true
+  },
   "plugins": {
     "SplashScreen": {
       "launchShowDuration": 3000,

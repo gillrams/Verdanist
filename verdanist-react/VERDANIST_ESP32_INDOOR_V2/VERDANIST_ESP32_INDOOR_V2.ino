@@ -639,15 +639,21 @@ void sensorRead() {
 // ================================================================
 
 void supabaseSendSensor() {
-  if (!g_wifiOK || !g_sensorOK) return;
+  if (!g_wifiOK) return;
 
   HTTPClient http;
   String url = String(SUPABASE_URL) +
                "/rest/v1/device_settings?device_id=eq." + DEVICE_ID;
 
   JsonDocument doc;
-  doc["temperature"] = round(g_temp * 10.0) / 10.0;
-  doc["humidity"]    = round(g_hum * 10.0) / 10.0;
+  
+  if (g_sensorOK) {
+    doc["temperature"] = round(g_temp * 10.0) / 10.0;
+    doc["humidity"]    = round(g_hum * 10.0) / 10.0;
+  } else {
+    doc["temperature"] = nullptr;
+    doc["humidity"]    = nullptr;
+  }
   
   doc["valid_sensors"] = g_validSensors;
   

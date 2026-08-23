@@ -17,12 +17,26 @@ interface SensorDetailsModalProps {
   tempThreshold: number;
   humThreshold: number;
   pumpActive: boolean;
+  deviceOnline: boolean;
 }
 
 export default function SensorDetailsModal({
-  isOpen, onClose, zone, validSensors,
-  temp1, hum1, temp2, hum2, temp3, hum3,
-  avgTemp, avgHum, tempThreshold, humThreshold, pumpActive
+  isOpen,
+  onClose,
+  zone,
+  validSensors,
+  temp1,
+  hum1,
+  temp2,
+  hum2,
+  temp3,
+  hum3,
+  avgTemp,
+  avgHum,
+  tempThreshold,
+  humThreshold,
+  pumpActive,
+  deviceOnline,
 }: SensorDetailsModalProps) {
   if (!isOpen) return null;
 
@@ -74,6 +88,17 @@ export default function SensorDetailsModal({
           </div>
 
           <div className="p-6 overflow-y-auto max-h-[70vh] flex flex-col gap-6">
+            {!deviceOnline && (
+              <div className="bg-destructive/15 border border-destructive/30 rounded-2xl p-3 flex items-center gap-3">
+                <div className="w-8 h-8 bg-destructive/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="material-symbols-rounded text-destructive text-lg">wifi_off</span>
+                </div>
+                <div>
+                  <p className="text-destructive font-bold text-sm">Perangkat Offline</p>
+                  <p className="text-destructive/70 text-xs">Data terakhir mungkin tidak akurat</p>
+                </div>
+              </div>
+            )}
             
             {/* Individual Sensors */}
             <div className="grid gap-3">

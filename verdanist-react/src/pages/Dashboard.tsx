@@ -237,20 +237,26 @@ export default function Dashboard() {
       const timeLabel = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
       
       const iSensor = indoorSensorRef.current;
-      if (deviceOnlineRef.current.indoor && (iSensor.temp !== null || iSensor.hum !== null)) {
-        setIndoorChartData(prev => {
-          const next = [...prev, { time: timeLabel, suhu: iSensor.temp, humidity: iSensor.hum }];
-          return next.length > MAX_CHART_POINTS ? next.slice(-MAX_CHART_POINTS) : next;
-        });
-      }
+      const indoorOnline = deviceOnlineRef.current.indoor;
+      setIndoorChartData(prev => {
+        const next = [...prev, {
+          time: timeLabel,
+          suhu: indoorOnline ? iSensor.temp : null,
+          humidity: indoorOnline ? iSensor.hum : null,
+        }];
+        return next.length > MAX_CHART_POINTS ? next.slice(-MAX_CHART_POINTS) : next;
+      });
 
       const oSensor = outdoorSensorRef.current;
-      if (deviceOnlineRef.current.outdoor && (oSensor.temp !== null || oSensor.hum !== null)) {
-        setOutdoorChartData(prev => {
-          const next = [...prev, { time: timeLabel, suhu: oSensor.temp, humidity: oSensor.hum }];
-          return next.length > MAX_CHART_POINTS ? next.slice(-MAX_CHART_POINTS) : next;
-        });
-      }
+      const outdoorOnline = deviceOnlineRef.current.outdoor;
+      setOutdoorChartData(prev => {
+        const next = [...prev, {
+          time: timeLabel,
+          suhu: outdoorOnline ? oSensor.temp : null,
+          humidity: outdoorOnline ? oSensor.hum : null,
+        }];
+        return next.length > MAX_CHART_POINTS ? next.slice(-MAX_CHART_POINTS) : next;
+      });
     }, CHART_INTERVAL_MS);
 
     return () => clearInterval(chartTimer);
@@ -505,7 +511,7 @@ export default function Dashboard() {
                       contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 12, color: "var(--color-foreground)", fontSize: 12 }}
                       labelStyle={{ color: "var(--color-muted-foreground)" }}
                     />
-                    <Area type="monotone" dataKey="suhu" name={t('dash.tempC')} stroke="var(--primary)" strokeWidth={2} fill="url(#suhuGradMobile)" dot={false} animationDuration={500} />
+                    <Area type="monotone" dataKey="suhu" name={t('dash.tempC')} stroke="var(--primary)" strokeWidth={2} fill="url(#suhuGradMobile)" dot={false} animationDuration={500} connectNulls={false} />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
@@ -636,6 +642,7 @@ export default function Dashboard() {
         tempThreshold={zone === 'indoor' ? indoorSensor.tempThreshold : outdoorSensor.tempThreshold}
         humThreshold={zone === 'indoor' ? indoorSensor.humThreshold : outdoorSensor.humThreshold}
         pumpActive={zone === 'indoor' ? indoorPump.on : outdoorPump.on}
+        deviceOnline={zone === 'indoor' ? deviceOnline.indoor : deviceOnline.outdoor}
       />
       <AlertModal {...alertState} onClose={() => setAlertState(p => ({ ...p, isOpen: false }))} />
 

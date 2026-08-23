@@ -1,4 +1,4 @@
-﻿verdanist-react/jdk21
+verdanist-react/jdk21
 verdanist-react/jdk21_temp
 verdanist-react/node_modules
 verdanist-react/node_modules_old
@@ -6,3 +6,6 @@ verdanist-react/android/build
 verdanist-react/android/.gradle
 verdanist-react/android/sdk
 verdanist-react/dist
+.vercel
+.env*
+*.apk

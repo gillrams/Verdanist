@@ -1,0 +1,9 @@
+verdanist-react/node_modules
+verdanist-react/android
+verdanist-react/jdk21
+verdanist-react/jdk21_temp
+verdanist-react/dist
+verdanist-react/VERDANIST_ESP32_INDOOR_V2
+verdanist-react/public-old
+*.apk
+.git

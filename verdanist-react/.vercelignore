@@ -1,3 +1,9 @@
-android/
-jdk21/
-jdk21_temp/
+/node_modules
+/android
+/jdk21
+/jdk21_temp
+/*.apk
+/public-old
+/VERDANIST_ESP32_INDOOR_V2
+/assets
+/dist

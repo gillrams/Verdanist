@@ -40,6 +40,16 @@ export default function SensorDetailsModal({
 }: SensorDetailsModalProps) {
   if (!isOpen) return null;
 
+  // Saat offline, semua nilai di-null-kan agar tampil '--' (sama seperti dashboard)
+  const d1Temp = deviceOnline ? temp1 : null;
+  const d1Hum  = deviceOnline ? hum1  : null;
+  const d2Temp = deviceOnline ? temp2 : null;
+  const d2Hum  = deviceOnline ? hum2  : null;
+  const d3Temp = deviceOnline ? temp3 : null;
+  const d3Hum  = deviceOnline ? hum3  : null;
+  const dAvgTemp = deviceOnline ? avgTemp : null;
+  const dAvgHum  = deviceOnline ? avgHum  : null;
+
   const getStatusColor = (val: number | null, threshold: number, isTemp: boolean) => {
     if (val === null) return 'text-muted-foreground';
     if (isTemp) return val >= threshold ? 'text-orange-500' : 'text-emerald-500';
@@ -47,9 +57,9 @@ export default function SensorDetailsModal({
   };
 
   const sensors = [
-    { id: 1, temp: temp1, hum: hum1 },
-    { id: 2, temp: temp2, hum: hum2 },
-    { id: 3, temp: temp3, hum: hum3 },
+    { id: 1, temp: d1Temp, hum: d1Hum },
+    { id: 2, temp: d2Temp, hum: d2Hum },
+    { id: 3, temp: d3Temp, hum: d3Hum },
   ];
 
   return (
@@ -143,14 +153,14 @@ export default function SensorDetailsModal({
                     <span className="text-[11px] font-bold uppercase tracking-widest">Suhu Rata-rata</span>
                   </div>
                   <div className="flex items-end gap-2 mb-2">
-                    <span className="text-2xl font-black tracking-tight">{avgTemp !== null ? avgTemp.toFixed(1) : '--'}</span>
+                    <span className="text-2xl font-black tracking-tight">{dAvgTemp !== null ? dAvgTemp.toFixed(1) : '--'}</span>
                     <span className="text-sm font-bold text-muted-foreground mb-1">°C</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs font-medium">
                     <span className="text-muted-foreground">Batas:</span>
                     <span className="font-bold">{tempThreshold}°C</span>
-                    <span className={`ml-auto ${getStatusColor(avgTemp, tempThreshold, true)}`}>
-                      {avgTemp !== null && avgTemp >= tempThreshold ? 'Panas' : 'Aman'}
+                    <span className={`ml-auto ${getStatusColor(dAvgTemp, tempThreshold, true)}`}>
+                      {dAvgTemp !== null && dAvgTemp >= tempThreshold ? 'Panas' : dAvgTemp !== null ? 'Aman' : '--'}
                     </span>
                   </div>
                 </div>
@@ -163,14 +173,14 @@ export default function SensorDetailsModal({
                     <span className="text-[11px] font-bold uppercase tracking-widest">RH Rata-rata</span>
                   </div>
                   <div className="flex items-end gap-2 mb-2">
-                    <span className="text-2xl font-black tracking-tight">{avgHum !== null ? avgHum.toFixed(1) : '--'}</span>
+                    <span className="text-2xl font-black tracking-tight">{dAvgHum !== null ? dAvgHum.toFixed(1) : '--'}</span>
                     <span className="text-sm font-bold text-muted-foreground mb-1">%</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs font-medium">
                     <span className="text-muted-foreground">Batas:</span>
                     <span className="font-bold">{humThreshold}%</span>
-                    <span className={`ml-auto ${getStatusColor(avgHum, humThreshold, false)}`}>
-                      {avgHum !== null && avgHum <= humThreshold ? 'Kering' : 'Aman'}
+                    <span className={`ml-auto ${getStatusColor(dAvgHum, humThreshold, false)}`}>
+                      {dAvgHum !== null && dAvgHum <= humThreshold ? 'Kering' : dAvgHum !== null ? 'Aman' : '--'}
                     </span>
                   </div>
                 </div>

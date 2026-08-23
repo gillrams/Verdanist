@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   AreaChart, Area,
-  XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
+  XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine
 } from "recharts";
 import { TrendingUp, TrendingDown, Thermometer, Droplets, Zap } from "lucide-react";
 import { ThemeToggle } from '../components/ui/ThemeToggle';
@@ -158,7 +158,24 @@ export default function Analytics() {
     setLoading(false);
   }, [period]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => { 
+    fetchData(); 
+
+    const channel = supabase
+      .channel('analytics-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'sensor_readings' },
+        () => {
+          fetchData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchData]);
 
   const xKey = "time";
 
@@ -252,6 +269,9 @@ export default function Analytics() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid key="grid" strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                {data.filter(d => d.suhu === null).map((d, i) => (
+                  <ReferenceLine key={`offline-${i}`} x={d.time} stroke="#ef4444" strokeWidth={2} strokeOpacity={0.5} strokeDasharray="4 4" />
+                ))}
                 <XAxis key="x" dataKey={xKey} tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={15} />
                 <YAxis key="y" domain={['auto', 'auto']} tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} />
                 <Tooltip

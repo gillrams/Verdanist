@@ -4,7 +4,7 @@
   "webDir": "dist",
   "bundledWebRuntime": false,
   "server": {
-    "url": "https://verdanist.id",
+    "url": "https://verdanist-react-bice.vercel.app",
     "cleartext": true,
     "allowNavigation": ["verdanist.id", "*.verdanist.id", "*.supabase.co"]
   },

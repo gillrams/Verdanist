@@ -204,9 +204,15 @@ export default function Analytics() {
         {/* Main area chart */}
         <div className="px-6 mb-5">
           <div className="bg-card border border-border rounded-3xl p-4 shadow-[var(--shadow-custom)]">
-            <div className="flex justify-between items-center mb-4">
-              <p style={{ fontWeight: 600, fontSize: 14 }} className="text-foreground">{t(METRIC_CONFIG[metric].labelKey)}</p>
-              {loading && <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>}
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex flex-col">
+                <p style={{ fontWeight: 600, fontSize: 14 }} className="text-foreground">{t(METRIC_CONFIG[metric].labelKey)}</p>
+                <div className="flex items-center gap-1.5 mt-1.5">
+                  <div className="w-4 h-0 border-t-2 border-dashed border-[#ef4444] opacity-60"></div>
+                  <span style={{ fontSize: 10 }} className="text-muted-foreground font-medium">Offline (Tidak ada data)</span>
+                </div>
+              </div>
+              {loading && <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin mt-1"></div>}
             </div>
             <ResponsiveContainer width="100%" height={220}>
               <AreaChart data={data} margin={{ top: 10, right: 10, left: -25, bottom: 5 }}>
@@ -221,7 +227,7 @@ export default function Analytics() {
                   <ReferenceLine key={`offline-${i}`} x={d.time} stroke="#ef4444" strokeWidth={2} strokeOpacity={0.5} strokeDasharray="4 4" />
                 ))}
                 <XAxis key="x" dataKey={xKey} tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={15} />
-                <YAxis key="y" domain={['auto', 'auto']} tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis key="y" domain={data.some(d => d[metric] !== null && d[metric] !== undefined) ? ['auto', 'auto'] : (metric === 'suhu' ? [20, 40] : metric === 'rh' ? [0, 100] : [0, 60])} tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} />
                 <Tooltip
                   key="tip"
                   content={({ active, payload, label }) => {

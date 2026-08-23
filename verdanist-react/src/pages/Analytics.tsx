@@ -95,41 +95,39 @@ export default function Analytics() {
       .order('recorded_at', { ascending: false }) // Fetch newest first
       .limit(period === '30D' ? 15000 : period === '7D' ? 5000 : 1000);
 
-    if (error || !rows || rows.length === 0) {
-      setData(generateMockData(period));
-    } else {
-      const grouped: Record<number, { time: string, suhuSum: number, suhuCount: number, rhSum: number, rhCount: number, pompa: number, timestamp: number }> = {};
+    const grouped: Record<number, { time: string, suhuSum: number, suhuCount: number, rhSum: number, rhCount: number, pompa: number, timestamp: number }> = {};
 
-      let roundFactor = 60 * 1000;
-      let points = 12;
+    let roundFactor = 60 * 1000;
+    let points = 12;
+    
+    if (period === '1H') { roundFactor = 5 * 60 * 1000; points = 12; }
+    else if (period === '6H') { roundFactor = 30 * 60 * 1000; points = 12; }
+    else if (period === '1D') { roundFactor = 2 * 60 * 60 * 1000; points = 12; }
+    else if (period === '7D') { roundFactor = 24 * 60 * 60 * 1000; points = 7; }
+    else if (period === '30D') { roundFactor = 24 * 60 * 60 * 1000; points = 30; }
+
+    // PRE-FILL BUCKETS so the chart always has a full axis
+    const nowTime = Date.now();
+    const currentRounded = Math.floor(nowTime / roundFactor) * roundFactor;
+    
+    for (let i = points - 1; i >= 0; i--) {
+      const bucketTime = currentRounded - (i * roundFactor);
+      const rd = new Date(bucketTime);
+      const h = rd.getHours().toString().padStart(2, '0');
+      const m = rd.getMinutes().toString().padStart(2, '0');
+      const dd = rd.getDate().toString().padStart(2, '0');
+      const mm = (rd.getMonth() + 1).toString().padStart(2, '0');
+      const dayName = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'][rd.getDay()];
+
+      let label: string;
+      if (period === '30D') label = `${dd}/${mm}`;
+      else if (period === '7D') label = `${dayName} ${dd}`;
+      else label = `${h}:${m}`;
       
-      if (period === '1H') { roundFactor = 5 * 60 * 1000; points = 12; }
-      else if (period === '6H') { roundFactor = 30 * 60 * 1000; points = 12; }
-      else if (period === '1D') { roundFactor = 2 * 60 * 60 * 1000; points = 12; }
-      else if (period === '7D') { roundFactor = 24 * 60 * 60 * 1000; points = 7; }
-      else if (period === '30D') { roundFactor = 24 * 60 * 60 * 1000; points = 30; }
+      grouped[bucketTime] = { time: label, suhuSum: 0, suhuCount: 0, rhSum: 0, rhCount: 0, pompa: 0, timestamp: bucketTime };
+    }
 
-      // PRE-FILL BUCKETS so the chart always has a full axis
-      const nowTime = Date.now();
-      const currentRounded = Math.floor(nowTime / roundFactor) * roundFactor;
-      
-      for (let i = points - 1; i >= 0; i--) {
-        const bucketTime = currentRounded - (i * roundFactor);
-        const rd = new Date(bucketTime);
-        const h = rd.getHours().toString().padStart(2, '0');
-        const m = rd.getMinutes().toString().padStart(2, '0');
-        const dd = rd.getDate().toString().padStart(2, '0');
-        const mm = (rd.getMonth() + 1).toString().padStart(2, '0');
-        const dayName = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'][rd.getDay()];
-
-        let label: string;
-        if (period === '30D') label = `${dd}/${mm}`;
-        else if (period === '7D') label = `${dayName} ${dd}`;
-        else label = `${h}:${m}`;
-        
-        grouped[bucketTime] = { time: label, suhuSum: 0, suhuCount: 0, rhSum: 0, rhCount: 0, pompa: 0, timestamp: bucketTime };
-      }
-
+    if (rows && rows.length > 0) {
       rows.forEach(r => {
         const d = new Date(r.recorded_at);
         const bucketTime = Math.floor(d.getTime() / roundFactor) * roundFactor;
@@ -141,20 +139,19 @@ export default function Analytics() {
           else if (r.type === 'pump') { grouped[bucketTime].pompa += numericVal; }
         }
       });
-
-      const formatted = Object.values(grouped).sort((a, b) => a.timestamp - b.timestamp).map(g => {
-        const hasData = g.suhuCount > 0 || g.rhCount > 0 || g.pompa > 0;
-        return {
-          time: g.time,
-          suhu: g.suhuCount > 0 ? parseFloat((g.suhuSum / g.suhuCount).toFixed(1)) : null,
-          rh: g.rhCount > 0 ? Math.round(g.rhSum / g.rhCount) : null,
-          pompa: hasData ? g.pompa : null
-        };
-      });
-      const hasEnoughData = formatted.filter(d => d.suhu !== null || d.rh !== null).length >= 2;
-      if (hasEnoughData) setData(formatted);
-      else setData(generateMockData(period));
     }
+
+    const formatted = Object.values(grouped).sort((a, b) => a.timestamp - b.timestamp).map(g => {
+      const hasData = g.suhuCount > 0 || g.rhCount > 0 || g.pompa > 0;
+      return {
+        time: g.time,
+        suhu: g.suhuCount > 0 ? parseFloat((g.suhuSum / g.suhuCount).toFixed(1)) : null,
+        rh: g.rhCount > 0 ? Math.round(g.rhSum / g.rhCount) : null,
+        pompa: hasData ? g.pompa : null
+      };
+    });
+    
+    setData(formatted);
     setLoading(false);
   }, [period]);
 

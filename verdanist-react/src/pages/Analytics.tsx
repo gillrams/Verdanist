@@ -142,12 +142,15 @@ export default function Analytics() {
         }
       });
 
-      const formatted = Object.values(grouped).sort((a, b) => a.timestamp - b.timestamp).map(g => ({
-        time: g.time,
-        suhu: g.suhuCount > 0 ? parseFloat((g.suhuSum / g.suhuCount).toFixed(1)) : null,
-        rh: g.rhCount > 0 ? Math.round(g.rhSum / g.rhCount) : null,
-        pompa: g.pompa
-      }));
+      const formatted = Object.values(grouped).sort((a, b) => a.timestamp - b.timestamp).map(g => {
+        const hasData = g.suhuCount > 0 || g.rhCount > 0 || g.pompa > 0;
+        return {
+          time: g.time,
+          suhu: g.suhuCount > 0 ? parseFloat((g.suhuSum / g.suhuCount).toFixed(1)) : null,
+          rh: g.rhCount > 0 ? Math.round(g.rhSum / g.rhCount) : null,
+          pompa: hasData ? g.pompa : null
+        };
+      });
       const hasEnoughData = formatted.filter(d => d.suhu !== null || d.rh !== null).length >= 2;
       if (hasEnoughData) setData(formatted);
       else setData(generateMockData(period));
@@ -253,19 +256,30 @@ export default function Analytics() {
                 <YAxis key="y" domain={['auto', 'auto']} tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} />
                 <Tooltip
                   key="tip"
-                  contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 12, color: "var(--color-foreground)", fontSize: 12, boxShadow: "0 10px 25px rgba(0,0,0,0.1)" }}
-                  labelStyle={{ color: "var(--color-muted-foreground)", fontWeight: 'bold', marginBottom: 4 }}
-                  formatter={(value: any) => {
-                    const unit = metric === 'suhu' ? '°C' : metric === 'rh' ? '%' : (lang === 'id' ? ' mnt' : ' min');
-                    return [`${value}${unit}`, t(METRIC_CONFIG[metric].labelKey)];
+                  content={({ active, payload, label }) => {
+                    if (active) {
+                      const val = payload && payload.length > 0 ? payload[0].value : null;
+                      const isOffline = val === null || val === undefined;
+                      const unit = metric === 'suhu' ? '°C' : metric === 'rh' ? '%' : (lang === 'id' ? ' mnt' : ' min');
+                      return (
+                        <div style={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 12, padding: "8px 12px", color: "var(--color-foreground)", fontSize: 12, boxShadow: "0 10px 25px rgba(0,0,0,0.1)" }}>
+                          <p style={{ color: "var(--color-muted-foreground)", fontWeight: 'bold', marginBottom: 4 }}>
+                            {lang === 'en' ? label : `Pukul ${label}`}
+                          </p>
+                          <p style={{ color: METRIC_CONFIG[metric].color, fontWeight: 600 }}>
+                            {t(METRIC_CONFIG[metric].labelKey)}: {isOffline ? (lang === 'id' ? 'Offline (Mati)' : 'Offline') : `${val}${unit}`}
+                          </p>
+                        </div>
+                      );
+                    }
+                    return null;
                   }}
-                  labelFormatter={(label) => lang === 'en' ? label : `Pukul ${label}`}
                 />
                 <Area
                   key={`area-${metric}`}
                   type="monotone"
                   dataKey={metric}
-                  connectNulls={true}
+                  connectNulls={false}
                   stroke={METRIC_CONFIG[metric].color}
                   strokeWidth={2.5}
                   fill="url(#metricGrad)"

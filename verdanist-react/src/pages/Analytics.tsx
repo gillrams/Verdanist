@@ -226,6 +226,12 @@ export default function Analytics() {
                 {data.filter(d => d.suhu === null).map((d, i) => (
                   <ReferenceLine key={`offline-${i}`} x={d.time} stroke="#ef4444" strokeWidth={2} strokeOpacity={0.5} strokeDasharray="4 4" />
                 ))}
+                
+                {/* Fallback Area to force chart rendering when all data is null */}
+                {!data.some(d => d[metric] !== null && d[metric] !== undefined) && (
+                  <Area dataKey={() => (metric === 'suhu' ? 30 : metric === 'rh' ? 50 : 30)} stroke="transparent" fill="transparent" isAnimationActive={false} />
+                )}
+
                 <XAxis key="x" dataKey={xKey} tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} minTickGap={15} />
                 <YAxis key="y" domain={data.some(d => d[metric] !== null && d[metric] !== undefined) ? ['auto', 'auto'] : (metric === 'suhu' ? [20, 40] : metric === 'rh' ? [0, 100] : [0, 60])} tick={{ fill: "var(--color-muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} />
                 <Tooltip

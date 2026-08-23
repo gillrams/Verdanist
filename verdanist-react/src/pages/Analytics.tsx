@@ -8,56 +8,7 @@ import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { supabase } from '../lib/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 
-const generateMockData = (period: Period) => {
-  const points = period === '1H' ? 12 : period === '6H' ? 12 : period === '1D' ? 12 : period === '7D' ? 7 : 30;
-  const data = [];
-  const now = new Date();
-  
-  // Base values for smooth curves
-  let currentTemp = 24 + Math.random() * 5;
-  let currentRh = 65 + Math.random() * 15;
 
-  for (let i = points - 1; i >= 0; i--) {
-    const d = new Date(now.getTime());
-    if (period === '1H') d.setMinutes(d.getMinutes() - i * 5);
-    else if (period === '6H') d.setMinutes(d.getMinutes() - i * 30);
-    else if (period === '1D') d.setHours(d.getHours() - i * 2);
-    else if (period === '7D') d.setDate(d.getDate() - i);
-    else if (period === '30D') d.setDate(d.getDate() - i);
-
-    const h = d.getHours().toString().padStart(2, '0');
-    const m = d.getMinutes().toString().padStart(2, '0');
-    const dd = d.getDate().toString().padStart(2, '0');
-    const mm = (d.getMonth() + 1).toString().padStart(2, '0');
-    const dayName = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'][d.getDay()];
-
-    let label: string;
-    if (period === '30D') label = `${dd}/${mm}`;
-    else if (period === '7D') label = `${dayName} ${dd}`;
-    else label = `${h}:${m}`;
-
-    // Add some random walk for realism
-    currentTemp += (Math.random() - 0.5) * 2;
-    currentRh += (Math.random() - 0.5) * 4;
-    
-    // Constrain
-    if (currentTemp < 20) currentTemp = 20;
-    if (currentTemp > 35) currentTemp = 35;
-    if (currentRh < 40) currentRh = 40;
-    if (currentRh > 90) currentRh = 90;
-
-    const basePompa = Math.random() > 0.8 ? Math.floor(Math.random() * 15) : 0;
-
-    data.push({
-      time: label,
-      suhu: parseFloat(currentTemp.toFixed(1)),
-      rh: Math.floor(currentRh),
-      pompa: basePompa,
-      timestamp: d.getTime()
-    });
-  }
-  return data;
-};
 
 type Period = "1H" | "6H" | "1D" | "7D" | "30D";
 type Metric = "suhu" | "rh" | "pompa";
@@ -87,7 +38,7 @@ export default function Analytics() {
     const hours = hoursMap[period];
     const since = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
 
-    const { data: rows, error } = await supabase
+    const { data: rows } = await supabase
       .from('sensor_readings')
       .select('type, value, recorded_at, device_id')
       .gte('recorded_at', since)

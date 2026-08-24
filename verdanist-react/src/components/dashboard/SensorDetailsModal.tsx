@@ -92,7 +92,7 @@ export default function SensorDetailsModal({
               </div>
               <div>
                 <h3 className="text-lg font-extrabold text-foreground tracking-tight">Detail Sensor {zone === 'indoor' ? 'Indoor' : 'Outdoor'}</h3>
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{validSensors} Sensor Aktif</p>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{deviceOnline ? validSensors : 0} Sensor Aktif</p>
               </div>
             </div>
           </div>

@@ -262,8 +262,10 @@ export default function Dashboard() {
     return () => clearInterval(chartTimer);
   }, []);
 
-  // Count sensors that have actual data from DHT11
-  const connectedSensorsCount = zone === 'indoor' ? indoorSensor.validSensors : outdoorSensor.validSensors;
+  // Count sensors that have actual data from DHT11 — 0 jika offline
+  const connectedSensorsCount = zone === 'indoor'
+    ? (deviceOnline.indoor ? indoorSensor.validSensors : 0)
+    : (deviceOnline.outdoor ? outdoorSensor.validSensors : 0);
   // Is current zone sensor connected?
   const currentSensorConnected = zone === 'indoor' ? deviceOnline.indoor : deviceOnline.outdoor;
 

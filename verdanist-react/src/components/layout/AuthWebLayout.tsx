@@ -3,6 +3,7 @@ import { ImageWithFallback } from '../ui/ImageWithFallback';
 import logoLight from '../../assets/Logo_Light_Samping.png';
 import logoDark from '../../assets/Logo_Dark_samping.png';
 import { Download, Smartphone, Leaf } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 import { Capacitor } from '@capacitor/core';
 
@@ -63,9 +64,8 @@ export default function AuthWebLayout({ children }: AuthWebLayoutProps) {
               ))}
             </div>
 
-            <a
-              href="/verdanist.apk"
-              download="Verdanist.apk"
+            <Link
+              to="/download"
               className="w-full max-w-xs bg-primary text-primary-foreground hover:bg-primary/90 transition-all rounded-2xl px-6 py-4 flex items-center justify-center gap-3 font-semibold shadow-lg hover:-translate-y-1 active:scale-[0.98]"
             >
               <Download className="w-5 h-5" />
@@ -73,7 +73,7 @@ export default function AuthWebLayout({ children }: AuthWebLayoutProps) {
                 <span className="text-[10px] uppercase tracking-wider opacity-80 leading-tight mb-0.5">Unduh Aplikasi Android</span>
                 <span className="text-base leading-none">Download APK Verdanist</span>
               </div>
-            </a>
+            </Link>
             <p className="text-xs text-muted-foreground/60 mt-3">Tersedia untuk Android 8.0+</p>
           </div>
         </div>

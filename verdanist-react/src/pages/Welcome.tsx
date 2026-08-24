@@ -110,15 +110,14 @@ export default function Welcome() {
                 <span className="text-muted-foreground/60 text-xs">Punya Android?</span>
                 <div className="flex-1 h-px bg-border" />
               </div>
-              <a
-                href="/verdanist.apk"
-                download="Verdanist.apk"
+              <button
+                onClick={() => navigate('/download')}
                 className="w-full border border-primary/40 text-primary bg-primary/5 hover:bg-primary/10 active:scale-[0.98] transition-all rounded-2xl py-3.5 flex items-center justify-center gap-2.5"
                 style={{ fontWeight: 600, fontSize: 15 }}
               >
                 <Download className="w-5 h-5" />
                 Download Aplikasi Android
-              </a>
+              </button>
               <p className="text-center text-xs text-muted-foreground/50 mt-2">Gratis · APK langsung · Android 8.0+</p>
             </div>
           )}

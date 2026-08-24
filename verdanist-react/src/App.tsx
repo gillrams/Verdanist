@@ -21,6 +21,7 @@ import FarmAccess from './pages/FarmAccess';
 import WelcomeGuest from './pages/WelcomeGuest';
 import Admin from './pages/Admin';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import Download from './pages/Download';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
@@ -90,6 +91,7 @@ function App() {
           <Route path="/admin" element={<ProtectedRoute><AppLayout><Admin /></AppLayout></ProtectedRoute>} />
           <Route path="/about" element={<AppLayout><About /></AppLayout>} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/download" element={<Download />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

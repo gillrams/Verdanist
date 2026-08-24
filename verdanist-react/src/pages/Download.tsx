@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, Download, Smartphone, Wifi, Thermometer,
+  ArrowLeft, DownloadIcon, Smartphone, Wifi, Thermometer,
   Droplets, Bell, Shield, ChevronDown, Star, Zap, CheckCircle2
 } from 'lucide-react';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
@@ -68,7 +68,9 @@ export default function Download() {
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
             <span className="font-semibold tracking-wide uppercase text-sm">Kembali</span>
           </button>
-          <ThemeToggle className="w-10 h-10 bg-card border border-border shadow-sm" />
+          <div className="w-10 h-10">
+            <ThemeToggle />
+          </div>
         </div>
 
         {/* Hero */}
@@ -143,7 +145,7 @@ export default function Download() {
                   />
                 ) : (
                   <motion.div key="icon" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                    <Download className="w-4 h-4" />
+                    <DownloadIcon className="w-4 h-4" />
                   </motion.div>
                 )}
               </AnimatePresence>

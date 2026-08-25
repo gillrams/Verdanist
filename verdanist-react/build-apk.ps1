@@ -68,7 +68,7 @@ Write-Host ""
 Write-Host "=== Step 4: Build APK ===" -ForegroundColor Green
 
 Set-Location $androidDir
-& .\gradlew.bat assembleDebug 2>&1
+& .\gradlew.bat clean assembleDebug --no-daemon 2>&1
 
 # === Check Result ===
 Write-Host ""

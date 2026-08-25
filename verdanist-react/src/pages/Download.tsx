@@ -46,7 +46,13 @@ export default function Download() {
     if (!APK_URL) return;
     setDownloading(true);
     setTimeout(() => {
-      window.open(APK_URL, '_blank');
+      const a = document.createElement('a');
+      a.href = APK_URL;
+      a.download = 'Verdanist-Live.apk';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
       setDownloading(false);
     }, 1200);
   };

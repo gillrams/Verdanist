@@ -14,7 +14,7 @@ const APK_VERSION   = '3.0.0';
 const APK_SIZE      = '106 MB';
 const APK_DATE      = 'Agustus 2025';
 // Ganti URL ini dengan link download APK yang sebenarnya (Google Drive, GitHub Release, dsb.)
-const APK_URL       = '#';
+const APK_URL       = 'https://github.com/gillrams/Verdanist/releases/download/v3.0.0/Verdanist-Live.apk';
 
 const FEATURES = [
   { icon: <Thermometer className="w-5 h-5" />, label: 'Monitor Suhu & RH', desc: 'Pantau kondisi lingkungan secara real-time dari 3 sensor sekaligus' },

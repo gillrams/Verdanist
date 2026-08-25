@@ -43,7 +43,7 @@ export default function Download() {
   const [openChangelog, setOpenChangelog] = useState<number | null>(0);
 
   const handleDownload = () => {
-    if (APK_URL === '#') return;
+    if (!APK_URL) return;
     setDownloading(true);
     setTimeout(() => {
       window.open(APK_URL, '_blank');
@@ -135,7 +135,7 @@ export default function Download() {
             <button
               id="btn-download-apk"
               onClick={handleDownload}
-              disabled={downloading || APK_URL === '#'}
+              disabled={downloading}
               className="flex items-center gap-2.5 px-6 py-3.5 bg-primary text-primary-foreground rounded-2xl font-bold text-sm shadow-lg shadow-primary/30 hover:opacity-90 active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <AnimatePresence mode="wait">
@@ -154,22 +154,7 @@ export default function Download() {
           </div>
         </motion.div>
 
-        {/* Info box jika URL belum di-set */}
-        {APK_URL === '#' && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 flex items-start gap-3 mb-8"
-          >
-            <span className="material-symbols-rounded text-amber-500 text-xl mt-0.5">info</span>
-            <div>
-              <p className="text-amber-700 dark:text-amber-400 font-bold text-sm">Link Download Belum Tersedia</p>
-              <p className="text-amber-600/80 dark:text-amber-400/70 text-xs mt-0.5">
-                File APK sedang disiapkan. Hubungi admin untuk mendapatkan tautan unduhan.
-              </p>
-            </div>
-          </motion.div>
-        )}
+
 
         {/* Cara Install */}
         <motion.div

@@ -42,19 +42,13 @@ export default function Download() {
   const [downloading, setDownloading] = useState(false);
   const [openChangelog, setOpenChangelog] = useState<number | null>(0);
 
-  const handleDownload = () => {
+  const handleDownloadClick = () => {
     if (!APK_URL) return;
     setDownloading(true);
+    // Spinner hanya untuk efek visual sebentar, browser akan handle download aslinya
     setTimeout(() => {
-      const a = document.createElement('a');
-      a.href = APK_URL;
-      a.download = 'Verdanist-Live.apk';
-      a.rel = 'noopener noreferrer';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
       setDownloading(false);
-    }, 1200);
+    }, 2000);
   };
 
   return (
@@ -138,11 +132,11 @@ export default function Download() {
             </div>
 
             {/* Button */}
-            <button
+            <a
               id="btn-download-apk"
-              onClick={handleDownload}
-              disabled={downloading}
-              className="flex items-center gap-2.5 px-6 py-3.5 bg-primary text-primary-foreground rounded-2xl font-bold text-sm shadow-lg shadow-primary/30 hover:opacity-90 active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              href={APK_URL}
+              onClick={handleDownloadClick}
+              className={`flex items-center gap-2.5 px-6 py-3.5 bg-primary text-primary-foreground rounded-2xl font-bold text-sm shadow-lg shadow-primary/30 hover:opacity-90 active:scale-95 transition-all ${downloading ? 'opacity-60 pointer-events-none' : ''}`}
             >
               <AnimatePresence mode="wait">
                 {downloading ? (
@@ -156,7 +150,7 @@ export default function Download() {
                 )}
               </AnimatePresence>
               {downloading ? 'Membuka...' : 'Download'}
-            </button>
+            </a>
           </div>
         </motion.div>
 

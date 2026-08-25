@@ -4,9 +4,9 @@
   "webDir": "dist",
   "bundledWebRuntime": false,
   "server": {
-    "url": "https://verdanist-react-bice.vercel.app",
+    "url": "https://verdanist.my.id",
     "cleartext": true,
-    "allowNavigation": ["verdanist.id", "*.verdanist.id", "*.supabase.co"]
+    "allowNavigation": ["verdanist.my.id", "*.verdanist.my.id", "verdanist.id", "*.verdanist.id", "*.supabase.co"]
   },
   "plugins": {
     "SplashScreen": {
